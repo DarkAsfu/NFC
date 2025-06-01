@@ -1,10 +1,14 @@
-import { Button } from "@/components/ui/button";
+'use client';
+import { HeroBanner } from "../modules/HeroBanner";
 
+import dynamic from 'next/dynamic';
+
+const Lanyard = dynamic(() => import('../modules/Lanyard'), { ssr: false });
 const Home = () =>{
     return(
         <div>
-            <h1 className="text-[12px] text-shadow-amber-300">hello</h1>
-            <Button>Test</Button>
+            <HeroBanner/>
+            <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
         </div>
     )
 }

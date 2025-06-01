@@ -1,5 +1,7 @@
 import { Poppins } from "next/font/google";
 import "../globals.css";
+import { Navbar } from "../modules/NavBar";
+import { Footer } from "../modules/Footer";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,9 +21,9 @@ export default function RootLayout({ children }) {
         className={`${poppins.className} antialiased`}
         suppressHydrationWarning
       >
-        <h1>Navbar</h1>
+        <Navbar/>
         {children}
-        <h1>Footer</h1>
+        <Footer/>
       </body>
     </html>
   );
