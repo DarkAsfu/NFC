@@ -133,10 +133,10 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
         <meshLineMaterial
           color="white"
           depthTest={false}
-          resolution={isSmall ? [1000, 2000] : [1000, 1000]}
+          resolution={isSmall ? [1000, 2000] : [1000, 1800]}
           useMap
           map={texture}
-          repeat={[-2, 1]}
+          repeat={[-3, 1]}
           lineWidth={1}
         />
       </mesh>

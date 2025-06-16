@@ -57,22 +57,6 @@ export function HeroBanner() {
                 How It Works
               </Button>
             </div>
-
-            {/* Trust indicators */}
-            <div className="hidden md:pt-8 md:flex flex-wrap items-center gap-4 text-sm text-gray-300">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-8 w-8 rounded-full bg-gray-400 border-2 border-background" />
-                  ))}
-                </div>
-                <span>5000+ Professionals Trust Us</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
-                <span>Live Customer Support</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -1,7 +1,8 @@
 import { Poppins } from "next/font/google";
 import "../globals.css";
-import { Navbar } from "../modules/NavBar";
-import { Footer } from "../modules/Footer";
+import { Navbar } from "../modules/store/NavBar";
+import { Footer } from "../modules/store/Footer";
+import { ScrollProgress } from "@/components/magicui/scroll-progress";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
         className={`${poppins.className} antialiased`}
         suppressHydrationWarning
       >
+        <ScrollProgress className="top-[65px]"  />
         <Navbar/>
         {children}
         <Footer/>
