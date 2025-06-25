@@ -5,11 +5,14 @@ const CButton = ({ label, href, className = '', target = '_self', rel = 'noopene
   return (
     <Link
       href={href}
-      className={`px-4 py-2 rounded-md font-medium bg-primary text-white transition-colors duration-200 ${className}`}
+      className={`inline-flex items-center justify-center text-center font-medium transition-all duration-300 ${className}`}
       target={target}
       rel={target === '_blank' ? rel : undefined}
     >
       {label}
+      <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
+        →
+      </span>
     </Link>
   );
 };

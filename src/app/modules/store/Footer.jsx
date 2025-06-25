@@ -1,4 +1,3 @@
-// components/Footer.jsx
 "use client";
 
 import { 
@@ -38,14 +37,19 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
+    <footer 
+      className="text-[#EEE0FF]/80 border-t border-white/10"
+      style={{
+        background: "radial-gradient(164.1% 251.8% at 49.44% 266.96%, rgb(93, 16, 143) 0%, rgb(86, 15, 133) 32.31%, rgb(68, 12, 105) 56.01%, rgb(39, 6, 60) 75%, rgb(14, 2, 23) 100%)"
+      }}
+    >
       <div className="max-w-7xl px-4 xl:px-0 mx-auto py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           
           {/* Brand Column */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+              <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black font-bold">
                 BN
               </div>
               <span className="text-xl font-semibold text-white">NFC Cards</span>
@@ -55,16 +59,16 @@ export function Footer() {
             </p>
             
             <div className="flex gap-4 pt-2">
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
+              <Button variant="ghost" size="icon" className="text-[#EEE0FF]/60 hover:text-white hover:bg-white/10">
                 <Facebook className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
+              <Button variant="ghost" size="icon" className="text-[#EEE0FF]/60 hover:text-white hover:bg-white/10">
                 <Twitter className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
+              <Button variant="ghost" size="icon" className="text-[#EEE0FF]/60 hover:text-white hover:bg-white/10">
                 <Instagram className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
+              <Button variant="ghost" size="icon" className="text-[#EEE0FF]/60 hover:text-white hover:bg-white/10">
                 <Linkedin className="h-5 w-5" />
               </Button>
             </div>
@@ -78,7 +82,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link 
                     href={link.href} 
-                    className="text-sm hover:text-primary transition-colors"
+                    className="text-sm hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -95,7 +99,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link 
                     href={link.href} 
-                    className="text-sm hover:text-primary transition-colors"
+                    className="text-sm hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -109,21 +113,21 @@ export function Footer() {
             <h3 className="text-lg font-semibold text-white">Contact Us</h3>
             <address className="not-italic space-y-3">
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 mt-0.5 text-primary" />
+                <MapPin className="h-5 w-5 mt-0.5 text-purple-300" />
                 <p className="text-sm">
                   123 Tech Park, Digital Avenue<br />
                   San Francisco, CA 94107
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-primary" />
-                <Link href="mailto:info@nfccards.com" className="text-sm hover:text-primary">
+                <Mail className="h-5 w-5 text-purple-300" />
+                <Link href="mailto:info@nfccards.com" className="text-sm hover:text-white">
                   info@nfccards.com
                 </Link>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-primary" />
-                <Link href="tel:+11234567890" className="text-sm hover:text-primary">
+                <Phone className="h-5 w-5 text-purple-300" />
+                <Link href="tel:+11234567890" className="text-sm hover:text-white">
                   +1 (123) 456-7890
                 </Link>
               </div>
@@ -132,22 +136,22 @@ export function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-800 my-8"></div>
+        <div className="border-t border-white/10 my-8"></div>
 
         {/* Bottom Row */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[#EEE0FF]/60">
             © {currentYear} NFC Cards. All rights reserved.
           </p>
           
           <div className="flex gap-4">
-            <Link href="/privacy" className="text-xs text-gray-500 hover:text-primary">
+            <Link href="/privacy" className="text-xs text-[#EEE0FF]/60 hover:text-white">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-xs text-gray-500 hover:text-primary">
+            <Link href="/terms" className="text-xs text-[#EEE0FF]/60 hover:text-white">
               Terms of Service
             </Link>
-            <Link href="/cookies" className="text-xs text-gray-500 hover:text-primary">
+            <Link href="/cookies" className="text-xs text-[#EEE0FF]/60 hover:text-white">
               Cookie Policy
             </Link>
           </div>

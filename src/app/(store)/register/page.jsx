@@ -39,7 +39,7 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-gray-700">Account Type *</Label>
+        <Label className="text-sm font-medium text-[#EEE0FF]/80">Account Type *</Label>
         <RadioGroup
           name="accountType"
           value={formData.accountType}
@@ -50,8 +50,8 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
             htmlFor="personal"
             className={`flex flex-col items-center justify-center space-y-2 p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
               formData.accountType === "Personal"
-                ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
-                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                ? "border-purple-500 bg-purple-500/10 text-white"
+                : "border-white/20 bg-white/5 text-[#EEE0FF]/80 hover:border-purple-400/50"
             }`}
           >
             <RadioGroupItem value="Personal" id="personal" className="sr-only" />
@@ -62,8 +62,8 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
             htmlFor="organization"
             className={`flex flex-col items-center justify-center space-y-2 p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
               formData.accountType === "Organization"
-                ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
-                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                ? "border-purple-500 bg-purple-500/10 text-white"
+                : "border-white/20 bg-white/5 text-[#EEE0FF]/80 hover:border-purple-400/50"
             }`}
           >
             <RadioGroupItem value="Organization" id="organization" className="sr-only" />
@@ -71,11 +71,11 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
             <span className="font-medium">Organization</span>
           </Label>
         </RadioGroup>
-        {stepErrors.accountType && <p className="text-red-500 text-sm mt-1">{stepErrors.accountType}</p>}
+        {stepErrors.accountType && <p className="text-red-400 text-sm mt-1">{stepErrors.accountType}</p>}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="email" className="text-sm font-medium text-[#EEE0FF]/80">
           Email Address *
         </Label>
         <Input
@@ -86,13 +86,13 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
           required
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
         />
-        {stepErrors.email && <p className="text-red-500 text-sm mt-1">{stepErrors.email}</p>}
+        {stepErrors.email && <p className="text-red-400 text-sm mt-1">{stepErrors.email}</p>}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="username" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="username" className="text-sm font-medium text-[#EEE0FF]/80">
           Username *
         </Label>
         <Input
@@ -105,13 +105,17 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
           maxLength={40}
           value={formData.username}
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-          className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
         />
-        <p className="text-xs text-gray-500">3-40 characters, unique identifier</p>
-        {stepErrors.username && <p className="text-red-500 text-sm mt-1">{stepErrors.username}</p>}
+        <p className="text-xs text-[#EEE0FF]/50">3-40 characters, unique identifier</p>
+        {stepErrors.username && <p className="text-red-400 text-sm mt-1">{stepErrors.username}</p>}
       </div>
 
-      <Button type="button" onClick={handleNext} className="w-full h-11 bg-blue-600 hover:bg-blue-700">
+      <Button 
+        type="button" 
+        onClick={handleNext} 
+        className="w-full h-11 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+      >
         Next <ArrowRight className="ml-2 h-4 w-4" />
       </Button>
     </div>
@@ -141,7 +145,7 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-2">
-          <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="firstName" className="text-sm font-medium text-[#EEE0FF]/80">
             First Name
           </Label>
           <Input
@@ -152,11 +156,11 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
             maxLength={50}
             value={formData.firstName}
             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-            className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="lastName" className="text-sm font-medium text-[#EEE0FF]/80">
             Last Name
           </Label>
           <Input
@@ -167,13 +171,13 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
             maxLength={50}
             value={formData.lastName}
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-            className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="phone" className="text-sm font-medium text-[#EEE0FF]/80">
           Phone Number (Optional)
         </Label>
         <Input
@@ -184,9 +188,9 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
           maxLength={20}
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
         />
-        {stepErrors.phone && <p className="text-red-500 text-sm mt-1">{stepErrors.phone}</p>}
+        {stepErrors.phone && <p className="text-red-400 text-sm mt-1">{stepErrors.phone}</p>}
       </div>
 
       <div className="flex justify-between gap-3">
@@ -194,11 +198,15 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
           type="button"
           variant="outline"
           onClick={onBack}
-          className="w-1/2 h-11 border-gray-300 text-gray-700 hover:bg-gray-100"
+          className="w-1/2 h-11 border-white/20 text-[#EEE0FF]/80 hover:bg-white/10 hover:text-white"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
-        <Button type="button" onClick={handleNext} className="w-1/2 h-11 bg-blue-600 hover:bg-blue-700">
+        <Button 
+          type="button" 
+          onClick={handleNext} 
+          className="w-1/2 h-11 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+        >
           Next <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
@@ -225,16 +233,16 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
   }
 
   const handleSubmit = (event) => {
-    event.preventDefault() // Prevent default form submission
+    event.preventDefault()
     if (validateStep()) {
-      onSubmit() // Call the parent's onSubmit
+      onSubmit()
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="password" className="text-sm font-medium text-[#EEE0FF]/80">
           Password *
         </Label>
         <div className="relative">
@@ -247,23 +255,23 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
             minLength={8}
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="h-10 pr-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            className="h-10 pr-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
           />
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="absolute right-0 top-0 h-10 px-3 text-gray-500 hover:bg-gray-100"
+            className="absolute right-0 top-0 h-10 px-3 text-[#EEE0FF]/60 hover:text-white hover:bg-white/10"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
         </div>
-        {stepErrors.password && <p className="text-red-500 text-sm mt-1">{stepErrors.password}</p>}
+        {stepErrors.password && <p className="text-red-400 text-sm mt-1">{stepErrors.password}</p>}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#EEE0FF]/80">
           Confirm Password *
         </Label>
         <div className="relative">
@@ -276,19 +284,19 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
             minLength={8}
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            className="h-10 pr-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            className="h-10 pr-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
           />
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="absolute right-0 top-0 h-10 px-3 text-gray-500 hover:bg-gray-100"
+            className="absolute right-0 top-0 h-10 px-3 text-[#EEE0FF]/60 hover:text-white hover:bg-white/10"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
         </div>
-        {stepErrors.confirmPassword && <p className="text-red-500 text-sm mt-1">{stepErrors.confirmPassword}</p>}
+        {stepErrors.confirmPassword && <p className="text-red-400 text-sm mt-1">{stepErrors.confirmPassword}</p>}
       </div>
 
       <div className="flex justify-between gap-3">
@@ -296,14 +304,14 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
           type="button"
           variant="outline"
           onClick={onBack}
-          className="w-1/2 h-11 border-gray-300 text-gray-700 hover:bg-gray-100"
+          className="w-1/2 h-11 border-white/20 text-[#EEE0FF]/80 hover:bg-white/10 hover:text-white"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
         <Button
           type="submit"
           disabled={isPending}
-          className="w-1/2 h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200"
+          className="w-1/2 h-11 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
         >
           {isPending ? (
             <div className="flex items-center gap-2">
@@ -328,26 +336,26 @@ export default function MultiStepRegister() {
     firstName: "",
     lastName: "",
     phone: "",
-    accountType: "Personal", // Default value
+    accountType: "Personal",
     password: "",
     confirmPassword: "",
   })
   const [isPending, setIsPending] = useState(false)
-  const [apiResponse, setApiResponse] = useState(null) // To store success/error from API
+  const [apiResponse, setApiResponse] = useState(null)
 
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1)
-    setApiResponse(null) // Clear API response on step change
+    setApiResponse(null)
   }
 
   const handleBack = () => {
     setCurrentStep((prev) => prev - 1)
-    setApiResponse(null) // Clear API response on step change
+    setApiResponse(null)
   }
 
   const handleSubmit = async () => {
     setIsPending(true)
-    setApiResponse(null) // Clear previous response
+    setApiResponse(null)
 
     try {
       const response = await fetch("http://localhost:5000/auth/register/", {
@@ -362,15 +370,11 @@ export default function MultiStepRegister() {
 
       if (response.ok) {
         setApiResponse({ success: true, message: result.message || "Registration successful!" })
-        // Optionally, redirect user or show a success screen
-        // router.push('/success-page');
       } else {
-        // Assuming API returns errors in a 'detail' or 'errors' field
         const errorMessages = []
         if (result.detail) {
           errorMessages.push(result.detail)
         } else if (result.errors) {
-          // Handle specific field errors if your API returns them like: { email: ["invalid"], username: ["taken"] }
           for (const key in result.errors) {
             errorMessages.push(`${key}: ${result.errors[key].join(", ")}`)
           }
@@ -414,42 +418,55 @@ export default function MultiStepRegister() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-lg">
+    <div 
+      className="min-h-screen bg-bG flex items-center justify-center px-4 pt-52 md:pt-32 pb-32 relative overflow-hidden"
+    //   style={{
+    //     background: "radial-gradient(164.1% 251.8% at 49.44% 266.96%, rgb(93, 16, 143) 0%, rgb(86, 15, 133) 32.31%, rgb(68, 12, 105) 56.01%, rgb(39, 6, 60) 75%, rgb(14, 2, 23) 100%)"
+    //   }}
+    >
+      {/* Background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-purple-900/20 blur-3xl"></div>
+        <div className="absolute -top-20 -right-20 h-[400px] w-[400px] rounded-full bg-blue-900/20 blur-3xl"></div>
+      </div>
+
+      <div className="w-full max-w-lg relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Sign Up</h1>
-          <p className="text-lg text-gray-600">Create your account to get started</p>
+          <h1 className="text-4xl font-extrabold text-white mb-2">Sign Up</h1>
+          <p className="text-lg text-[#EEE0FF]/80">Create your account to get started</p>
         </div>
 
         {/* Registration Form Card */}
-        <Card className="shadow-xl border-gray-200 rounded-xl">
+        <Card className="shadow-xl border-white/10 rounded-xl bg-[#0F0A31]/50 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-900">{getStepTitle()}</h2>
-              <span className="text-sm text-gray-500">Step {currentStep} of 3</span>
+              <h2 className="text-xl font-bold text-white">{getStepTitle()}</h2>
+              <span className="text-sm text-[#EEE0FF]/60">Step {currentStep} of 3</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div className="w-full bg-white/20 rounded-full h-2.5">
               <div
-                className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2.5 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${(currentStep / 3) * 100}%` }}
               ></div>
             </div>
-            <CardDescription className="text-center text-gray-500 mt-4">{getStepDescription()}</CardDescription>
+            <CardDescription className="text-center text-[#EEE0FF]/80 mt-4">
+              {getStepDescription()}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Global Success Message */}
             {apiResponse?.success && (
-              <Alert className="border-green-200 bg-green-50 text-green-800">
-                <CheckCircle className="h-4 w-4 text-green-600" />
+              <Alert className="border-green-200 bg-green-900/20 text-green-100">
+                <CheckCircle className="h-4 w-4 text-green-300" />
                 <AlertDescription>{apiResponse.message}</AlertDescription>
               </Alert>
             )}
 
-            {/* Global Error Messages (from API) */}
+            {/* Global Error Messages */}
             {apiResponse?.errors && apiResponse.errors.length > 0 && (
-              <Alert className="border-red-200 bg-red-50 text-red-800">
-                <AlertCircle className="h-4 w-4 text-red-600" />
+              <Alert className="border-red-200 bg-red-900/20 text-red-100">
+                <AlertCircle className="h-4 w-4 text-red-300" />
                 <AlertDescription>
                   <ul className="list-disc list-inside space-y-1">
                     {apiResponse.errors.map((error, index) => (
@@ -482,14 +499,14 @@ export default function MultiStepRegister() {
               />
             )}
 
-            {/* Terms and Login Link (always visible) */}
-            <p className="text-xs text-gray-500 text-center mt-4">
+            {/* Terms and Login Link */}
+            <p className="text-xs text-[#EEE0FF]/60 text-center mt-4">
               By clicking "Create Account", you agree to our{" "}
-              <Link href="/terms" className="text-blue-600 hover:underline font-medium">
+              <Link href="/terms" className="text-purple-300 hover:text-white hover:underline font-medium">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="text-blue-600 hover:underline font-medium">
+              <Link href="/privacy" className="text-purple-300 hover:text-white hover:underline font-medium">
                 Privacy Policy
               </Link>
               .
@@ -498,9 +515,9 @@ export default function MultiStepRegister() {
         </Card>
 
         {/* Login Link */}
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center text-sm text-[#EEE0FF]/80 mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline font-medium">
+          <Link href="/login" className="text-purple-300 hover:text-white hover:underline font-medium">
             Log in
           </Link>
         </p>

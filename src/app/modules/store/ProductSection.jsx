@@ -42,11 +42,19 @@ const ProductSection = () => {
     ];
   
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-bG">
+        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-purple-900/20 blur-3xl"></div>
+        <div className="absolute -top-20 -right-20 h-[400px] w-[400px] rounded-full bg-blue-900/20 blur-3xl"></div>
+      </div>
+        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 -left-20 h-[300px] w-[300px] rounded-full bg-purple-900/20 blur-3xl animate-[pulse_8s_ease-in-out_infinite]" />
+        <div className="absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-blue-900/20 blur-3xl animate-[pulse_12s_ease-in-out_infinite]" />
+      </div>
         <div className="max-w-7xl mx-auto px-4">
           <CTitle title={"Our Products"} />
   
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8 mt-10">
             {products.map((product, index) => (
               <ProductCard key={index} product={product} />
             ))}
