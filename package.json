@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@motionone/utils": "^10.18.0",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-radio-group": "^1.3.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@react-three/drei": "^10.1.2",
     "@react-three/fiber": "^9.1.2",
