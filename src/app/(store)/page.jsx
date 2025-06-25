@@ -11,7 +11,7 @@ import UniqueCollection from "../modules/store/UniqueCollection";
 import WhatsWeProvide from "../modules/store/WhatsWeProvide";
 import NFCSubscriptionPlans from "../modules/store/NFCSubscriptionPlans";
 
-const Lanyard = dynamic(() => import('../modules/store/Lanyard'), { ssr: false });
+// const Lanyard = dynamic(() => import('../modules/store/Lanyard'), { ssr: false });
 const Home = () =>{
     return(
         <div>
@@ -19,7 +19,7 @@ const Home = () =>{
             <About/>
             <VideoPlayer/>
             <ProductSection/>
-            <UniqueCollection/>
+            {/* <UniqueCollection/> */}
             <WhatsWeProvide/>
             <NFCSubscriptionPlans/>
             <BandMoto/>

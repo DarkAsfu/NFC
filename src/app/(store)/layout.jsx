@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${poppins.className} antialiased`}
+        className={`${poppins.className} antialiased `}
         suppressHydrationWarning
       >
         <ScrollProgress className="top-[65px]"  />

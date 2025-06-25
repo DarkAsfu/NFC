@@ -39,16 +39,16 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 w-full border-b transition-all duration-300",
-          hasScrolled ? "bg-background shadow-sm" : "bg-background",
-          "backdrop-blur supports-[backdrop-filter]:bg-background"
+          "sticky top-0 z-50 w-full transition-all duration-300 -mt-30 md:-mt-16",
+          hasScrolled ? "bg-black/30 shadow-sm backdrop-blur-md" : "bg-transparent backdrop-blur-none",
+          "text-white" // Added white text color
         )}
       >
         <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4">
           {/* Logo and Mobile Menu Button */}
           <div className="flex items-center gap-4">
             <button
-              className="md:hidden p-2 rounded-md hover:bg-accent"
+              className="md:hidden p-2 rounded-md hover:bg-white/10 text-white"
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
@@ -56,10 +56,10 @@ export function Navbar() {
             </button>
 
             <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+              <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black font-bold">
                 BN
               </div>
-              <span className="text-lg font-semibold hidden sm:inline-block">
+              <span className="text-lg font-semibold hidden sm:inline-block text-white">
                 BrandName
               </span>
             </Link>
@@ -72,7 +72,7 @@ export function Navbar() {
                 key={link.href}
                 asChild
                 variant="ghost"
-                className="text-sm font-medium hover:text-primary"
+                className="text-sm font-medium text-white hover:text-white hover:bg-white/10"
               >
                 <Link href={link.href}>{link.name}</Link>
               </Button>
@@ -81,7 +81,11 @@ export function Navbar() {
 
           {/* Right Side Icons */}
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="md:hidden" asChild>
+            <Button 
+              size="sm" 
+              className="md:hidden group relative overflow-hidden px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium text-[14px] hover:from-purple-700 hover:to-blue-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+              asChild
+            >
               <Link href="/login" className="flex items-center gap-1">
                 <User className="h-4 w-4" />
                 <span>Login</span>
@@ -89,13 +93,22 @@ export function Navbar() {
             </Button>
 
             <div className="hidden md:flex gap-2 ml-2">
-              <Button variant="outline" size="sm" asChild>
+              <Button 
+                // variant="outline" 
+                size="sm" 
+                className="group relative overflow-hidden px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium text-[14px] hover:from-purple-700 hover:to-blue-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+                asChild
+              >
                 <Link href="/login" className="flex items-center gap-1">
                   <User className="h-4 w-4" />
                   <span>Login</span>
                 </Link>
               </Button>
-              <Button size="sm" asChild>
+              <Button 
+                size="sm" 
+                className="bg-white text-black hover:bg-white/90"
+                asChild
+              >
                 <Link href="/register">Register</Link>
               </Button>
             </div>
@@ -103,19 +116,10 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* Optional backdrop for mobile menu */}
-      {/* <div
-        className={cn(
-          "fixed inset-0 z-30 bg-black transition-opacity duration-300",
-          isMenuOpen ? "opacity-50" : "opacity-0 pointer-events-none"
-        )}
-        onClick={toggleMenu}
-      /> */}
-
-      {/* Mobile Menu - Always rendered, animated */}
+      {/* Mobile Menu */}
       <div
         className={cn(
-          "fixed inset-0 z-40 mt-16 bg-background overflow-y-auto transition-transform duration-300 ease-in-out",
+          "fixed inset-0 z-40 mt-16 bg-bG overflow-y-auto transition-transform duration-300 ease-in-out text-white",
           isMenuOpen
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0 pointer-events-none"
@@ -126,16 +130,19 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="py-3 px-4 text-lg font-medium rounded-lg hover:bg-accent transition-colors"
+              className="py-3 px-4 text-lg font-medium rounded-lg hover:bg-white/10 transition-colors text-white"
               onClick={toggleMenu}
             >
               {link.name}
             </Link>
           ))}
 
-          <div className="pt-4 mt-4 border-t">
+          <div className="pt-4 mt-4 border-t border-white/20">
             <div className="flex flex-col gap-3">
-              <Button variant="outline" className="w-full" asChild>
+              <Button 
+                className="group relative overflow-hidden px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium text-[14px] hover:from-purple-700 hover:to-blue-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+                asChild
+              >
                 <Link
                   href="/login"
                   onClick={toggleMenu}
@@ -145,7 +152,10 @@ export function Navbar() {
                   <span>Login</span>
                 </Link>
               </Button>
-              <Button className="w-full" asChild>
+              <Button 
+                className="w-full bg-white text-black hover:bg-white/90"
+                asChild
+              >
                 <Link href="/register" onClick={toggleMenu}>
                   Register
                 </Link>
