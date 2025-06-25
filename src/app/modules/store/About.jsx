@@ -30,7 +30,7 @@ const About = () => {
         <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
       </div> */}
       <div className='mt-4 md:mt-0'>
-        <Image width={900} height={500} src="/nfc.webp" />
+        <Image width={900} alt='about-img' height={500} src="/nfc.webp" />
       </div>
     </div>
   )
