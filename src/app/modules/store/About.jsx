@@ -4,10 +4,12 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
+import { useAuth } from '@/provider/AuthProvider'
 
 const Lanyard = dynamic(() => import('./Lanyard'), { ssr: false })
 
 const About = () => {
+  const {user} = useAuth();
   return (
     <div className='bg-[#010313] relative overflow-hidden'>
       {/* Animated background elements */}

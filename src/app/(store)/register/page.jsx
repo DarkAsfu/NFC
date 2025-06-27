@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,29 +10,19 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, CheckCircle, AlertCircle, User, Building2, ArrowLeft, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/provider/AuthProvider"
+
 
 // --- Step 1 Component ---
-function Step1AccountInfo({ formData, setFormData, onNext }) {
-  const [stepErrors, setStepErrors] = useState({})
-
-  const validateStep = () => {
-    const newErrors = {}
-    if (!formData.email || !formData.email.includes("@")) {
-      newErrors.email = "Valid email is required."
-    }
-    if (!formData.username || formData.username.length < 3 || formData.username.length > 40) {
-      newErrors.username = "Username must be between 3-40 characters."
-    }
-    if (!formData.accountType) {
-      newErrors.accountType = "Account type is required."
-    }
-
-    setStepErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+function Step1AccountInfo({ register, errors, watch, setValue, trigger, onNext }) {
+  const validateStep = async () => {
+    const isValid = await trigger(["email", "username", "accountType"])
+    return isValid
   }
 
-  const handleNext = () => {
-    if (validateStep()) {
+  const handleNext = async () => {
+    const isValid = await validateStep()
+    if (isValid) {
       onNext()
     }
   }
@@ -42,14 +33,14 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
         <Label className="text-sm font-medium text-[#EEE0FF]/80">Account Type *</Label>
         <RadioGroup
           name="accountType"
-          value={formData.accountType}
-          onValueChange={(value) => setFormData({ ...formData, accountType: value })}
+          value={watch("accountType")}
+          onValueChange={(value) => setValue("accountType", value)}
           className="grid grid-cols-1 sm:grid-cols-2 gap-3"
         >
           <Label
             htmlFor="personal"
             className={`flex flex-col items-center justify-center space-y-2 p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-              formData.accountType === "Personal"
+              watch("accountType") === "Personal"
                 ? "border-purple-500 bg-purple-500/10 text-white"
                 : "border-white/20 bg-white/5 text-[#EEE0FF]/80 hover:border-purple-400/50"
             }`}
@@ -61,7 +52,7 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
           <Label
             htmlFor="organization"
             className={`flex flex-col items-center justify-center space-y-2 p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-              formData.accountType === "Organization"
+              watch("accountType") === "Organization"
                 ? "border-purple-500 bg-purple-500/10 text-white"
                 : "border-white/20 bg-white/5 text-[#EEE0FF]/80 hover:border-purple-400/50"
             }`}
@@ -71,7 +62,7 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
             <span className="font-medium">Organization</span>
           </Label>
         </RadioGroup>
-        {stepErrors.accountType && <p className="text-red-400 text-sm mt-1">{stepErrors.accountType}</p>}
+        {errors.accountType && <p className="text-red-400 text-sm mt-1">{errors.accountType.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -80,15 +71,18 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
         </Label>
         <Input
           id="email"
-          name="email"
           type="email"
           placeholder="john@example.com"
-          required
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: "Invalid email address"
+            }
+          })}
         />
-        {stepErrors.email && <p className="text-red-400 text-sm mt-1">{stepErrors.email}</p>}
+        {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -97,18 +91,23 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
         </Label>
         <Input
           id="username"
-          name="username"
           type="text"
           placeholder="johndoe"
-          required
-          minLength={3}
-          maxLength={40}
-          value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+          {...register("username", {
+            required: "Username is required",
+            minLength: {
+              value: 3,
+              message: "Username must be at least 3 characters"
+            },
+            maxLength: {
+              value: 40,
+              message: "Username must be less than 40 characters"
+            }
+          })}
         />
         <p className="text-xs text-[#EEE0FF]/50">3-40 characters, unique identifier</p>
-        {stepErrors.username && <p className="text-red-400 text-sm mt-1">{stepErrors.username}</p>}
+        {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username.message}</p>}
       </div>
 
       <Button 
@@ -123,20 +122,15 @@ function Step1AccountInfo({ formData, setFormData, onNext }) {
 }
 
 // --- Step 2 Component ---
-function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
-  const [stepErrors, setStepErrors] = useState({})
-
-  const validateStep = () => {
-    const newErrors = {}
-    if (formData.phone && (formData.phone.length < 10 || formData.phone.length > 20)) {
-      newErrors.phone = "Phone number must be between 10-20 characters."
-    }
-    setStepErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+function Step2PersonalDetails({ register, errors, watch, trigger, onNext, onBack }) {
+  const validateStep = async () => {
+    const isValid = await trigger(["phone"])
+    return isValid
   }
 
-  const handleNext = () => {
-    if (validateStep()) {
+  const handleNext = async () => {
+    const isValid = await validateStep()
+    if (isValid) {
       onNext()
     }
   }
@@ -150,13 +144,15 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
           </Label>
           <Input
             id="firstName"
-            name="firstName"
             type="text"
             placeholder="John"
-            maxLength={50}
-            value={formData.firstName}
-            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+            {...register("firstName", {
+              maxLength: {
+                value: 50,
+                message: "First name must be less than 50 characters"
+              }
+            })}
           />
         </div>
         <div className="space-y-2">
@@ -165,13 +161,15 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
           </Label>
           <Input
             id="lastName"
-            name="lastName"
             type="text"
             placeholder="Doe"
-            maxLength={50}
-            value={formData.lastName}
-            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
             className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+            {...register("lastName", {
+              maxLength: {
+                value: 50,
+                message: "Last name must be less than 50 characters"
+              }
+            })}
           />
         </div>
       </div>
@@ -182,15 +180,21 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
         </Label>
         <Input
           id="phone"
-          name="phone"
           type="tel"
           placeholder="+1 (555) 123-4567"
-          maxLength={20}
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
           className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+          {...register("phone", {
+            minLength: {
+              value: 10,
+              message: "Phone number must be at least 10 characters"
+            },
+            maxLength: {
+              value: 20,
+              message: "Phone number must be less than 20 characters"
+            }
+          })}
         />
-        {stepErrors.phone && <p className="text-red-400 text-sm mt-1">{stepErrors.phone}</p>}
+        {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone.message}</p>}
       </div>
 
       <div className="flex justify-between gap-3">
@@ -198,7 +202,7 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
           type="button"
           variant="outline"
           onClick={onBack}
-          className="w-1/2 h-11 border-white/20 text-[#EEE0FF]/80 hover:bg-white/10 hover:text-white"
+          className="w-1/2 h-11 border-white/20 text-[#EEE0FF]/80 bg-white/10 hover:bg-white/20 hover:text-white"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
@@ -215,26 +219,19 @@ function Step2PersonalDetails({ formData, setFormData, onNext, onBack }) {
 }
 
 // --- Step 3 Component ---
-function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, apiResponse }) {
+function Step3SetPassword({ register, errors, watch, trigger, onBack, onSubmit, isPending }) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [stepErrors, setStepErrors] = useState({})
 
-  const validateStep = () => {
-    const newErrors = {}
-    if (!formData.password || formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters."
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match."
-    }
-    setStepErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+  const validateStep = async () => {
+    const isValid = await trigger(["password", "confirmPassword"])
+    return isValid
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    if (validateStep()) {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const isValid = await validateStep()
+    if (isValid) {
       onSubmit()
     }
   }
@@ -248,14 +245,16 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
         <div className="relative">
           <Input
             id="password"
-            name="password"
             type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
-            required
-            minLength={8}
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             className="h-10 pr-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+            {...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 8,
+                message: "Password must be at least 8 characters"
+              }
+            })}
           />
           <Button
             type="button"
@@ -267,7 +266,7 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
         </div>
-        {stepErrors.password && <p className="text-red-400 text-sm mt-1">{stepErrors.password}</p>}
+        {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -277,14 +276,14 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
         <div className="relative">
           <Input
             id="confirmPassword"
-            name="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm your password"
-            required
-            minLength={8}
-            value={formData.confirmPassword}
-            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             className="h-10 pr-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+            {...register("confirmPassword", {
+              required: "Please confirm your password",
+              validate: value => 
+                value === watch("password") || "Passwords do not match"
+            })}
           />
           <Button
             type="button"
@@ -296,7 +295,7 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
         </div>
-        {stepErrors.confirmPassword && <p className="text-red-400 text-sm mt-1">{stepErrors.confirmPassword}</p>}
+        {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword.message}</p>}
       </div>
 
       <div className="flex justify-between gap-3">
@@ -304,7 +303,7 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
           type="button"
           variant="outline"
           onClick={onBack}
-          className="w-1/2 h-11 border-white/20 text-[#EEE0FF]/80 hover:bg-white/10 hover:text-white"
+          className="w-1/2 h-11 border-white/20 text-[#EEE0FF]/80 bg-white/10 hover:bg-white/20 hover:text-white"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
@@ -327,103 +326,201 @@ function Step3SetPassword({ formData, setFormData, onBack, onSubmit, isPending, 
   )
 }
 
+// --- Step 4 OTP Verification ---
+function Step4VerifyOTP({ register, errors, handleSubmit, onResend, isPending, resendLoading }) {
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-2">
+        <Label htmlFor="otp" className="text-sm font-medium text-[#EEE0FF]/80">
+          Verification Code *
+        </Label>
+        <Input
+          id="otp"
+          type="text"
+          placeholder="Enter 6-digit code"
+          className="h-10 border-white/20 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+          {...register("otp", {
+            required: "Verification code is required",
+            pattern: {
+              value: /^\d{6}$/,
+              message: "Code must be 6 digits"
+            }
+          })}
+        />
+        {errors.otp && <p className="text-red-400 text-sm mt-1">{errors.otp.message}</p>}
+      </div>
+
+      <div className="text-center text-sm text-[#EEE0FF]/60">
+        We've sent a verification code to your email. Please check your inbox.
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="w-full h-11 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+        >
+          {isPending ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Verifying...
+            </div>
+          ) : (
+            "Verify Account"
+          )}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onResend}
+          disabled={resendLoading}
+          className="w-full h-11 border-white/20 text-[#EEE0FF]/80 bg-white/10 hover:bg-white/20 hover:text-white"
+        >
+          {resendLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Sending...
+            </div>
+          ) : (
+            "Resend Code"
+          )}
+        </Button>
+      </div>
+    </form>
+  )
+}
+
 // --- Main Multi-Step Register Component ---
 export default function MultiStepRegister() {
   const [currentStep, setCurrentStep] = useState(1)
-  const [formData, setFormData] = useState({
-    email: "",
-    username: "",
-    firstName: "",
-    lastName: "",
-    phone: "",
-    accountType: "Personal",
-    password: "",
-    confirmPassword: "",
-  })
   const [isPending, setIsPending] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
   const [apiResponse, setApiResponse] = useState(null)
+  const { register: authRegister, verifyAccount, resendOtp } = useAuth()
 
-  const handleNext = () => {
-    setCurrentStep((prev) => prev + 1)
-    setApiResponse(null)
-  }
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+    trigger,
+  } = useForm({
+    defaultValues: {
+      email: "",
+      username: "",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      accountType: "Personal",
+      password: "",
+      confirmPassword: "",
+      otp: ""
+    }
+  })
 
-  const handleBack = () => {
-    setCurrentStep((prev) => prev - 1)
-    setApiResponse(null)
-  }
+  const handleNext = () => setCurrentStep(prev => prev + 1)
+  const handleBack = () => setCurrentStep(prev => prev - 1)
 
-  const handleSubmit = async () => {
+  const onSubmitRegister = async () => {
     setIsPending(true)
     setApiResponse(null)
 
     try {
-      const response = await fetch("http://localhost:5000/auth/register/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
+      const formData = {
+        email: watch("email"),
+        username: watch("username"),
+        first_name: watch("firstName"),
+        last_name: watch("lastName"),
+        phone: watch("phone"),
+        account_type: watch("accountType"),
+        password: watch("password"),
+        confirm_password: watch("confirmPassword")
+      }
 
-      const result = await response.json()
-
-      if (response.ok) {
-        setApiResponse({ success: true, message: result.message || "Registration successful!" })
-      } else {
-        const errorMessages = []
-        if (result.detail) {
-          errorMessages.push(result.detail)
-        } else if (result.errors) {
-          for (const key in result.errors) {
-            errorMessages.push(`${key}: ${result.errors[key].join(", ")}`)
-          }
-        } else {
-          errorMessages.push("An unexpected error occurred.")
-        }
-        setApiResponse({ success: false, errors: errorMessages })
+      const response = await authRegister(formData)
+      
+      if (response) {
+        setApiResponse({ success: true, message: response.success })
+        handleNext()
       }
     } catch (error) {
-      console.error("Registration failed:", error)
-      setApiResponse({ success: false, errors: ["Network error or server is unreachable."] })
+      setApiResponse({ 
+        success: false, 
+        errors: [error.message || "Registration failed. Please try again."] 
+      })
     } finally {
       setIsPending(false)
     }
   }
 
+  const onSubmitVerify = async (data) => {
+    setIsPending(true)
+    setApiResponse(null)
+
+    try {
+      const response = await verifyAccount({
+        email_or_username: watch("email"),
+        otp: data.otp
+      })
+
+      if (response) {
+        setApiResponse({ success: true, message: response.success })
+        // Redirect to dashboard or login page after successful verification
+      }
+    } catch (error) {
+      setApiResponse({ 
+        success: false, 
+        errors: [error.response.data.error || "Verification failed. Please try again."] 
+      })
+    } finally {
+      setIsPending(false)
+    }
+  }
+
+  const onResendCode = async () => {
+    setResendLoading(true)
+    setApiResponse(null)
+
+    try {
+      const response = await resendOtp({
+        email_or_username: watch("email")
+      })
+      if (response) {
+        setApiResponse({ success: true, message: "New verification code sent!" })
+      }
+    } catch (error) {
+      setApiResponse({ 
+        success: false, 
+        errors: [error.response.data.error || "Failed to resend code. Please try again."] 
+      })
+    } finally {
+      setResendLoading(false)
+    }
+  }
+
   const getStepTitle = () => {
     switch (currentStep) {
-      case 1:
-        return "Account & Login Info"
-      case 2:
-        return "Personal Details"
-      case 3:
-        return "Set Your Password"
-      default:
-        return "Register"
+      case 1: return "Account & Login Info"
+      case 2: return "Personal Details"
+      case 3: return "Set Your Password"
+      case 4: return "Verify Your Account"
+      default: return "Register"
     }
   }
 
   const getStepDescription = () => {
     switch (currentStep) {
-      case 1:
-        return "Tell us about your account type and how to reach you."
-      case 2:
-        return "Provide some optional personal details."
-      case 3:
-        return "Choose a strong password for your account."
-      default:
-        return ""
+      case 1: return "Tell us about your account type and how to reach you."
+      case 2: return "Provide some optional personal details."
+      case 3: return "Choose a strong password for your account."
+      case 4: return "Enter the verification code sent to your email."
+      default: return ""
     }
   }
 
   return (
-    <div 
-      className="min-h-screen bg-bG flex items-center justify-center px-4 pt-52 md:pt-32 pb-32 relative overflow-hidden"
-    //   style={{
-    //     background: "radial-gradient(164.1% 251.8% at 49.44% 266.96%, rgb(93, 16, 143) 0%, rgb(86, 15, 133) 32.31%, rgb(68, 12, 105) 56.01%, rgb(39, 6, 60) 75%, rgb(14, 2, 23) 100%)"
-    //   }}
-    >
+    <div className="min-h-screen bg-bG flex items-center justify-center px-4 pt-52 md:pt-32 pb-32 relative overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-purple-900/20 blur-3xl"></div>
@@ -442,14 +539,18 @@ export default function MultiStepRegister() {
           <CardHeader className="pb-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-white">{getStepTitle()}</h2>
-              <span className="text-sm text-[#EEE0FF]/60">Step {currentStep} of 3</span>
+              {currentStep < 4 && (
+                <span className="text-sm text-[#EEE0FF]/60">Step {currentStep} of 3</span>
+              )}
             </div>
-            <div className="w-full bg-white/20 rounded-full h-2.5">
-              <div
-                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2.5 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${(currentStep / 3) * 100}%` }}
-              ></div>
-            </div>
+            {currentStep < 4 && (
+              <div className="w-full bg-white/20 rounded-full h-2.5">
+                <div
+                  className="bg-gradient-to-r from-purple-500 to-blue-500 h-2.5 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${(currentStep / 3) * 100}%` }}
+                ></div>
+              </div>
+            )}
             <CardDescription className="text-center text-[#EEE0FF]/80 mt-4">
               {getStepDescription()}
             </CardDescription>
@@ -478,39 +579,64 @@ export default function MultiStepRegister() {
             )}
 
             {currentStep === 1 && (
-              <Step1AccountInfo formData={formData} setFormData={setFormData} onNext={handleNext} />
+              <Step1AccountInfo 
+                register={register}
+                errors={errors}
+                watch={watch}
+                setValue={setValue}
+                trigger={trigger}
+                onNext={handleNext}
+              />
             )}
+
             {currentStep === 2 && (
               <Step2PersonalDetails
-                formData={formData}
-                setFormData={setFormData}
+                register={register}
+                errors={errors}
+                watch={watch}
+                trigger={trigger}
                 onNext={handleNext}
                 onBack={handleBack}
               />
             )}
+
             {currentStep === 3 && (
               <Step3SetPassword
-                formData={formData}
-                setFormData={setFormData}
+                register={register}
+                errors={errors}
+                watch={watch}
+                trigger={trigger}
                 onBack={handleBack}
-                onSubmit={handleSubmit}
+                onSubmit={onSubmitRegister}
                 isPending={isPending}
-                apiResponse={apiResponse}
+              />
+            )}
+
+            {currentStep === 4 && (
+              <Step4VerifyOTP
+                register={register}
+                errors={errors}
+                handleSubmit={handleSubmit(onSubmitVerify)}
+                onResend={onResendCode}
+                isPending={isPending}
+                resendLoading={resendLoading}
               />
             )}
 
             {/* Terms and Login Link */}
-            <p className="text-xs text-[#EEE0FF]/60 text-center mt-4">
-              By clicking "Create Account", you agree to our{" "}
-              <Link href="/terms" className="text-purple-300 hover:text-white hover:underline font-medium">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="text-purple-300 hover:text-white hover:underline font-medium">
-                Privacy Policy
-              </Link>
-              .
-            </p>
+            {currentStep !== 4 && (
+              <p className="text-xs text-[#EEE0FF]/60 text-center mt-4">
+                By clicking "Create Account", you agree to our{" "}
+                <Link href="/terms" className="text-purple-300 hover:text-white hover:underline font-medium">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" className="text-purple-300 hover:text-white hover:underline font-medium">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+            )}
           </CardContent>
         </Card>
 

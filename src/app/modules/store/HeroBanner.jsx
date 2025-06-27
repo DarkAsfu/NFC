@@ -11,7 +11,7 @@ export function HeroBanner() {
     <section className="relative w-full h-screen overflow-hidden pt-20">
       {/* YouTube Video Background */}
       <div className="absolute inset-0 z-0">
-        <div className="relative w-full h-full">
+        {/* <div className="relative w-full h-full">
           <iframe
             ref={videoRef}
             src="https://www.youtube.com/embed/v5snnfUFZw0?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&modestbranding=1&playlist=v5snnfUFZw0&rel=0&iv_load_policy=3"
@@ -28,7 +28,7 @@ export function HeroBanner() {
             allowFullScreen
             title="NFC Technology Background"
           />
-        </div>
+        </div> */}
 
         {/* New Purple Gradient Overlay */}
         <div 

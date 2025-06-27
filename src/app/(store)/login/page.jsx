@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,64 +10,80 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/provider/AuthProvider"
+
 
 export default function LoginPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  })
-  const [isPending, setIsPending] = useState(false)
-  const [apiResponse, setApiResponse] = useState(null)
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+  const [isPending, setIsPending] = useState(false)
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  })
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+  const onSubmit = async (data) => {
     setIsPending(true)
-    setApiResponse(null)
-
+    
     try {
-      const response = await fetch("http://localhost:5000/auth/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const response = await login({
+        email: data.email,
+        password: data.password
       })
-
-      const result = await response.json()
-
-      if (response.ok) {
-        setApiResponse({ success: true, message: result.message || "Login successful!" })
-        router.push("/dashboard")
-      } else {
-        const errorMessages = []
-        if (result.detail) {
-          errorMessages.push(result.detail)
-        } else if (result.errors) {
-          for (const key in result.errors) {
-            errorMessages.push(`${key}: ${result.errors[key].join(", ")}`)
-          }
-        } else {
-          errorMessages.push("Invalid credentials or an unexpected error occurred.")
-        }
-        setApiResponse({ success: false, errors: errorMessages })
+      
+      if (response) {
+        router.push("/")
       }
     } catch (error) {
-      console.error("Login failed:", error)
-      setApiResponse({ success: false, errors: ["Network error or server is unreachable."] })
+      console.log(error.response.data.non_field_errors[0])
+      // Handle different error cases
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status === 401) {
+          setError("root", {
+            type: "manual",
+            message: error.response.data.non_field_errors[0]
+          })
+        } else if (error.response.status === 400) {
+          setError("root", {
+            type: "manual",
+            message: error.response.data.non_field_errors[0]
+          })
+        } else {
+          setError("root", {
+            type: "manual",
+            message: error.response.data.non_field_errors[0]
+          })
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        setError("root", {
+          type: "manual",
+          message: "Network error. Please check your connection."
+        })
+      } else {
+        // Something happened in setting up the request
+        setError("root", {
+          type: "manual",
+          message: "An error occurred. Please try again."
+        })
+      }
     } finally {
       setIsPending(false)
     }
   }
 
   return (
-    <div 
-      className="min-h-screen bg-bG flex items-center justify-center px-4 pt-52 md:pt-32 pb-32  relative overflow-hidden"
-    //   style={{
-    //     background: "radial-gradient(164.1% 251.8% at 49.44% 266.96%, rgb(93, 16, 143) 0%, rgb(86, 15, 133) 32.31%, rgb(68, 12, 105) 56.01%, rgb(39, 6, 60) 75%, rgb(14, 2, 23) 100%)"
-    //   }}
-    >
+    <div className="min-h-screen bg-bG flex items-center justify-center px-4 pt-52 md:pt-32 pb-32 relative overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-purple-900/20 blur-3xl"></div>
@@ -89,61 +106,56 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Success Message */}
-            {apiResponse?.success && (
-              <Alert className="border-green-200 bg-green-900/20 text-green-100">
-                <CheckCircle className="h-4 w-4 text-green-300" />
-                <AlertDescription>{apiResponse.message}</AlertDescription>
-              </Alert>
-            )}
-
             {/* Error Messages */}
-            {apiResponse?.errors && apiResponse.errors.length > 0 && (
+            {errors.root && (
               <Alert className="border-red-200 bg-red-900/20 text-red-100">
                 <AlertCircle className="h-4 w-4 text-red-300" />
-                <AlertDescription>
-                  <ul className="list-disc list-inside space-y-1">
-                    {apiResponse.errors.map((error, index) => (
-                      <li key={index}>{error}</li>
-                    ))}
-                  </ul>
-                </AlertDescription>
+                <AlertDescription>{errors.root.message}</AlertDescription>
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Email/Username */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-[#EEE0FF]/80">
-                  Email Address
+                  Email Address *
                 </Label>
                 <Input
                   id="email"
-                  name="email"
                   type="email"
                   placeholder="john@example.com"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="h-10 border-white/10 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address"
+                    }
+                  })}
                 />
+                {errors.email && (
+                  <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+                )}
               </div>
 
               {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium text-[#EEE0FF]/80">
-                  Password
+                  Password *
                 </Label>
                 <div className="relative">
                   <Input
                     id="password"
-                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    required
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className="h-10 pr-10 border-white/10 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 8,
+                        message: "Password must be at least 8 characters"
+                      }
+                    })}
                   />
                   <Button
                     type="button"
@@ -155,7 +167,13 @@ export default function LoginPage() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
-                <Link href="/forgot-password" className="text-sm text-purple-300 hover:text-white hover:underline block text-right mt-1">
+                {errors.password && (
+                  <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
+                )}
+                <Link 
+                  href="/forgot-password" 
+                  className="text-sm text-purple-300 hover:text-white hover:underline block text-right mt-1"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -182,7 +200,10 @@ export default function LoginPage() {
         {/* Register Link */}
         <p className="text-center text-sm text-[#EEE0FF]/80 mt-6">
           Don't have an account?{" "}
-          <Link href="/register" className="text-purple-300 hover:text-white hover:underline font-medium">
+          <Link 
+            href="/register" 
+            className="text-purple-300 hover:text-white hover:underline font-medium"
+          >
             Sign up
           </Link>
         </p>

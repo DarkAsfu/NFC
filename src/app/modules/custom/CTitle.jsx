@@ -14,7 +14,7 @@ const CTitle = ({ title, className = '' }) => {
         viewport={{ once: true }}
         variants={itemVariants}
         transition={{ duration: 0.6 }}
-        className='text-4xl font-bold text-center text-white mb-4'
+        className='text-3xl md:text-4xl font-bold text-center text-white mb-4'
       >
         {title}
       </motion.h2>

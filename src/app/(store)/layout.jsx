@@ -1,32 +1,19 @@
-import { Poppins } from "next/font/google";
-import "../globals.css";
 import { Navbar } from "../modules/store/NavBar";
 import { Footer } from "../modules/store/Footer";
 import { ScrollProgress } from "@/components/magicui/scroll-progress";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
 export const metadata = {
-  title: "NFC",
-  description: "Digital Card",
+  title: "NFC Store",
+  description: "Digital Card Store",
 };
 
-export default function RootLayout({ children }) {
+export default function StoreLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${poppins.className} antialiased `}
-        suppressHydrationWarning
-      >
-        <ScrollProgress className="top-[65px]"  />
-        <Navbar/>
-        {children}
-        <Footer/>
-      </body>
-    </html>
+    <>
+      <ScrollProgress className="top-[65px]" />
+      <Navbar />
+      {children}
+      <Footer />
+    </>
   );
 }
