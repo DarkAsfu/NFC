@@ -1,10 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    
+    experimental: {
+      authInterrupts: true,
+    },
     // Image configurations
     images: {
-      domains: ['i.ytimg.com', 'www.youtube.com'],
+      domains: ['i.ytimg.com', 'www.youtube.com', '127.0.0.1'],
     },
     
     // For Three.js SSR support

@@ -123,7 +123,6 @@
   }
 }
 
-
 /* Custom breakpoint for extra small devices */
 @media (min-width: 475px) {
   .min-\[475px\]\:text-3xl {

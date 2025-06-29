@@ -9,13 +9,15 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/provider/AuthProvider"
 
 
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
   const [showPassword, setShowPassword] = useState(false)
   const [isPending, setIsPending] = useState(false)
   
@@ -41,7 +43,7 @@ export default function LoginPage() {
       })
       
       if (response) {
-        router.push("/")
+        router.push(redirectTo)
       }
     } catch (error) {
       console.log(error.response.data.non_field_errors[0])
@@ -118,19 +120,19 @@ export default function LoginPage() {
               {/* Email/Username */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-[#EEE0FF]/80">
-                  Email Address *
+                  Email Address or Username *
                 </Label>
                 <Input
                   id="email"
-                  type="email"
+                  type="text"
                   placeholder="john@example.com"
                   className="h-10 border-white/10 bg-white/5 text-white focus:border-purple-500 focus:ring-purple-500"
                   {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address"
-                    }
+                    required: "Email or username is required"
+                    // pattern: {
+                    //   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    //   message: "Invalid email address"
+                    // }
                   })}
                 />
                 {errors.email && (

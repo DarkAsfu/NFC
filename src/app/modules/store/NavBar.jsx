@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Menu, X, LogOut } from "lucide-react";
+import { User, Menu, X, LogOut, LayoutPanelLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -101,7 +101,7 @@ export function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-8 w-8 rounded-full hover:bg-white/10"
+                    className="relative h-8 w-8 rounded-full hover:bg-white/10 text-black"
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatar} alt={user.username} />
@@ -113,7 +113,13 @@ export function Navbar() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="w-56 bg-bG text-tX font-semibold" align="end" forceMount>
+                <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="w-full cursor-pointer">
+                      <LayoutPanelLeft className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/profile" className="w-full cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
