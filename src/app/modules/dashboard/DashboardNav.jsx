@@ -73,17 +73,6 @@ export function DashboardNav() {
             <p className="text-xs text-muted-foreground truncate">john@wavy.example</p>
           </div>
         </div>
-        
-        <Button 
-          asChild 
-          variant="ghost" 
-          className="justify-start h-12 px-4 hover:bg-accent/50 text-muted-foreground"
-        >
-          <Link href="/logout" className="flex items-center gap-3">
-            <LogOut className="h-5 w-5 opacity-70" />
-            <span className="text-sm font-medium">Sign Out</span>
-          </Link>
-        </Button>
       </div>
     </nav>
   )
