@@ -10,6 +10,8 @@ import ProductSection from "../modules/store/ProductSection";
 import UniqueCollection from "../modules/store/UniqueCollection";
 import WhatsWeProvide from "../modules/store/WhatsWeProvide";
 import NFCSubscriptionPlans from "../modules/store/NFCSubscriptionPlans";
+import { DualCarousel } from "../modules/store/DualCarousel";
+
 
 // const Lanyard = dynamic(() => import('../modules/store/Lanyard'), { ssr: false });
 const Home = () =>{
@@ -20,6 +22,7 @@ const Home = () =>{
             <VideoPlayer/>
             <ProductSection/>
             {/* <UniqueCollection/> */}
+            <DualCarousel/>
             <WhatsWeProvide/>
             <NFCSubscriptionPlans/>
             <BandMoto/>

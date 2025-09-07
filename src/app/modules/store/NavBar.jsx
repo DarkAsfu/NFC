@@ -71,10 +71,10 @@ export function Navbar() {
 
             <Link href="/" className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black font-bold">
-                BN
+                W
               </div>
               <span className="text-lg font-semibold hidden sm:inline-block text-white">
-                BrandName
+                Widely
               </span>
             </Link>
           </div>

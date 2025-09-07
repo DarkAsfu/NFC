@@ -6,7 +6,7 @@ const nextConfig = {
     },
     // Image configurations
     images: {
-      domains: ['i.ytimg.com', 'www.youtube.com', '127.0.0.1'],
+      domains: ['i.ytimg.com', 'www.youtube.com', '127.0.0.1', 'imagedelivery.net'],
     },
     
     // For Three.js SSR support
