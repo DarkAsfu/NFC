@@ -14,14 +14,8 @@ export const metadata = {
 
 export default function ProfileLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${poppins.className} antialiased`}
-        suppressHydrationWarning
-      >
-        <h1>Profile Layout</h1>
-        {children}
-      </body>
-    </html>
+    <div className={`${poppins.className} antialiased bg-bG min-h-screen`}>
+      {children}
+    </div>
   );
 }

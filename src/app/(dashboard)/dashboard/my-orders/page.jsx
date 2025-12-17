@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
+import { resolveMediaUrl } from '@/lib/utils';
 
 const statusSteps = [
   { id: 'pending', label: 'Order Placed', icon: CalendarDays, color: 'bg-amber-500' },
@@ -77,7 +78,7 @@ const OrdersPage = () => {
           <ShoppingBag className="mx-auto h-12 w-12 text-blue-600" />
           <h3 className="text-lg font-medium">No orders found</h3>
           <p className="text-muted-foreground">Your order history will appear once you make purchases.</p>
-          <Button onClick={() => router.push('/dashboard/cards')}>Browse Products</Button>
+          <Button onClick={() => router.push('/products')}>Browse Products</Button>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -95,7 +96,7 @@ const OrdersPage = () => {
                   {order.product?.images?.[0]?.image && (
                     <div className="relative w-16 h-16 rounded-md border overflow-hidden">
                       <Image
-                        src={order.product.images[0].image}
+                        src={resolveMediaUrl(order.product.images[0].image)}
                         alt={order.product.title}
                         fill
                         className="object-cover"
@@ -171,7 +172,7 @@ const OrdersPage = () => {
                   {selectedOrder.product?.images?.[0]?.image && (
                     <div className="relative w-full sm:w-32 h-32 rounded-md border overflow-hidden">
                       <Image
-                        src={selectedOrder.product.images[0].image}
+                        src={resolveMediaUrl(selectedOrder.product.images[0].image)}
                         alt={selectedOrder.product.title}
                         fill
                         className="object-cover"

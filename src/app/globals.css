@@ -177,6 +177,16 @@ html {
   overflow: hidden;
 }
 
+/* Scrollbar utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .video-container iframe {
   position: absolute;
   top: 50%;

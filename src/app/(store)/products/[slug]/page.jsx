@@ -2,19 +2,34 @@
 
 import useProduct from '@/app/hooks/store/useProduct'
 import { forbidden, useParams, useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import ProtectedRoute from '@/lib/ProtectedRoute'
 import { useAuth } from '@/provider/AuthProvider'
 import Link from 'next/link'
+import { resolveMediaUrl } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import useShippingAreaCosts from '@/app/hooks/store/useShippingAreaCosts'
+import { Sparkles, Truck } from 'lucide-react'
 
 const ProductDetailPage = () => {
   const { slug } = useParams()
   const { product, loading, error } = useProduct(slug)
+  const { shippingCosts } = useShippingAreaCosts()
   const [selectedImage, setSelectedImage] = useState(0)
   const { user } = useAuth()
   const router = useRouter()
+  const shippingRange = useMemo(() => {
+    if (!shippingCosts?.length) return null
+    const values = shippingCosts
+      .map(s => Number.parseFloat(s?.cost))
+      .filter(n => Number.isFinite(n))
+    if (!values.length) return null
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    return { min, max }
+  }, [shippingCosts])
 //   if (!user) {
 //     forbidden()
 //   }
@@ -80,6 +95,7 @@ const ProductDetailPage = () => {
     localStorage.setItem('product', JSON.stringify(productInfo));
     router.push('/checkout')
   }
+
   return (
     <div className='bg-bG pt-36 pb-12 md:py-24 min-h-screen '>
       <div className='max-w-7xl mx-auto px-4'>
@@ -110,102 +126,125 @@ const ProductDetailPage = () => {
           </ol>
         </nav>
 
-        {/* Product Content */}
-        <div className='grid md:grid-cols-2 gap-8 lg:gap-12'>
-          {/* Product Images */}
-          <div>
-            <motion.div
-              className='bg-white rounded-xl overflow-hidden shadow-lg mb-4 aspect-square'
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-            >
-              <Image
-                src={
-                  product.images[selectedImage]?.image ||
-                  '/placeholder-product.jpg'
-                }
-                alt={product.title}
-                width={800}
-                height={800}
-                className='w-full h-full object-contain'
-                priority
-              />
-            </motion.div>
-
-            <div className='flex gap-2 overflow-x-auto py-2'>
-              {product.images.map((img, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 ${
-                    selectedImage === index
-                      ? 'border-primary border-2'
-                      : 'border-transparent'
-                  }`}
-                >
-                  <Image
-                    src={img.image}
-                    alt={`${product.title} thumbnail ${index + 1}`}
-                    width={100}
-                    height={100}
-                    className='w-full h-full object-cover'
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Product Details */}
-          <div className='text-tX'>
-            <h1 className='text-2xl md:text-3xl font-bold mb-2'>
-              {product.title}
-            </h1>
-            <p className='text-gray-500 mb-4'>{product.category}</p>
-
-            <div className='flex items-center mb-6'>
-              <span className='text-2xl font-bold'>Tk {product.price}</span>
-              {product.originalPrice && (
-                <span className='ml-3 text-lg text-gray-400 line-through'>
-                  Tk {product.originalPrice}
-                </span>
-              )}
-            </div>
-
-            <div className='mb-8'>
-              <h3 className='font-semibold text-lg mb-2'>Description</h3>
-              <p className='text-gray-300 whitespace-pre-line'>
-                {product.description}
-              </p>
-            </div>
-
-            <div className='flex flex-col sm:flex-row gap-4'>
-              {/* <button className="bg-tX text-bG px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition">
-                Add to Cart
-              </button> */}
-              <button
-                onClick={() => handleCheckout(product.id, product.slug)}
-                className='border border-tX text-tX px-6 py-3 rounded-lg font-medium hover:bg-tX hover:text-bG transition text-center cursor-pointer'
+        {/* Top section */}
+        <div className='grid lg:grid-cols-12 gap-8 lg:gap-12'>
+          {/* Gallery */}
+          <div className='lg:col-span-7'>
+            <div className='rounded-2xl border border-white/10 bg-white/5 p-3 md:p-4'>
+              <motion.div
+                className='bg-black/30 rounded-xl overflow-hidden aspect-square md:aspect-[4/3]'
+                whileHover={{ scale: 1.01 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               >
-                Buy Now
-              </button>
-            </div>
+                <Image
+                  src={
+                    resolveMediaUrl(product.images[selectedImage]?.image) ||
+                    '/placeholder-product.jpg'
+                  }
+                  alt={product.title}
+                  width={1200}
+                  height={900}
+                  className='w-full h-full object-contain'
+                  priority
+                  unoptimized
+                />
+              </motion.div>
 
-            {/* Additional Info */}
-            <div className='mt-8 pt-6 border-t border-gray-700'>
-              <h3 className='font-semibold text-lg mb-3'>Product Details</h3>
-              <ul className='space-y-2 text-gray-300'>
-                <li>
-                  <span className='font-medium'>Category:</span>{' '}
-                  {product.category}
-                </li>
-                <li>
-                  <span className='font-medium'>Material:</span>{' '}
-                  {product.material || 'Not specified'}
-                </li>
-                {/* Add more product details as needed */}
-              </ul>
+              <div className='mt-3 flex gap-2 overflow-x-auto pb-1'>
+                {product.images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border transition ${
+                      selectedImage === index
+                        ? 'border-purple-400'
+                        : 'border-white/10 hover:border-white/20'
+                    }`}
+                    aria-label={`Select image ${index + 1}`}
+                  >
+                    <Image
+                      src={resolveMediaUrl(img.image)}
+                      alt={`${product.title} thumbnail ${index + 1}`}
+                      width={128}
+                      height={128}
+                      className='w-full h-full object-cover'
+                      unoptimized
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Purchase panel */}
+          <div className='lg:col-span-5 text-tX'>
+            <div className='lg:sticky lg:top-24'>
+              <div className='flex flex-wrap items-center gap-2 mb-3'>
+                <Badge className='bg-white/10 text-white border border-white/15'>
+                  {product.category}
+                </Badge>
+                <Badge className='bg-purple-500/15 text-purple-200 border border-purple-400/20'>
+                  <Sparkles className='h-3.5 w-3.5 mr-1' />
+                  NFC Ready
+                </Badge>
+              </div>
+
+              <h1 className='text-2xl md:text-4xl font-extrabold leading-tight'>
+                {product.title}
+              </h1>
+
+              <div className='mt-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6'>
+                <div className='flex items-end justify-between gap-4'>
+                  <div>
+                    <div className='text-sm text-white/60'>Price</div>
+                    <div className='flex items-baseline gap-2'>
+                      <span className='text-3xl font-bold'>Tk {product.price}</span>
+                      {product.originalPrice && (
+                        <span className='text-sm text-white/40 line-through'>
+                          Tk {product.originalPrice}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span className='text-xs text-white/40'>VAT may apply</span>
+                </div>
+
+                <div className='mt-3 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3'>
+                  <div className='flex items-center gap-2'>
+                    <span className='inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 border border-white/10'>
+                      <Truck className='h-4 w-4 text-blue-200' />
+                    </span>
+                    <div>
+                      <div className='text-xs text-white/50'>Shipping</div>
+                      <div className='text-sm text-white/85 font-medium leading-tight'>
+                        {shippingRange
+                          ? `৳${shippingRange.min.toFixed(2)} – ৳${shippingRange.max.toFixed(2)}`
+                          : 'Calculated at checkout'}
+                      </div>
+                    </div>
+                  </div>
+                  <span className='text-xs text-white/35 whitespace-nowrap'>
+                    based on area
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => handleCheckout(product.id, product.slug)}
+                  className='mt-5 w-full rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 font-semibold transition'
+                >
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-width description */}
+        <div className='mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-8'>
+          <h2 className='text-xl md:text-2xl font-bold text-white'>Description</h2>
+          <p className='mt-3 text-gray-200/90 whitespace-pre-line leading-relaxed'>
+            {product.description || 'No description available.'}
+          </p>
         </div>
       </div>
     </div>

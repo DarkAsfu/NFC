@@ -275,6 +275,30 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // Forgot password (request OTP)
+  const forgotPassword = async payload => {
+    try {
+      setError(null)
+      const { data } = await authAxios.post('/forget-password/', payload)
+      return data
+    } catch (err) {
+      setError(err.response?.data || 'Forgot password request failed')
+      throw err
+    }
+  }
+
+  // Reset password (OTP + new password)
+  const resetPassword = async payload => {
+    try {
+      setError(null)
+      const { data } = await authAxios.post('/reset-password/', payload)
+      return data
+    } catch (err) {
+      setError(err.response?.data || 'Reset password failed')
+      throw err
+    }
+  }
+
   // Check if user is authenticated
   const isAuthenticated = () => {
     return isTokenValid(accessToken);
@@ -295,6 +319,8 @@ export const AuthProvider = ({ children }) => {
     resendOtp,
     updateEmail,
     changePassword,
+    forgotPassword,
+    resetPassword,
     isAuthenticated,
     refreshAuthToken
   }

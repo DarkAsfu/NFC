@@ -240,13 +240,6 @@ const CheckoutPage = () => {
 //     }
 //   }
 
-// ✅ Helper function to get a cookie value by name
-function getCookie(name) {
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) return parts.pop().split(';').shift()
-}
-
 const handleSubmit = async e => {
   e.preventDefault()
 
@@ -269,36 +262,33 @@ const handleSubmit = async e => {
   setSubmitError('')
 
   try {
-    // ✅ Get access token from localStorage
-    const accessToken = localStorage.getItem('accessToken')
-
-    // ✅ Get CSRF token from cookies
-    const csrftoken = getCookie('csrftoken')
-
-    // ✅ Prepare headers
-    const headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'X-CSRFToken': csrftoken
+    // Backend uses JWT (no CSRF needed for this SPA flow).
+    // Build payload, omitting subscription_id if not selected (backend allows null).
+    const payload = {
+      ...formData,
+      coupon: formData.coupon?.trim() || null
     }
-
-    if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`
+    // Only include subscription_id if it has a value
+    if (formData.subscription_id) {
+      payload.subscription_id = formData.subscription_id
     }
 
     // ✅ Submit the form
-    const response = await api.post('/order/', formData, {
-      headers: headers,
-      withCredentials: true // Ensure cookies (like csrftoken) are included
-    })
+    const response = await api.post('/order/', payload)
 
     console.log('Order created:', response.data)
     localStorage.removeItem('product')
-    router.push('/order-success')
+    try {
+      sessionStorage.setItem('lastOrder', JSON.stringify(response.data))
+    } catch {
+      // ignore
+    }
+    router.push(`/order-success?order=${encodeURIComponent(response.data?.order_number || '')}`)
   } catch (err) {
     console.error('Error creating order:', err)
     setSubmitError(
-      err.response?.data?.message ||
+      err.response?.data?.detail ||
+      err.response?.data?.error ||
       'Failed to place order. Please try again.'
     )
   } finally {

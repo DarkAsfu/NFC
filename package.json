@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "dev": "NODE_OPTIONS=\"--require ./scripts/node-preload.cjs\" next dev --turbopack",
+    "build": "NODE_OPTIONS=\"--require ./scripts/node-preload.cjs\" next build",
+    "start": "NODE_OPTIONS=\"--require ./scripts/node-preload.cjs\" next start",
     "lint": "next lint"
   },
   "dependencies": {

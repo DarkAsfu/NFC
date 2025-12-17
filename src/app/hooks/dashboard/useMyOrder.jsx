@@ -11,24 +11,18 @@ export const useMyOrder = () => {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem('accessToken')
-      if (!token) {
-        router.push('/login')
-        return
-      }
-
-      const response = await api.get('/order/', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          accept: 'application/json'
-        }
-      })
+      const response = await api.get('/order/')
       console.log(response)
       if (!response.status === 200) throw new Error('Failed to fetch orders')
 
       setOrders(response.data)
     } catch (err) {
-      setError(err.message)
+      // If unauthenticated/expired, send user to login.
+      if (err?.response?.status === 401) {
+        router.push('/login?redirect=/dashboard/my-orders')
+        return
+      }
+      setError(err?.response?.data?.detail || err.message)
       console.error('Error fetching orders:', err)
     } finally {
       setLoading(false)

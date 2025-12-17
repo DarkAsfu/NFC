@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { resolveMediaUrl } from '@/lib/utils'
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   // Get the first image as default and second image as hover (if available)
-  const defaultImage = product.images[0]?.image
-  const hoverImage = product.images[1]?.image || defaultImage
+  const defaultImage = resolveMediaUrl(product?.images?.[0]?.image)
+  const hoverImage = resolveMediaUrl(product?.images?.[1]?.image) || defaultImage
 
   return (
     <Link href={`/products/${product.slug}`}>
