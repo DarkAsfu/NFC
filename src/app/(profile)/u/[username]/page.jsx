@@ -20,7 +20,9 @@ import {
   Award,
   BookOpen,
   FileText,
-  Calendar
+  Calendar,
+  Mail,
+  Phone
 } from 'lucide-react'
 
 export default function PublicProfilePage() {
@@ -29,6 +31,7 @@ export default function PublicProfilePage() {
 
   const [profile, setProfile] = useState(null)
   const [theme, setTheme] = useState(null)
+  const [about, setAbout] = useState(null)
   const [languages, setLanguages] = useState([])
   const [skills, setSkills] = useState([])
   const [experiences, setExperiences] = useState([])
@@ -40,7 +43,7 @@ export default function PublicProfilePage() {
   const [certificates, setCertificates] = useState([])
   const [publications, setPublications] = useState([])
   const [honors, setHonors] = useState([])
-  const [contactInfo, setContactInfo] = useState(null)
+  const [contactInfo, setContactInfo] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -63,6 +66,7 @@ export default function PublicProfilePage() {
 
         // Fetch optional sections (allow failures)
         const optionalSections = await Promise.allSettled([
+          api.get(`/profile/about/${username}/`).catch(() => ({ data: null })),
           api.get(`/profile/languages/${username}/`),
           api.get(`/profile/skills/${username}/`),
           api.get(`/profile/experiences/${username}/`),
@@ -74,24 +78,25 @@ export default function PublicProfilePage() {
           api.get(`/profile/certificates/${username}/`),
           api.get(`/profile/publications/${username}/`),
           api.get(`/profile/honor-and-award/${username}/`),
-          api.get(`/profile/contact-informations/${username}/`).catch(() => ({ data: null }))
+          api.get(`/profile/contact-informations/${username}/`).catch(() => ({ data: [] }))
         ])
 
         if (cancelled) return
 
         // Extract data from settled promises
-        setLanguages(optionalSections[0].status === 'fulfilled' ? optionalSections[0].value.data || [] : [])
-        setSkills(optionalSections[1].status === 'fulfilled' ? optionalSections[1].value.data || [] : [])
-        setExperiences(optionalSections[2].status === 'fulfilled' ? optionalSections[2].value.data || [] : [])
-        setEducations(optionalSections[3].status === 'fulfilled' ? optionalSections[3].value.data || [] : [])
-        setGalleries(optionalSections[4].status === 'fulfilled' ? optionalSections[4].value.data || [] : [])
-        setPortfolios(optionalSections[5].status === 'fulfilled' ? optionalSections[5].value.data || [] : [])
-        setServices(optionalSections[6].status === 'fulfilled' ? optionalSections[6].value.data || [] : [])
-        setSocials(optionalSections[7].status === 'fulfilled' ? optionalSections[7].value.data || [] : [])
-        setCertificates(optionalSections[8].status === 'fulfilled' ? optionalSections[8].value.data || [] : [])
-        setPublications(optionalSections[9].status === 'fulfilled' ? optionalSections[9].value.data || [] : [])
-        setHonors(optionalSections[10].status === 'fulfilled' ? optionalSections[10].value.data || [] : [])
-        setContactInfo(optionalSections[11].status === 'fulfilled' ? optionalSections[11].value.data : null)
+        setAbout(optionalSections[0].status === 'fulfilled' ? optionalSections[0].value.data : null)
+        setLanguages(optionalSections[1].status === 'fulfilled' ? optionalSections[1].value.data || [] : [])
+        setSkills(optionalSections[2].status === 'fulfilled' ? optionalSections[2].value.data || [] : [])
+        setExperiences(optionalSections[3].status === 'fulfilled' ? optionalSections[3].value.data || [] : [])
+        setEducations(optionalSections[4].status === 'fulfilled' ? optionalSections[4].value.data || [] : [])
+        setGalleries(optionalSections[5].status === 'fulfilled' ? optionalSections[5].value.data || [] : [])
+        setPortfolios(optionalSections[6].status === 'fulfilled' ? optionalSections[6].value.data || [] : [])
+        setServices(optionalSections[7].status === 'fulfilled' ? optionalSections[7].value.data || [] : [])
+        setSocials(optionalSections[8].status === 'fulfilled' ? optionalSections[8].value.data || [] : [])
+        setCertificates(optionalSections[9].status === 'fulfilled' ? optionalSections[9].value.data || [] : [])
+        setPublications(optionalSections[10].status === 'fulfilled' ? optionalSections[10].value.data || [] : [])
+        setHonors(optionalSections[11].status === 'fulfilled' ? optionalSections[11].value.data || [] : [])
+        setContactInfo(optionalSections[12].status === 'fulfilled' ? (optionalSections[12].value.data || []) : [])
       } catch (e) {
         if (cancelled) return
         const errorMsg = e?.response?.data?.detail || e?.response?.data?.error || e?.message || 'Failed to load profile'
@@ -204,6 +209,21 @@ export default function PublicProfilePage() {
         </div>
       </div>
 
+      {/* About Section */}
+      {about?.bio && (
+        <div className='mt-6'>
+          <Card className='bg-white/5 border-white/10 p-6'>
+            <div className='flex items-center gap-2 text-white font-semibold mb-4'>
+              <FileText className='h-5 w-5 text-white/70' />
+              About
+            </div>
+            <p className='text-white/75 leading-relaxed whitespace-pre-line text-sm'>
+              {about.bio}
+            </p>
+          </Card>
+        </div>
+      )}
+
       {/* Sections */}
       <div className='mt-10 grid lg:grid-cols-12 gap-6'>
         <div className='lg:col-span-4 space-y-6'>
@@ -266,33 +286,75 @@ export default function PublicProfilePage() {
           )}
 
           {/* Contact Information */}
-          {contactInfo && (
+          {contactInfo?.length > 0 && (
             <Card className='bg-white/5 border-white/10 p-5'>
               <div className='text-white font-semibold mb-3'>Contact</div>
               <div className='space-y-2 text-sm text-white/75'>
-                {contactInfo.website && (
-                  <a
-                    href={contactInfo.website}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-3 hover:bg-black/30 transition'
-                  >
-                    <Globe className='h-4 w-4 text-white/50' />
-                    <span className='truncate'>{contactInfo.website}</span>
-                  </a>
-                )}
-                {contactInfo.address && (
-                  <div className='flex items-start gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-3'>
-                    <MapPin className='h-4 w-4 text-white/50 mt-0.5' />
-                    <span>{contactInfo.address}</span>
-                  </div>
-                )}
-                {contactInfo.dob && (
-                  <div className='flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-3'>
-                    <Calendar className='h-4 w-4 text-white/50' />
-                    <span>{new Date(contactInfo.dob).toLocaleDateString()}</span>
-                  </div>
-                )}
+                {contactInfo.map((contact) => {
+                  const getIcon = () => {
+                    switch (contact.contact_type) {
+                      case 'email':
+                        return <Mail className='h-4 w-4 text-white/50' />
+                      case 'phone':
+                      case 'telephone':
+                        return <Phone className='h-4 w-4 text-white/50' />
+                      case 'website':
+                        return <Globe className='h-4 w-4 text-white/50' />
+                      case 'address':
+                        return <MapPin className='h-4 w-4 text-white/50 mt-0.5' />
+                      default:
+                        return <Globe className='h-4 w-4 text-white/50' />
+                    }
+                  }
+
+                  const getHref = () => {
+                    switch (contact.contact_type) {
+                      case 'email':
+                        return `mailto:${contact.value}`
+                      case 'phone':
+                      case 'telephone':
+                        return `tel:${contact.value}`
+                      case 'website':
+                        return contact.value.startsWith('http') ? contact.value : `https://${contact.value}`
+                      default:
+                        return null
+                    }
+                  }
+
+                  const isClickable = ['email', 'phone', 'telephone', 'website'].includes(contact.contact_type)
+                  const href = getHref()
+
+                  if (isClickable && href) {
+                    return (
+                      <a
+                        key={contact.id}
+                        href={href}
+                        target={contact.contact_type === 'website' ? '_blank' : undefined}
+                        rel={contact.contact_type === 'website' ? 'noreferrer' : undefined}
+                        className='flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-3 hover:bg-black/30 transition'
+                      >
+                        {getIcon()}
+                        <span className='truncate flex-1'>{contact.value}</span>
+                        {contact.is_primary && (
+                          <span className='text-xs text-white/40 ml-2'>•</span>
+                        )}
+                      </a>
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={contact.id}
+                      className='flex items-start gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-3'
+                    >
+                      {getIcon()}
+                      <span className='flex-1'>{contact.value}</span>
+                      {contact.is_primary && (
+                        <span className='text-xs text-white/40'>•</span>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </Card>
           )}

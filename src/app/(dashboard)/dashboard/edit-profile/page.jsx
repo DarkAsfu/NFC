@@ -131,20 +131,85 @@ export default function EditProfilePage() {
   }
 
   const handleSaveContact = async (data) => {
-    if (!user?.username) return
+    if (!user?.username) {
+      setMessage({ type: 'error', text: 'User not found' })
+      return
+    }
+    if (!profile?.id) {
+      setMessage({ type: 'error', text: 'Profile not found. Please refresh the page.' })
+      return
+    }
+    
     setSaving(true)
     setMessage(null)
     try {
-      // For OneToOne relationships, use PUT for both create and update
+      // For OneToOne relationships, use POST (backend handles both create and update)
       // Include profile ID in the data
-      const payload = { ...data, profile: profile?.id }
-      await api.put(`/profile/contact-informations/${user.username}/`, payload)
-      setMessage({ type: 'success', text: 'Contact information updated' })
+      const payload = { 
+        ...data, 
+        profile: profile.id,
+        address: data.address || '' // Ensure address is always a string
+      }
+      const endpoint = `/profile/contact-informations/${user.username}/`
+      
+      console.log('Saving contact info:', { payload, endpoint, profileId: profile.id })
+      
+      // Use POST - backend create method handles both create and update
+      const response = await api.post(endpoint, payload)
+      console.log('Contact info saved successfully:', response.data)
+      setMessage({ type: 'success', text: 'Contact information saved successfully' })
       fetchProfileData()
     } catch (err) {
-      const errorMsg = err?.response?.data?.detail || err?.response?.data?.error || err?.response?.data?.non_field_errors?.[0] || err?.response?.data?.message || 'Failed to update contact info'
+      // Comprehensive error handling
+      const errorData = err?.response?.data
+      const statusCode = err?.response?.status
+      const requestUrl = err?.config?.url
+      const requestMethod = err?.config?.method
+      
+      console.error('Contact save error - Full details:', {
+        status: statusCode,
+        statusText: err?.response?.statusText,
+        data: errorData,
+        dataType: typeof errorData,
+        dataKeys: errorData ? Object.keys(errorData) : [],
+        message: err?.message,
+        requestUrl,
+        requestMethod,
+        requestData: err?.config?.data,
+        fullError: err,
+        stack: err?.stack
+      })
+      
+      // Build error message from various possible sources
+      let errorMsg = 'Failed to save contact info'
+      
+      if (errorData) {
+        if (errorData.detail) {
+          errorMsg = errorData.detail
+        } else if (errorData.error) {
+          errorMsg = errorData.error
+        } else if (errorData.non_field_errors && errorData.non_field_errors.length > 0) {
+          errorMsg = errorData.non_field_errors[0]
+        } else if (errorData.message) {
+          errorMsg = errorData.message
+        } else if (errorData.address) {
+          errorMsg = `Address: ${Array.isArray(errorData.address) ? errorData.address[0] : errorData.address}`
+        } else if (errorData.website) {
+          errorMsg = `Website: ${Array.isArray(errorData.website) ? errorData.website[0] : errorData.website}`
+        } else if (Object.keys(errorData).length > 0) {
+          // Format field errors
+          const fieldErrors = Object.entries(errorData)
+            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors[0] : errors}`)
+            .join(', ')
+          errorMsg = fieldErrors || JSON.stringify(errorData)
+        }
+      } else if (err?.message) {
+        errorMsg = err.message
+      } else if (statusCode) {
+        errorMsg = `Server error (${statusCode})`
+      }
+      
       setMessage({ type: 'error', text: errorMsg })
-      console.error('Contact save error:', err?.response?.data, err?.response?.status)
     } finally {
       setSaving(false)
     }
