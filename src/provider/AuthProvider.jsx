@@ -68,8 +68,8 @@ export const AuthProvider = ({ children }) => {
           originalRequest.headers.Authorization = `Bearer ${data.access}`;
           return authAxios(originalRequest);
         } catch (refreshError) {
-          // Handle refresh token expiration
-          if (refreshError.response?.status === 401) {
+          // Handle refresh token expiration or server errors
+          if (refreshError.response?.status === 401 || refreshError.response?.status === 500) {
             logout();
             router.push('/login?session_expired=true');
           }
@@ -210,6 +210,11 @@ export const AuthProvider = ({ children }) => {
       return data;
     } catch (err) {
       console.error('Token refresh failed:', err);
+      // If refresh fails with 500 or 401, treat as authentication failure
+      if (err.response?.status === 500 || err.response?.status === 401) {
+        logout();
+        throw err;
+      }
       throw err;
     }
   };

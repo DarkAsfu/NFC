@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, CheckCircle, AlertCircle, User, Building2, ArrowLeft, ArrowRight } from "lucide-react"
+import { Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/provider/AuthProvider"
 
 
 // --- Step 1 Component ---
 function Step1AccountInfo({ register, errors, watch, setValue, trigger, onNext }) {
   const validateStep = async () => {
-    const isValid = await trigger(["email", "username", "accountType"])
+    const isValid = await trigger(["email", "username"])
     return isValid
   }
 
@@ -29,42 +29,6 @@ function Step1AccountInfo({ register, errors, watch, setValue, trigger, onNext }
 
   return (
     <div className="space-y-5">
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-[#EEE0FF]/80">Account Type *</Label>
-        <RadioGroup
-          name="accountType"
-          value={watch("accountType")}
-          onValueChange={(value) => setValue("accountType", value)}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-        >
-          <Label
-            htmlFor="personal"
-            className={`flex flex-col items-center justify-center space-y-2 p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-              watch("accountType") === "Personal"
-                ? "border-purple-500 bg-purple-500/10 text-white"
-                : "border-white/20 bg-white/5 text-[#EEE0FF]/80 hover:border-purple-400/50"
-            }`}
-          >
-            <RadioGroupItem value="Personal" id="personal" className="sr-only" />
-            <User className="h-6 w-6" />
-            <span className="font-medium">Personal</span>
-          </Label>
-          <Label
-            htmlFor="organization"
-            className={`flex flex-col items-center justify-center space-y-2 p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-              watch("accountType") === "Organization"
-                ? "border-purple-500 bg-purple-500/10 text-white"
-                : "border-white/20 bg-white/5 text-[#EEE0FF]/80 hover:border-purple-400/50"
-            }`}
-          >
-            <RadioGroupItem value="Organization" id="organization" className="sr-only" />
-            <Building2 className="h-6 w-6" />
-            <span className="font-medium">Organization</span>
-          </Label>
-        </RadioGroup>
-        {errors.accountType && <p className="text-red-400 text-sm mt-1">{errors.accountType.message}</p>}
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-medium text-[#EEE0FF]/80">
           Email Address *
@@ -392,6 +356,7 @@ function Step4VerifyOTP({ register, errors, handleSubmit, onResend, isPending, r
 
 // --- Main Multi-Step Register Component ---
 export default function MultiStepRegister() {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [isPending, setIsPending] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
@@ -412,7 +377,6 @@ export default function MultiStepRegister() {
       firstName: "",
       lastName: "",
       phone: "",
-      accountType: "Personal",
       password: "",
       confirmPassword: "",
       otp: ""
@@ -433,7 +397,6 @@ export default function MultiStepRegister() {
         first_name: watch("firstName"),
         last_name: watch("lastName"),
         phone: watch("phone"),
-        account_type: watch("accountType"),
         password: watch("password"),
         confirm_password: watch("confirmPassword")
       }
@@ -466,12 +429,15 @@ export default function MultiStepRegister() {
 
       if (response) {
         setApiResponse({ success: true, message: response.success })
-        // Redirect to dashboard or login page after successful verification
+        // Redirect to login page after successful verification
+        setTimeout(() => {
+          router.push('/login?verified=true')
+        }, 1500) // Wait 1.5 seconds to show success message
       }
     } catch (error) {
       setApiResponse({ 
         success: false, 
-        errors: [error.response.data.error || "Verification failed. Please try again."] 
+        errors: [error.response?.data?.error || "Verification failed. Please try again."] 
       })
     } finally {
       setIsPending(false)
@@ -511,7 +477,7 @@ export default function MultiStepRegister() {
 
   const getStepDescription = () => {
     switch (currentStep) {
-      case 1: return "Tell us about your account type and how to reach you."
+      case 1: return "Tell us how to reach you."
       case 2: return "Provide some optional personal details."
       case 3: return "Choose a strong password for your account."
       case 4: return "Enter the verification code sent to your email."

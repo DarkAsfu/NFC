@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -17,9 +17,21 @@ export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/'
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
+  const isVerified = searchParams.get('verified') === 'true'
   const [showPassword, setShowPassword] = useState(false)
   const [isPending, setIsPending] = useState(false)
+  const [verificationSuccess, setVerificationSuccess] = useState(isVerified)
+
+  // Auto-hide verification success message after 5 seconds
+  useEffect(() => {
+    if (verificationSuccess) {
+      const timer = setTimeout(() => {
+        setVerificationSuccess(false)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [verificationSuccess])
   
   const {
     register,
@@ -35,6 +47,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data) => {
     setIsPending(true)
+    setVerificationSuccess(false) // Clear verification message when user starts logging in
     
     try {
       const response = await login({
@@ -43,7 +56,7 @@ export default function LoginPage() {
       })
       
       if (response) {
-        router.push(redirectTo)
+        router.push(redirectTo || '/dashboard')
       }
     } catch (error) {
       console.log(error.response.data.non_field_errors[0])
@@ -108,6 +121,16 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Verification Success Message */}
+            {verificationSuccess && (
+              <Alert className="border-green-200 bg-green-900/20 text-green-100">
+                <CheckCircle className="h-4 w-4 text-green-300" />
+                <AlertDescription>
+                  Account verified successfully! Please log in to continue.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             {/* Error Messages */}
             {errors.root && (
               <Alert className="border-red-200 bg-red-900/20 text-red-100">

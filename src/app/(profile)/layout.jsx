@@ -1,11 +1,4 @@
-import { Poppins } from "next/font/google";
 import "../globals.css";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
 
 export const metadata = {
   title: "NFC",
@@ -14,7 +7,7 @@ export const metadata = {
 
 export default function ProfileLayout({ children }) {
   return (
-    <div className={`${poppins.className} antialiased bg-bG min-h-screen`}>
+    <div className="antialiased bg-bG min-h-screen">
       {children}
     </div>
   );

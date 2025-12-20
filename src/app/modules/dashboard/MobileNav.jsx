@@ -2,13 +2,13 @@
 
 import Link from 'next/link'
 import {
-  Home,
   User,
   CreditCard,
   Bell,
-  Share2,
+  Palette,
   Radio,
-  ShoppingBag
+  ShoppingBag,
+  Share2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -18,17 +18,14 @@ export function MobileNav () {
   const pathname = usePathname()
 
   const navItems = [
-    { href: '/dashboard', icon: Home, label: 'Home' },
-    { href: '/dashboard/cards', icon: CreditCard, label: 'Cards' },
     {
-      href: '/dashboard/share',
-      icon: Share2,
-      label: 'Share'
-      // isSpecial: true,
-      // badge: <Radio className="absolute -top-1 -right-1 h-3 w-3 text-blue-600" />
+      href: '/dashboard/themes',
+      icon: Palette,
+      label: 'Theme'
     },
-    { href: '/dashboard/my-orders', icon: ShoppingBag, label: 'Orders' },
-    // { href: "/dashboard/notifications", icon: Bell, label: "Alerts" },
+    { href: '/dashboard/cards', icon: CreditCard, label: 'Card' },
+    { href: '/dashboard', icon: ShoppingBag, label: 'Dashboard' },
+    { href: '/dashboard/share', icon: Share2, label: 'Share' },
     { href: '/dashboard/profile', icon: User, label: 'Profile' }
   ]
 

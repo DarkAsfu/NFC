@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useAuth } from '@/provider/AuthProvider'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
@@ -15,10 +15,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { AlertCircle, CheckCircle, Plus, X, Trash2, Edit2, Save, Image as ImageIcon, ExternalLink, Upload, X as XIcon, User, Briefcase, Award, Image as ImageIcon2, Globe, FileText, Menu, Mail, Phone, GraduationCap, MapPin, Eye } from 'lucide-react'
+import { AlertCircle, CheckCircle, Plus, X, Trash2, Edit2, Save, Image as ImageIcon, ExternalLink, Upload, X as XIcon, User, Briefcase, Award, Image as ImageIcon2, Globe, FileText, Menu, Mail, Phone, GraduationCap, MapPin, Eye, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight, MoveHorizontal, BookOpen } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import ProtectedRoute from '@/lib/ProtectedRoute'
 import { ImageCropper } from '@/components/ImageCropper'
+import { ThemePreview } from '@/app/modules/themes/ThemePreview'
 
 const PROFILE_TYPES = [
   'Graphic Designer', 'UI/UX Designer', 'Web Developer', 'Software Engineer',
@@ -45,7 +47,17 @@ export default function MyCardsPage() {
   const [activeCategory, setActiveCategory] = useState('profile')
   const [showPreviewModal, setShowPreviewModal] = useState(false)
 
-  // Profile data
+  // Auto-dismiss messages after 5 seconds
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [message])
+
+  // Profile data (saved state)
   const [profile, setProfile] = useState(null)
   const [theme, setTheme] = useState(null)
   const [about, setAbout] = useState(null)
@@ -53,7 +65,17 @@ export default function MyCardsPage() {
   const [languages, setLanguages] = useState([])
   const [skills, setSkills] = useState([])
   const [experiences, setExperiences] = useState([])
+  const [liveExperiences, setLiveExperiences] = useState(null)
   const [educations, setEducations] = useState([])
+  const [liveEducations, setLiveEducations] = useState(null)
+  const [liveSkills, setLiveSkills] = useState(null)
+  const [liveLanguages, setLiveLanguages] = useState(null)
+  const [liveSocials, setLiveSocials] = useState(null)
+  const [livePortfolios, setLivePortfolios] = useState(null)
+  const [liveServices, setLiveServices] = useState(null)
+  const [liveCertificates, setLiveCertificates] = useState(null)
+  const [livePublications, setLivePublications] = useState(null)
+  const [liveHonors, setLiveHonors] = useState(null)
   const [galleries, setGalleries] = useState([])
   const [portfolios, setPortfolios] = useState([])
   const [services, setServices] = useState([])
@@ -62,6 +84,11 @@ export default function MyCardsPage() {
   const [publications, setPublications] = useState([])
   const [honors, setHonors] = useState([])
   const [socialPlatforms, setSocialPlatforms] = useState([])
+
+  // Live preview state (updates as user types)
+  const [liveProfile, setLiveProfile] = useState(null)
+  const [liveAbout, setLiveAbout] = useState(null)
+  const [liveContactInfo, setLiveContactInfo] = useState(null)
 
   useEffect(() => {
     if (!user?.username) return
@@ -117,21 +144,64 @@ export default function MyCardsPage() {
         api.get(`/profile/honor-and-award/${username}/`)
       ])
 
-      if (profileRes.status === 'fulfilled') setProfile(profileRes.value.data)
+      if (profileRes.status === 'fulfilled') {
+        const profileData = profileRes.value.data
+        setProfile(profileData)
+        setLiveProfile(profileData)
+      }
       if (themeRes.status === 'fulfilled') setTheme(themeRes.value.data)
-      if (aboutRes.status === 'fulfilled') setAbout(aboutRes.value.data)
-      if (contactRes.status === 'fulfilled') setContactInfo(contactRes.value.data || [])
-      if (languagesRes.status === 'fulfilled') setLanguages(languagesRes.value.data || [])
-      if (skillsRes.status === 'fulfilled') setSkills(skillsRes.value.data || [])
-      if (experiencesRes.status === 'fulfilled') setExperiences(experiencesRes.value.data || [])
-      if (educationsRes.status === 'fulfilled') setEducations(educationsRes.value.data || [])
+      if (aboutRes.status === 'fulfilled') {
+        const aboutData = aboutRes.value.data
+        setAbout(aboutData)
+        setLiveAbout(aboutData)
+      }
+      if (contactRes.status === 'fulfilled') {
+        const contactData = contactRes.value.data || []
+        setContactInfo(contactData)
+        setLiveContactInfo(contactData)
+      }
+      if (languagesRes.status === 'fulfilled') {
+        setLanguages(languagesRes.value.data || [])
+        setLiveLanguages(null)
+      }
+      if (skillsRes.status === 'fulfilled') {
+        setSkills(skillsRes.value.data || [])
+        setLiveSkills(null)
+      }
+      if (experiencesRes.status === 'fulfilled') {
+        const experiencesData = experiencesRes.value.data || []
+        setExperiences(experiencesData)
+        setLiveExperiences(null) // Reset live state when fetching fresh data
+      }
+      if (educationsRes.status === 'fulfilled') {
+        setEducations(educationsRes.value.data || [])
+        setLiveEducations(null)
+      }
       if (galleriesRes.status === 'fulfilled') setGalleries(galleriesRes.value.data || [])
-      if (portfoliosRes.status === 'fulfilled') setPortfolios(portfoliosRes.value.data || [])
-      if (servicesRes.status === 'fulfilled') setServices(servicesRes.value.data || [])
-      if (socialsRes.status === 'fulfilled') setSocials(socialsRes.value.data || [])
-      if (certificatesRes.status === 'fulfilled') setCertificates(certificatesRes.value.data || [])
-      if (publicationsRes.status === 'fulfilled') setPublications(publicationsRes.value.data || [])
-      if (honorsRes.status === 'fulfilled') setHonors(honorsRes.value.data || [])
+      if (portfoliosRes.status === 'fulfilled') {
+        setPortfolios(portfoliosRes.value.data || [])
+        setLivePortfolios(null)
+      }
+      if (servicesRes.status === 'fulfilled') {
+        setServices(servicesRes.value.data || [])
+        setLiveServices(null)
+      }
+      if (socialsRes.status === 'fulfilled') {
+        setSocials(socialsRes.value.data || [])
+        setLiveSocials(null)
+      }
+      if (certificatesRes.status === 'fulfilled') {
+        setCertificates(certificatesRes.value.data || [])
+        setLiveCertificates(null)
+      }
+      if (publicationsRes.status === 'fulfilled') {
+        setPublications(publicationsRes.value.data || [])
+        setLivePublications(null)
+      }
+      if (honorsRes.status === 'fulfilled') {
+        setHonors(honorsRes.value.data || [])
+        setLiveHonors(null)
+      }
     } catch (err) {
       console.error('Error fetching profile:', err)
     } finally {
@@ -146,9 +216,11 @@ export default function MyCardsPage() {
     try {
       // data is already a FormData object, use it directly
       // axios will automatically set Content-Type with boundary for FormData
-      await api.patch(`/profile/${user.username}/`, data)
+      const response = await api.patch(`/profile/${user.username}/`, data)
+      const updatedProfile = response.data
+      setProfile(updatedProfile)
+      setLiveProfile(updatedProfile)
       setMessage({ type: 'success', text: 'Profile updated successfully' })
-      fetchProfileData()
     } catch (err) {
       setMessage({ type: 'error', text: err?.response?.data?.detail || 'Failed to update profile' })
     } finally {
@@ -174,8 +246,10 @@ export default function MyCardsPage() {
       
       // Use POST - backend handles both create and update for OneToOne
       const response = await api.post(endpoint, payload)
+      const updatedAbout = response.data
+      setAbout(updatedAbout)
+      setLiveAbout(updatedAbout)
       setMessage({ type: 'success', text: 'About information saved successfully' })
-      fetchProfileData()
     } catch (err) {
       const errorData = err?.response?.data
       const errorMsg = 
@@ -223,8 +297,17 @@ export default function MyCardsPage() {
         response = await api.post(endpoint, payload)
       }
       console.log('Contact info saved successfully:', response.data)
+      // Update contact info state directly
+      if (data.id) {
+        // Update existing contact
+        setContactInfo(prev => prev.map(c => c.id === data.id ? response.data : c))
+        setLiveContactInfo(prev => prev ? prev.map(c => c.id === data.id ? response.data : c) : [response.data])
+      } else {
+        // Add new contact
+        setContactInfo(prev => [...(prev || []), response.data])
+        setLiveContactInfo(prev => [...(prev || []), response.data])
+      }
       setMessage({ type: 'success', text: 'Contact information saved successfully' })
-      fetchProfileData()
     } catch (err) {
       // Comprehensive error handling
       const errorData = err?.response?.data
@@ -288,16 +371,53 @@ export default function MyCardsPage() {
     try {
       const url = endpoint.replace('{username}', user.username)
       
+      let response
       // Check if data is FormData (for file uploads like portfolio image)
       if (data instanceof FormData) {
         data.append('profile', profile?.id)
-        await api.post(url, data)
+        response = await api.post(url, data)
       } else {
         const payload = { ...data, profile: profile?.id }
-        await api.post(url, payload)
+        response = await api.post(url, payload)
       }
+      
+      const newItem = response.data
       setMessage({ type: 'success', text: 'Item added successfully' })
-      fetchProfileData()
+      
+      // Update state directly with the new item instead of refetching
+      if (endpoint.includes('experiences')) {
+        setExperiences(prev => [...prev, newItem])
+        setLiveExperiences(null)
+      } else if (endpoint.includes('educations')) {
+        setEducations(prev => [...prev, newItem])
+        setLiveEducations(null)
+      } else if (endpoint.includes('skills')) {
+        setSkills(prev => [...prev, newItem])
+        setLiveSkills(null)
+      } else if (endpoint.includes('languages')) {
+        setLanguages(prev => [...prev, newItem])
+        setLiveLanguages(null)
+      } else if (endpoint.includes('social-links')) {
+        setSocials(prev => [...prev, newItem])
+        setLiveSocials(null)
+      } else if (endpoint.includes('portfolios')) {
+        setPortfolios(prev => [...prev, newItem])
+        setLivePortfolios(null)
+      } else if (endpoint.includes('services')) {
+        setServices(prev => [...prev, newItem])
+        setLiveServices(null)
+      } else if (endpoint.includes('certificates')) {
+        setCertificates(prev => [...prev, newItem])
+        setLiveCertificates(null)
+      } else if (endpoint.includes('publications')) {
+        setPublications(prev => [...prev, newItem])
+        setLivePublications(null)
+      } else if (endpoint.includes('honor-and-award')) {
+        setHonors(prev => [...prev, newItem])
+        setLiveHonors(null)
+      } else if (endpoint.includes('galleries')) {
+        setGalleries(prev => [...prev, newItem])
+      }
     } catch (err) {
       const errorMsg = err?.response?.data?.detail || err?.response?.data?.error || err?.response?.data?.non_field_errors?.[0] || Object.values(err?.response?.data || {})[0]?.[0] || 'Failed to add item'
       setMessage({ type: 'error', text: errorMsg })
@@ -309,19 +429,59 @@ export default function MyCardsPage() {
 
   const handleUpdateItem = async (endpoint, id, data) => {
     if (!user?.username) return
+    setSaving(true)
     try {
       const url = `${endpoint.replace('{username}', user.username)}${id}/`
       
+      let response
       // Check if data is FormData (for file uploads like portfolio image)
       if (data instanceof FormData) {
-        await api.patch(url, data)
+        response = await api.patch(url, data)
       } else {
-        await api.patch(url, data)
+        response = await api.patch(url, data)
       }
+      
+      const updatedItem = response.data
       setMessage({ type: 'success', text: 'Item updated successfully' })
-      fetchProfileData()
+      
+      // Update state directly with the updated item instead of refetching
+      if (endpoint.includes('experiences')) {
+        setExperiences(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveExperiences(null)
+      } else if (endpoint.includes('educations')) {
+        setEducations(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveEducations(null)
+      } else if (endpoint.includes('skills')) {
+        setSkills(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveSkills(null)
+      } else if (endpoint.includes('languages')) {
+        setLanguages(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveLanguages(null)
+      } else if (endpoint.includes('social-links')) {
+        setSocials(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveSocials(null)
+      } else if (endpoint.includes('portfolios')) {
+        setPortfolios(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLivePortfolios(null)
+      } else if (endpoint.includes('services')) {
+        setServices(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveServices(null)
+      } else if (endpoint.includes('certificates')) {
+        setCertificates(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveCertificates(null)
+      } else if (endpoint.includes('publications')) {
+        setPublications(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLivePublications(null)
+      } else if (endpoint.includes('honor-and-award')) {
+        setHonors(prev => prev.map(item => item.id === id ? updatedItem : item))
+        setLiveHonors(null)
+      } else if (endpoint.includes('galleries')) {
+        setGalleries(prev => prev.map(item => item.id === id ? updatedItem : item))
+      }
     } catch (err) {
       setMessage({ type: 'error', text: err?.response?.data?.detail || 'Failed to update item' })
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -331,11 +491,136 @@ export default function MyCardsPage() {
     try {
       await api.delete(`${endpoint.replace('{username}', user.username)}${id}/`)
       setMessage({ type: 'success', text: 'Item deleted successfully' })
-      fetchProfileData()
+      
+      // Update state directly by removing the deleted item instead of refetching
+      if (endpoint.includes('experiences')) {
+        setExperiences(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('educations')) {
+        setEducations(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('skills')) {
+        setSkills(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('languages')) {
+        setLanguages(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('social-links')) {
+        setSocials(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('portfolios')) {
+        setPortfolios(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('services')) {
+        setServices(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('certificates')) {
+        setCertificates(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('publications')) {
+        setPublications(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('honor-and-award')) {
+        setHonors(prev => prev.filter(item => item.id !== id))
+      } else if (endpoint.includes('galleries')) {
+        setGalleries(prev => prev.filter(item => item.id !== id))
+      }
     } catch (err) {
       setMessage({ type: 'error', text: err?.response?.data?.detail || 'Failed to delete item' })
     }
   }
+
+  // Memoize live update callbacks to prevent infinite loops (must be before any conditional returns)
+  const handleLiveProfileUpdate = useCallback((updates) => {
+    setLiveProfile(prev => {
+      const base = prev || profile || {}
+      const merged = { ...base }
+      if (updates.bio !== undefined) merged.bio = updates.bio
+      if (updates.profile_type !== undefined) merged.profile_type = updates.profile_type
+      if (updates.profile_image !== undefined) merged.profile_image = updates.profile_image
+      if (updates.cover_image !== undefined) merged.cover_image = updates.cover_image
+      return merged
+    })
+    if (updates.about_bio !== undefined) {
+      setLiveAbout(prev => prev ? { ...prev, bio: updates.about_bio } : { bio: updates.about_bio })
+    }
+  }, [profile])
+
+  const handleLiveContactUpdate = useCallback((updates) => {
+    setLiveContactInfo(updates)
+  }, [])
+
+  const handleLiveExperiencesUpdate = useCallback((updates) => {
+    setLiveExperiences(updates)
+  }, [])
+
+  const handleLiveEducationsUpdate = useCallback((updates) => {
+    setLiveEducations(updates)
+  }, [])
+
+  const handleLiveSkillsUpdate = useCallback((updates) => {
+    setLiveSkills(updates)
+  }, [])
+
+  const handleLiveLanguagesUpdate = useCallback((updates) => {
+    setLiveLanguages(updates)
+  }, [])
+
+  const handleLiveSocialsUpdate = useCallback((updates) => {
+    setLiveSocials(updates)
+  }, [])
+
+  const handleLivePortfoliosUpdate = useCallback((updates) => {
+    setLivePortfolios(updates)
+  }, [])
+
+  const handleLiveServicesUpdate = useCallback((updates) => {
+    setLiveServices(updates)
+  }, [])
+
+  const handleLiveCertificatesUpdate = useCallback((updates) => {
+    setLiveCertificates(updates)
+  }, [])
+
+  const handleLivePublicationsUpdate = useCallback((updates) => {
+    setLivePublications(updates)
+  }, [])
+
+  const handleLiveHonorsUpdate = useCallback((updates) => {
+    setLiveHonors(updates)
+  }, [])
+
+  // Memoize form components to prevent recreation on every render
+  const ExperienceFormComponent = useCallback((props) => (
+    <ExperienceForm {...props} onLiveUpdate={handleLiveExperiencesUpdate} experiences={experiences} />
+  ), [handleLiveExperiencesUpdate, experiences])
+
+  const EducationFormComponent = useCallback((props) => (
+    <EducationForm {...props} onLiveUpdate={handleLiveEducationsUpdate} educations={educations} />
+  ), [handleLiveEducationsUpdate, educations])
+
+  const SkillFormComponent = useCallback((props) => (
+    <SkillForm {...props} onLiveUpdate={handleLiveSkillsUpdate} skills={skills} />
+  ), [handleLiveSkillsUpdate, skills])
+
+  const LanguageFormComponent = useCallback((props) => (
+    <LanguageForm {...props} onLiveUpdate={handleLiveLanguagesUpdate} languages={languages} />
+  ), [handleLiveLanguagesUpdate, languages])
+
+  const SocialFormComponent = useCallback((props) => (
+    <SocialForm {...props} socialPlatforms={socialPlatforms} onLiveUpdate={handleLiveSocialsUpdate} socials={socials} />
+  ), [handleLiveSocialsUpdate, socials, socialPlatforms])
+
+  const PortfolioFormComponent = useCallback((props) => (
+    <PortfolioForm {...props} onLiveUpdate={handleLivePortfoliosUpdate} portfolios={portfolios} />
+  ), [handleLivePortfoliosUpdate, portfolios])
+
+  const ServiceFormComponent = useCallback((props) => (
+    <ServiceForm {...props} onLiveUpdate={handleLiveServicesUpdate} services={services} />
+  ), [handleLiveServicesUpdate, services])
+
+  const CertificateFormComponent = useCallback((props) => (
+    <CertificateForm {...props} onLiveUpdate={handleLiveCertificatesUpdate} certificates={certificates} />
+  ), [handleLiveCertificatesUpdate, certificates])
+
+  const PublicationFormComponent = useCallback((props) => (
+    <PublicationForm {...props} onLiveUpdate={handleLivePublicationsUpdate} publications={publications} />
+  ), [handleLivePublicationsUpdate, publications])
+
+  const HonorFormComponent = useCallback((props) => (
+    <HonorForm {...props} onLiveUpdate={handleLiveHonorsUpdate} honors={honors} />
+  ), [handleLiveHonorsUpdate, honors])
 
   if (loading) {
     return (
@@ -348,13 +633,34 @@ export default function MyCardsPage() {
     )
   }
 
-  const cover = resolveMediaUrl(profile?.cover_image)
-  const avatar = resolveMediaUrl(profile?.profile_image)
+  // Use live state for preview, fallback to saved state
+  const previewProfile = liveProfile || profile
+  const previewAbout = liveAbout || about
+  const previewContactInfo = liveContactInfo || contactInfo
+  const previewExperiences = liveExperiences || experiences
+  const previewEducations = liveEducations || educations
+  const previewSkills = liveSkills || skills
+  const previewLanguages = liveLanguages || languages
+  const previewSocials = liveSocials || socials
+  const previewPortfolios = livePortfolios || portfolios
+  const previewServices = liveServices || services
+  const previewCertificates = liveCertificates || certificates
+  const previewPublications = livePublications || publications
+  const previewHonors = liveHonors || honors
+  
+  // Handle image URLs - if it's already a full URL (preview), use it directly, otherwise resolve
+  const cover = previewProfile?.cover_image?.startsWith('blob:') || previewProfile?.cover_image?.startsWith('http')
+    ? previewProfile.cover_image
+    : resolveMediaUrl(previewProfile?.cover_image)
+  const avatar = previewProfile?.profile_image?.startsWith('blob:') || previewProfile?.profile_image?.startsWith('http')
+    ? previewProfile.profile_image
+    : resolveMediaUrl(previewProfile?.profile_image)
 
   return (
     <ProtectedRoute>
-      <div className='space-y-4 md:space-y-6 pb-28 lg:pb-0'>
-        <div>
+      <div className='pb-28 lg:pb-0 min-h-screen'>
+        {/* Mobile Title - Visible on mobile only */}
+        <div className='lg:hidden mb-4'>
           <h1 className='text-2xl md:text-3xl font-bold'>My Card</h1>
           <p className='text-sm text-muted-foreground mt-1'>
             Manage your profile card information
@@ -362,18 +668,38 @@ export default function MyCardsPage() {
         </div>
 
         {message && (
-          <Alert className={message.type === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
-            {message.type === 'success' ? <CheckCircle className='h-4 w-4' /> : <AlertCircle className='h-4 w-4' />}
-            <AlertDescription>{message.text}</AlertDescription>
-          </Alert>
+          <div className={`fixed top-4 right-4 z-50 animate-in slide-in-from-top-5 fade-in-0 ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-900' : 'bg-red-50 border-red-200 text-red-900'} border rounded-lg shadow-lg p-4 max-w-md flex items-start gap-3`}>
+            {message.type === 'success' ? (
+              <CheckCircle className='h-5 w-5 text-green-600 flex-shrink-0 mt-0.5' />
+            ) : (
+              <AlertCircle className='h-5 w-5 text-red-600 flex-shrink-0 mt-0.5' />
+            )}
+            <div className='flex-1'>
+              <p className='text-sm font-medium'>{message.text}</p>
+            </div>
+            <button
+              onClick={() => setMessage(null)}
+              className='text-gray-400 hover:text-gray-600 flex-shrink-0'
+            >
+              <X className='h-4 w-4' />
+            </button>
+          </div>
         )}
 
-
         {/* Split View: Preview + Configuration */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-          {/* Left Side: Live Preview - Desktop Only */}
-          <div className='hidden lg:block order-2 lg:order-1'>
-            <Card className='sticky top-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 lg:h-[calc(100vh-2rem)]'>
+          {/* Left Side: Sticky Section with Title, Subtitle, and Preview */}
+          <div className='hidden lg:flex flex-col order-2 lg:order-1 sticky top-4 h-fit max-h-[calc(100vh-2rem)]'>
+            {/* Title and Subtitle - Desktop only */}
+            <div className='mb-4'>
+              <h1 className='text-2xl md:text-3xl font-bold'>My Card</h1>
+              <p className='text-sm text-muted-foreground mt-1'>
+                Manage your profile card information
+              </p>
+            </div>
+
+            {/* Preview Card */}
+            <Card className='flex-1 overflow-hidden'>
               <CardHeader className='pb-2'>
                 <div className='flex items-center justify-between'>
                   <CardTitle>Preview</CardTitle>
@@ -403,238 +729,37 @@ export default function MyCardsPage() {
 
                     {/* Scrollable Content Area */}
                     <div className='bg-black overflow-y-auto scrollbar-hide' style={{ height: 'calc(700px - 28px)' }}>
-                      {/* Profile Card - Mobile View */}
-                      <div className='bg-gradient-to-b from-purple-900/30 via-blue-900/20 to-purple-900/30'>
-                        {/* Cover Image */}
-                      <div className='relative h-44 bg-black/40'>
-                        {cover ? (
-                          <Image
-                            src={cover}
-                            alt='Cover'
-                            fill
-                            className='object-cover'
-                            unoptimized
-                          />
-                        ) : (
-                          <div className='absolute inset-0 bg-gradient-to-r from-purple-900/30 via-blue-900/20 to-purple-900/30' />
-                        )}
-                        <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent' />
+                      {/* Real-time Preview with Theme */}
+                      <ThemePreview
+                        theme={theme}
+                        cover={previewProfile?.cover_image}
+                        avatar={previewProfile?.profile_image}
+                        user={user}
+                        profile={previewProfile}
+                        about={previewAbout}
+                        contactInfo={previewContactInfo}
+                        socials={previewSocials}
+                        skills={previewSkills}
+                        experiences={previewExperiences}
+                        educations={previewEducations}
+                        languages={previewLanguages}
+                        portfolios={previewPortfolios}
+                        services={previewServices}
+                        certificates={previewCertificates}
+                        publications={previewPublications}
+                        honors={previewHonors}
+                      />
                       </div>
-
-                      {/* Profile Section */}
-                      <div className='px-4 pt-4 pb-2 flex flex-col gap-4'>
-                        <div className='relative -mt-14 flex flex-col items-center'>
-                          <div className='relative h-20 w-20 rounded-2xl border-4 border-black shadow-lg overflow-hidden bg-black/30'>
-                            {avatar ? (
-                              <Image
-                                src={avatar}
-                                alt='Profile'
-                                fill
-                                className='object-cover'
-                                unoptimized
-                              />
-                            ) : (
-                              <div className='h-full w-full flex items-center justify-center text-white/70 font-bold text-2xl'>
-                                {user?.username?.slice(0, 1)?.toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className='text-center mt-2'>
-                          <div className='flex flex-wrap items-center justify-center gap-2 mb-2'>
-                            {profile?.profile_type && (
-                              <Badge className='bg-white/10 border-white/15 text-white text-[10px] px-2 py-0.5'>
-                                {profile.profile_type}
-                              </Badge>
-                            )}
-                            {theme?.theme && (
-                              <Badge className='bg-purple-500/15 border-purple-400/20 text-purple-100 text-[10px] px-2 py-0.5'>
-                                {theme.theme}
-                              </Badge>
-                            )}
-                          </div>
-                          <h1 className='text-xl font-extrabold text-white mb-2'>
-                            {user?.username || 'Your Name'}
-                          </h1>
-                          {profile?.bio && (
-                            <p className='text-xs text-white/75 leading-relaxed whitespace-pre-line px-2'>
-                              {profile.bio}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Save Contact Button */}
-                        <div className='mt-4 mb-4 px-4'>
-                          <Button className='w-full bg-white text-black hover:bg-white/90 h-11 text-sm font-semibold'>
-                            Save Contact
-                          </Button>
-                        </div>
-
-                        {/* About Section */}
-                        {about?.bio && (
-                          <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                            <div className='flex items-center gap-2 text-white font-semibold mb-2 text-xs'>
-                              <FileText className='h-3.5 w-3.5 text-white/70' />
-                              About
-                            </div>
-                            <p className='text-white/75 leading-relaxed whitespace-pre-line text-[11px]'>
-                              {about.bio}
-                            </p>
-                          </Card>
-                        )}
-
-                        {/* Contact Information */}
-                        {contactInfo?.length > 0 && (
-                          <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                            <div className='text-white font-semibold mb-3 text-xs'>Contact</div>
-                            <div className='space-y-2'>
-                              {contactInfo.map((contact) => {
-                                const getIcon = () => {
-                                  switch (contact.contact_type) {
-                                    case 'email': return <Mail className='h-4 w-4 text-white/50' />
-                                    case 'phone':
-                                    case 'telephone': return <Phone className='h-4 w-4 text-white/50' />
-                                    case 'website': return <Globe className='h-4 w-4 text-white/50' />
-                                    case 'address': return <MapPin className='h-4 w-4 text-white/50' />
-                                    default: return null
-                                  }
-                                }
-                                return (
-                                  <div
-                                    key={contact.id}
-                                    className='flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[11px] text-white/75'
-                                  >
-                                    {getIcon()}
-                                    <span className='flex-1 truncate'>{contact.value}</span>
-                                    {contact.is_primary && (
-                                      <span className='text-[10px] text-white/40'>•</span>
-                                    )}
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          </Card>
-                        )}
-
-                        {/* Social Links */}
-                        {socials?.length > 0 && (
-                          <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                            <div className='text-white font-semibold mb-3 text-xs'>Links</div>
-                            <div className='space-y-2'>
-                              {socials.map((s) => (
-                                <a
-                                  key={s.id}
-                                  href={s.full_social_profile_url || s.profile_url}
-                                  target='_blank'
-                                  rel='noreferrer'
-                                  className='flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition text-[11px] text-white/85'
-                                >
-                                  <span>{s.core_social?.name || 'Social'}</span>
-                                  <ExternalLink className='h-3 w-3 text-white/50' />
-                                </a>
-                              ))}
-                            </div>
-                          </Card>
-                        )}
-
-                        {/* Skills */}
-                        {skills?.length > 0 && (
-                          <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                            <div className='text-white font-semibold mb-3 text-xs'>Skills</div>
-                            <div className='flex flex-wrap gap-2'>
-                              {skills.map((sk) => (
-                                <Badge
-                                  key={sk.id}
-                                  className='bg-white/10 border-white/15 text-white text-[10px] px-2 py-0.5'
-                                >
-                                  {sk.name}
-                                </Badge>
-                              ))}
-                            </div>
-                          </Card>
-                        )}
-
-                        {/* Experience */}
-                        {experiences?.length > 0 && (
-                          <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                            <div className='flex items-center gap-2 text-white font-semibold mb-3 text-xs'>
-                              <Briefcase className='h-3.5 w-3.5 text-white/70' />
-                              Experience
-                            </div>
-                            <div className='space-y-2'>
-                              {experiences.map((e) => (
-                                <div
-                                  key={e.id}
-                                  className='rounded-lg border border-white/10 bg-black/20 p-2.5'
-                                >
-                                  <div className='text-white font-semibold text-[11px]'>{e.name}</div>
-                                  {e.company && (
-                                    <div className='text-white/70 text-[10px] mt-0.5'>{e.company}</div>
-                                  )}
-                                  {e.employment_type && (
-                                    <div className='text-white/50 text-[10px] mt-0.5'>{e.employment_type}</div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </Card>
-                        )}
-
-                        {/* Education */}
-                        {educations?.length > 0 && (
-                          <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                            <div className='flex items-center gap-2 text-white font-semibold mb-3 text-xs'>
-                              <GraduationCap className='h-3.5 w-3.5 text-white/70' />
-                              Education
-                            </div>
-                            <div className='space-y-2'>
-                              {educations.map((ed) => (
-                                <div
-                                  key={ed.id}
-                                  className='rounded-lg border border-white/10 bg-black/20 p-2.5'
-                                >
-                                  <div className='text-white font-semibold text-[11px]'>{ed.school}</div>
-                                  <div className='text-white/70 text-[10px] mt-0.5'>
-                                    {ed.degree} {ed.department && `• ${ed.department}`}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </Card>
-                        )}
-
-                        {/* Languages */}
-                        {languages?.length > 0 && (
-                          <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                            <div className='text-white font-semibold mb-3 text-xs'>Languages</div>
-                            <div className='space-y-2'>
-                              {languages.map((l) => (
-                                <div
-                                  key={l.id}
-                                  className='flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[11px]'
-                                >
-                                  <span className='text-white/75'>{l.name}</span>
-                                  <span className='text-white/50 text-[10px]'>{l.proficiency}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </Card>
-                        )}
-
-                      </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Right Side: Configuration Panel */}
-          <div className='order-1 lg:order-2'>
-            <Card>
-              <CardHeader>
+          {/* Right Side: Configuration Panel - Scrollable */}
+          <div className='order-1 lg:order-2 overflow-y-auto lg:h-full'>
+            <Card className='lg:h-full flex flex-col'>
+              <CardHeader className='flex-shrink-0'>
                 <CardTitle className='text-2xl mb-2'>Create Your Digital Business Card</CardTitle>
                 <CardDescription className='mb-6'>Add your details to start building your digital business card</CardDescription>
                 
@@ -707,7 +832,7 @@ export default function MyCardsPage() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className='flex-1 overflow-y-auto'>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
                   {/* Category-specific sub-navigation */}
                   {activeCategory === 'profile' && (
@@ -762,11 +887,23 @@ export default function MyCardsPage() {
                   {(activeCategory === 'profile' || activeTab === 'basic' || activeTab === 'contact') && (
                     <>
                       <TabsContent value='basic' className='space-y-4 mt-6'>
-                        <BasicInfoForm profile={profile} about={about} onSave={handleSaveProfile} onSaveAbout={handleSaveAbout} saving={saving} />
+                        <BasicInfoForm 
+                          profile={profile} 
+                          about={about} 
+                          onSave={handleSaveProfile} 
+                          onSaveAbout={handleSaveAbout} 
+                          saving={saving}
+                          onLiveUpdate={handleLiveProfileUpdate}
+                        />
                       </TabsContent>
 
                       <TabsContent value='contact' className='space-y-4 mt-6'>
-                        <ContactInfoForm contactInfo={contactInfo} onSave={handleSaveContact} saving={saving} />
+                        <ContactInfoForm 
+                          contactInfo={contactInfo} 
+                          onSave={handleSaveContact} 
+                          saving={saving}
+                          onLiveUpdate={handleLiveContactUpdate}
+                        />
                       </TabsContent>
                     </>
                   )}
@@ -782,7 +919,10 @@ export default function MyCardsPage() {
                   onAdd={handleAddItem}
                   onUpdate={handleUpdateItem}
                   onDelete={handleDeleteItem}
-                  formComponent={ExperienceForm}
+                  formComponent={ExperienceFormComponent}
+                  onLiveUpdate={handleLiveExperiencesUpdate}
+                  onResetLivePreview={() => setLiveExperiences(null)}
+                  experiences={experiences}
                 />
               </TabsContent>
 
@@ -794,7 +934,9 @@ export default function MyCardsPage() {
                   onAdd={handleAddItem}
                   onUpdate={handleUpdateItem}
                   onDelete={handleDeleteItem}
-                  formComponent={EducationForm}
+                  formComponent={EducationFormComponent}
+                  onLiveUpdate={handleLiveEducationsUpdate}
+                  onResetLivePreview={() => setLiveEducations(null)}
                 />
               </TabsContent>
 
@@ -806,7 +948,9 @@ export default function MyCardsPage() {
                   onAdd={handleAddItem}
                   onUpdate={handleUpdateItem}
                   onDelete={handleDeleteItem}
-                  formComponent={SkillForm}
+                  formComponent={SkillFormComponent}
+                  onLiveUpdate={handleLiveSkillsUpdate}
+                  onResetLivePreview={() => setLiveSkills(null)}
                 />
               </TabsContent>
 
@@ -818,7 +962,9 @@ export default function MyCardsPage() {
               onAdd={handleAddItem}
               onUpdate={handleUpdateItem}
               onDelete={handleDeleteItem}
-              formComponent={LanguageForm}
+              formComponent={LanguageFormComponent}
+              onLiveUpdate={handleLiveLanguagesUpdate}
+              onResetLivePreview={() => setLiveLanguages(null)}
             />
               </TabsContent>
             </>
@@ -835,7 +981,9 @@ export default function MyCardsPage() {
               onAdd={handleAddItem}
               onUpdate={handleUpdateItem}
               onDelete={handleDeleteItem}
-              formComponent={PortfolioForm}
+              formComponent={PortfolioFormComponent}
+              onLiveUpdate={handleLivePortfoliosUpdate}
+              onResetLivePreview={() => setLivePortfolios(null)}
             />
               </TabsContent>
 
@@ -864,7 +1012,9 @@ export default function MyCardsPage() {
               onAdd={handleAddItem}
               onUpdate={handleUpdateItem}
               onDelete={handleDeleteItem}
-              formComponent={CertificateForm}
+              formComponent={CertificateFormComponent}
+              onLiveUpdate={handleLiveCertificatesUpdate}
+              onResetLivePreview={() => setLiveCertificates(null)}
             />
               </TabsContent>
 
@@ -876,7 +1026,9 @@ export default function MyCardsPage() {
                   onAdd={handleAddItem}
                   onUpdate={handleUpdateItem}
                   onDelete={handleDeleteItem}
-                  formComponent={PublicationForm}
+                  formComponent={PublicationFormComponent}
+                  onLiveUpdate={handleLivePublicationsUpdate}
+                  onResetLivePreview={() => setLivePublications(null)}
                 />
               </TabsContent>
 
@@ -888,7 +1040,9 @@ export default function MyCardsPage() {
                   onAdd={handleAddItem}
                   onUpdate={handleUpdateItem}
                   onDelete={handleDeleteItem}
-                  formComponent={HonorForm}
+                  formComponent={HonorFormComponent}
+                  onLiveUpdate={handleLiveHonorsUpdate}
+                  onResetLivePreview={() => setLiveHonors(null)}
                 />
               </TabsContent>
             </>
@@ -905,7 +1059,9 @@ export default function MyCardsPage() {
               onAdd={handleAddItem}
               onUpdate={handleUpdateItem}
               onDelete={handleDeleteItem}
-              formComponent={(props) => <SocialForm {...props} socialPlatforms={socialPlatforms} />}
+              formComponent={SocialFormComponent}
+              onLiveUpdate={handleLiveSocialsUpdate}
+              onResetLivePreview={() => setLiveSocials(null)}
             />
               </TabsContent>
 
@@ -917,7 +1073,9 @@ export default function MyCardsPage() {
                   onAdd={handleAddItem}
                   onUpdate={handleUpdateItem}
                   onDelete={handleDeleteItem}
-                  formComponent={ServiceForm}
+                  formComponent={ServiceFormComponent}
+                  onLiveUpdate={handleLiveServicesUpdate}
+                  onResetLivePreview={() => setLiveServices(null)}
                 />
               </TabsContent>
             </>
@@ -936,21 +1094,26 @@ export default function MyCardsPage() {
             <DialogTitle>Mobile Preview</DialogTitle>
           </DialogHeader>
           <div className='flex justify-center items-center bg-transparent overflow-auto flex-1 min-h-0 p-2 sm:p-4'>
-            <div className='flex justify-center items-center'>
-              <div className='scale-[0.75] sm:scale-90 md:scale-100'>
-                <PhonePreview 
-                  cover={cover}
-                  avatar={avatar}
-                  user={user}
-                  profile={profile}
+            <div className='flex justify-center items-center w-full'>
+              <div className='w-full max-w-md'>
+                <ThemePreview
                   theme={theme}
-                  about={about}
-                  contactInfo={contactInfo}
-                  socials={socials}
-                  skills={skills}
-                  experiences={experiences}
-                  educations={educations}
-                  languages={languages}
+                  cover={previewProfile?.cover_image}
+                  avatar={previewProfile?.profile_image}
+                  user={user}
+                  profile={previewProfile}
+                  about={previewAbout}
+                  contactInfo={previewContactInfo}
+                  socials={previewSocials}
+                  skills={previewSkills}
+                  experiences={previewExperiences}
+                  educations={previewEducations}
+                  languages={previewLanguages}
+                  portfolios={previewPortfolios}
+                  services={previewServices}
+                  certificates={previewCertificates}
+                  publications={previewPublications}
+                  honors={previewHonors}
                 />
               </div>
             </div>
@@ -973,249 +1136,9 @@ export default function MyCardsPage() {
   )
 }
 
-// Phone Preview Component
-function PhonePreview({ cover, avatar, user, profile, theme, about, contactInfo, socials, skills, experiences, educations, languages }) {
-  return (
-    <div className='rounded-[2.5rem] border-8 border-gray-900 bg-gray-900 overflow-hidden shadow-2xl' style={{ width: '375px', maxWidth: '100%', height: '800px', maxHeight: '90vh' }}>
-      {/* Phone Status Bar */}
-      <div className='bg-black h-7 flex items-center justify-between px-6 text-white text-[10px] font-medium'>
-        <span>9:41</span>
-        <div className='flex items-center gap-1'>
-          <div className='w-4 h-2 border border-white rounded-sm'></div>
-          <div className='w-1 h-1 bg-white rounded-full'></div>
-          <div className='w-6 h-3 border border-white rounded-sm ml-1'></div>
-        </div>
-      </div>
-
-      {/* Scrollable Content Area */}
-      <div className='bg-black overflow-y-auto scrollbar-hide' style={{ height: 'calc(100% - 28px)' }}>
-        {/* Profile Card - Mobile View */}
-        <div className='bg-gradient-to-b from-purple-900/30 via-blue-900/20 to-purple-900/30'>
-          {/* Cover Image */}
-          <div className='relative h-44 bg-black/40'>
-            {cover ? (
-              <Image
-                src={cover}
-                alt='Cover'
-                fill
-                className='object-cover'
-                unoptimized
-              />
-            ) : (
-              <div className='absolute inset-0 bg-gradient-to-r from-purple-900/30 via-blue-900/20 to-purple-900/30' />
-            )}
-            <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent' />
-          </div>
-
-          {/* Profile Section */}
-          <div className='px-4 pt-4 pb-2 flex flex-col gap-4'>
-            <div className='relative -mt-14 flex flex-col items-center'>
-              <div className='relative h-20 w-20 rounded-2xl border-4 border-black shadow-lg overflow-hidden bg-black/30'>
-                {avatar ? (
-                  <Image
-                    src={avatar}
-                    alt='Profile'
-                    fill
-                    className='object-cover'
-                    unoptimized
-                  />
-                ) : (
-                  <div className='h-full w-full flex items-center justify-center text-white/70 font-bold text-2xl'>
-                    {user?.username?.slice(0, 1)?.toUpperCase()}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className='text-center mt-2'>
-              <div className='flex flex-wrap items-center justify-center gap-2 mb-2'>
-                {profile?.profile_type && (
-                  <Badge className='bg-white/10 border-white/15 text-white text-[10px] px-2 py-0.5'>
-                    {profile.profile_type}
-                  </Badge>
-                )}
-                {theme?.theme && (
-                  <Badge className='bg-purple-500/15 border-purple-400/20 text-purple-100 text-[10px] px-2 py-0.5'>
-                    {theme.theme}
-                  </Badge>
-                )}
-              </div>
-              <h1 className='text-xl font-extrabold text-white mb-2'>
-                {user?.username || 'Your Name'}
-              </h1>
-              {profile?.bio && (
-                <p className='text-xs text-white/75 leading-relaxed whitespace-pre-line px-2'>
-                  {profile.bio}
-                </p>
-              )}
-            </div>
-
-            {/* Save Contact Button */}
-            <div className='mt-4 mb-4 px-4'>
-              <Button className='w-full bg-white text-black hover:bg-white/90 h-11 text-sm font-semibold'>
-                Save Contact
-              </Button>
-            </div>
-
-            {/* About Section */}
-            {about?.bio && (
-              <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                <div className='flex items-center gap-2 text-white font-semibold mb-2 text-xs'>
-                  <FileText className='h-3.5 w-3.5 text-white/70' />
-                  About
-                </div>
-                <p className='text-white/75 leading-relaxed whitespace-pre-line text-[11px]'>
-                  {about.bio}
-                </p>
-              </Card>
-            )}
-
-            {/* Contact Information */}
-            {contactInfo?.length > 0 && (
-              <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                <div className='text-white font-semibold mb-3 text-xs'>Contact</div>
-                <div className='space-y-2'>
-                  {contactInfo.map((contact) => {
-                    const getIcon = () => {
-                      switch (contact.contact_type) {
-                        case 'email': return <Mail className='h-4 w-4 text-white/50' />
-                        case 'phone':
-                        case 'telephone': return <Phone className='h-4 w-4 text-white/50' />
-                        case 'website': return <Globe className='h-4 w-4 text-white/50' />
-                        case 'address': return <MapPin className='h-4 w-4 text-white/50' />
-                        default: return null
-                      }
-                    }
-                    return (
-                      <div
-                        key={contact.id}
-                        className='flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[11px] text-white/75'
-                      >
-                        {getIcon()}
-                        <span className='flex-1 truncate'>{contact.value}</span>
-                        {contact.is_primary && (
-                          <span className='text-[10px] text-white/40'>•</span>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </Card>
-            )}
-
-            {/* Social Links */}
-            {socials?.length > 0 && (
-              <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                <div className='text-white font-semibold mb-3 text-xs'>Links</div>
-                <div className='space-y-2'>
-                  {socials.map((s) => (
-                    <a
-                      key={s.id}
-                      href={s.full_social_profile_url || s.profile_url}
-                      target='_blank'
-                      rel='noreferrer'
-                      className='flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition text-[11px] text-white/85'
-                    >
-                      <span>{s.core_social?.name || 'Social'}</span>
-                      <ExternalLink className='h-3 w-3 text-white/50' />
-                    </a>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Skills */}
-            {skills?.length > 0 && (
-              <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                <div className='text-white font-semibold mb-3 text-xs'>Skills</div>
-                <div className='flex flex-wrap gap-2'>
-                  {skills.map((sk) => (
-                    <Badge
-                      key={sk.id}
-                      className='bg-white/10 border-white/15 text-white text-[10px] px-2 py-0.5'
-                    >
-                      {sk.name}
-                    </Badge>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Experience */}
-            {experiences?.length > 0 && (
-              <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                <div className='flex items-center gap-2 text-white font-semibold mb-3 text-xs'>
-                  <Briefcase className='h-3.5 w-3.5 text-white/70' />
-                  Experience
-                </div>
-                <div className='space-y-2'>
-                  {experiences.map((e) => (
-                    <div
-                      key={e.id}
-                      className='rounded-lg border border-white/10 bg-black/20 p-2.5'
-                    >
-                      <div className='text-white font-semibold text-[11px]'>{e.name}</div>
-                      {e.company && (
-                        <div className='text-white/70 text-[10px] mt-0.5'>{e.company}</div>
-                      )}
-                      {e.employment_type && (
-                        <div className='text-white/50 text-[10px] mt-0.5'>{e.employment_type}</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Education */}
-            {educations?.length > 0 && (
-              <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                <div className='flex items-center gap-2 text-white font-semibold mb-3 text-xs'>
-                  <GraduationCap className='h-3.5 w-3.5 text-white/70' />
-                  Education
-                </div>
-                <div className='space-y-2'>
-                  {educations.map((ed) => (
-                    <div
-                      key={ed.id}
-                      className='rounded-lg border border-white/10 bg-black/20 p-2.5'
-                    >
-                      <div className='text-white font-semibold text-[11px]'>{ed.school}</div>
-                      <div className='text-white/70 text-[10px] mt-0.5'>
-                        {ed.degree} {ed.department && `• ${ed.department}`}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Languages */}
-            {languages?.length > 0 && (
-              <Card className='bg-white/5 border-white/10 p-4 mx-4 mt-4'>
-                <div className='text-white font-semibold mb-3 text-xs'>Languages</div>
-                <div className='space-y-2'>
-                  {languages.map((l) => (
-                    <div
-                      key={l.id}
-                      className='flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[11px]'
-                    >
-                      <span className='text-white/75'>{l.name}</span>
-                      <span className='text-white/50 text-[10px]'>{l.proficiency}</span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // Form Components (same as edit-profile page)
-function BasicInfoForm({ profile, about, onSave, onSaveAbout, saving }) {
+function BasicInfoForm({ profile, about, onSave, onSaveAbout, saving, onLiveUpdate }) {
   const [formData, setFormData] = useState({
     bio: profile?.bio || '',
     profile_type: profile?.profile_type || '',
@@ -1251,6 +1174,33 @@ function BasicInfoForm({ profile, about, onSave, onSaveAbout, saving }) {
       }))
     }
   }, [profile, about])
+
+  // Live update preview as user types
+  useEffect(() => {
+    if (!onLiveUpdate) return
+    
+    const updates = {}
+    if (formData.bio !== undefined && formData.bio !== profile?.bio) {
+      updates.bio = formData.bio
+    }
+    if (formData.profile_type !== undefined && formData.profile_type !== profile?.profile_type) {
+      updates.profile_type = formData.profile_type
+    }
+    if (formData.about_bio !== undefined && formData.about_bio !== about?.bio) {
+      updates.about_bio = formData.about_bio
+    }
+    // Handle image previews (only if we have new images)
+    if (profileImagePreview && formData.profile_image) {
+      updates.profile_image = profileImagePreview
+    }
+    if (coverImagePreview && formData.cover_image) {
+      updates.cover_image = coverImagePreview
+    }
+    
+    if (Object.keys(updates).length > 0) {
+      onLiveUpdate(updates)
+    }
+  }, [formData.bio, formData.profile_type, formData.about_bio, profileImagePreview, coverImagePreview, profile, about, onLiveUpdate])
 
   const handleImageSelect = (e, type) => {
     const file = e.target.files?.[0]
@@ -1492,14 +1442,16 @@ function BasicInfoForm({ profile, about, onSave, onSaveAbout, saving }) {
         <div className='border-t pt-6 space-y-6'>
           <div className='space-y-2'>
             <Label className='text-base font-semibold'>Profile Type</Label>
-            <SelectTrigger className='h-11'>
               <Select value={formData.profile_type} onValueChange={(v) => setFormData({ ...formData, profile_type: v })}>
-                <option value="" disabled>Select profile type</option>
+              <SelectTrigger className='h-11'>
+                <SelectValue placeholder="Select profile type" />
+              </SelectTrigger>
+              <SelectContent className='max-h-[200px]'>
                 {PROFILE_TYPES.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <SelectItem key={type} value={type}>{type}</SelectItem>
                 ))}
+              </SelectContent>
               </Select>
-            </SelectTrigger>
           </div>
           
           <div className='space-y-2'>
@@ -1509,7 +1461,7 @@ function BasicInfoForm({ profile, about, onSave, onSaveAbout, saving }) {
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
               rows={4}
               placeholder='Tell us about yourself...'
-              className='resize-none'
+              className='resize-none placeholder:text-xs sm:placeholder:text-sm'
             />
           </div>
           
@@ -1520,7 +1472,7 @@ function BasicInfoForm({ profile, about, onSave, onSaveAbout, saving }) {
               onChange={(e) => setFormData({ ...formData, about_bio: e.target.value })}
               rows={6}
               placeholder='Tell people more about yourself, your background, interests, and what makes you unique...'
-              className='resize-none'
+              className='resize-none placeholder:text-xs sm:placeholder:text-sm'
             />
             <p className='text-xs text-muted-foreground'>
               This will be displayed on your public profile
@@ -1528,8 +1480,9 @@ function BasicInfoForm({ profile, about, onSave, onSaveAbout, saving }) {
           </div>
         </div>
         
-        <div className='flex justify-end pt-4 border-t'>
-          <Button type='submit' disabled={saving} size='lg' className='min-w-[120px]'>
+        <div className='flex justify-end pt-4 pb-4 border-t'>
+          <Button type='submit' disabled={saving} size='lg' className='min-w-[130px] h-12 px-5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold'>
+            <Save className='h-4 w-4' />
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
@@ -1546,7 +1499,7 @@ const CONTACT_TYPES = [
   { value: 'address', label: 'Address' }
 ]
 
-function ContactInfoForm({ contactInfo, onSave, saving }) {
+function ContactInfoForm({ contactInfo, onSave, saving, onLiveUpdate }) {
   const { user } = useAuth()
   const [contacts, setContacts] = useState(contactInfo || [])
   const [editing, setEditing] = useState(null)
@@ -1583,6 +1536,27 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
     setFormData({ contact_type: 'email', value: '', is_primary: false })
   }
 
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdate) return
+    
+    if ((showAdd || editing) && formData.value.trim()) {
+      const tempContact = {
+        id: editing || 'temp-' + Date.now(),
+        contact_type: formData.contact_type,
+        value: formData.value,
+        is_primary: formData.is_primary
+      }
+      const updatedContacts = editing
+        ? contacts.map(c => c.id === editing ? tempContact : c)
+        : [...contacts, tempContact]
+      onLiveUpdate(updatedContacts)
+    } else if (!showAdd && !editing) {
+      // When form is closed, show saved contacts
+      onLiveUpdate(contacts)
+    }
+  }, [formData.contact_type, formData.value, formData.is_primary, showAdd, editing, contacts, onLiveUpdate])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!formData.value.trim()) {
@@ -1601,9 +1575,11 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
     if (!confirm('Are you sure you want to delete this contact?')) return
     try {
       await api.delete(`/profile/contact-informations/${user?.username}/${id}/`)
-      setContacts(contacts.filter(c => c.id !== id))
-      // Refresh the parent component's data
-      window.location.reload() // Simple refresh, or you could pass a callback
+      const updatedContacts = contacts.filter(c => c.id !== id)
+      setContacts(updatedContacts)
+      // Update parent component's state directly without reload
+      setContactInfo(updatedContacts)
+      setLiveContactInfo(updatedContacts)
     } catch (err) {
       console.error('Delete error:', err)
       alert('Failed to delete contact. Please try again.')
@@ -1621,11 +1597,12 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
 
   return (
     <div className='space-y-4'>
-      <div className='flex justify-between items-center'>
-        <h3 className='text-lg font-semibold'>Your Contacts</h3>
-        <Button onClick={handleAdd} size='sm' type='button'>
-          <Plus className='h-4 w-4 mr-2' />
-          Add Contact
+      <div className='flex justify-between items-center gap-4'>
+        <h3 className='text-base sm:text-lg font-semibold flex-1 min-w-0'>Your Contacts</h3>
+        <Button onClick={handleAdd} size='sm' type='button' className='h-9 px-4 sm:h-9 sm:px-5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border border-purple-500/20 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 rounded-lg flex-shrink-0 text-sm font-medium'>
+          <Plus className='h-4 w-4' />
+          <span className='hidden sm:inline'>Add Contact</span>
+          <span className='sm:hidden'>Add</span>
         </Button>
       </div>
 
@@ -1634,20 +1611,22 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
           <CardContent className='pt-6'>
             <form onSubmit={handleSubmit} className='space-y-4'>
               <div className='space-y-2'>
-                <Label>Contact Type</Label>
-                <SelectTrigger>
+                <Label className='text-xs sm:text-sm'>Contact Type</Label>
                   <Select value={formData.contact_type} onValueChange={(v) => setFormData({ ...formData, contact_type: v })}>
+                  <SelectTrigger>
                     <SelectValue placeholder="Select contact type" />
+                  </SelectTrigger>
+                  <SelectContent className='max-h-[200px]'>
                     {CONTACT_TYPES.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
                     ))}
+                  </SelectContent>
                   </Select>
-                </SelectTrigger>
               </div>
               <div className='space-y-2'>
-                <Label>
+                <Label className='text-xs sm:text-sm'>
                   {formData.contact_type === 'email' ? 'Email Address' :
                    formData.contact_type === 'phone' || formData.contact_type === 'telephone' ? 'Phone Number' :
                    formData.contact_type === 'website' ? 'Website URL' :
@@ -1659,6 +1638,7 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
                     onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                     rows={3}
                     placeholder='Enter your address...'
+                    className='placeholder:text-xs sm:placeholder:text-sm'
                     required
                   />
                 ) : (
@@ -1671,6 +1651,7 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
                       formData.contact_type === 'website' ? 'https://example.com' :
                       '+1234567890'
                     }
+                    className='placeholder:text-xs sm:placeholder:text-sm'
                     required
                   />
                 )}
@@ -1682,10 +1663,11 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
                   checked={formData.is_primary}
                   onChange={(e) => setFormData({ ...formData, is_primary: e.target.checked })}
                 />
-                <Label htmlFor='is_primary' className='text-sm'>Set as primary {formData.contact_type}</Label>
+                <Label htmlFor='is_primary' className='text-xs sm:text-sm'>Set as primary {formData.contact_type}</Label>
               </div>
               <div className='flex gap-2'>
-                <Button type='submit' disabled={saving} size='sm'>
+                <Button type='submit' disabled={saving} size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+                  <Save className='h-3.5 w-3.5' />
                   {saving ? 'Saving...' : editing ? 'Update' : 'Add'}
                 </Button>
                 <Button type='button' variant='outline' size='sm' onClick={handleCancel}>
@@ -1698,25 +1680,35 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
       )}
 
       {contacts.length === 0 && !showAdd && (
-        <p className='text-sm text-muted-foreground text-center py-4'>
+        <p className='text-xs sm:text-sm text-muted-foreground text-center py-4'>
           No contacts yet. Click "Add Contact" to get started.
         </p>
       )}
 
       {Object.keys(groupedContacts).map((type) => (
         <div key={type} className='space-y-2'>
-          <h4 className='font-medium text-sm text-muted-foreground uppercase'>
+          <h4 className='font-medium text-xs sm:text-sm text-muted-foreground uppercase'>
             {CONTACT_TYPES.find(t => t.value === type)?.label || type}
           </h4>
-          {groupedContacts[type].map((contact) => (
-            <div key={contact.id} className='border rounded-lg p-4 flex items-center justify-between'>
-              <div className='flex-1'>
-                <div className='flex items-center gap-2'>
-                  <span className='font-medium'>{contact.value}</span>
+          {groupedContacts[type].map((contact) => {
+            const getIcon = () => {
+              switch (contact.contact_type) {
+                case 'email': return <Mail className='h-4 w-4 text-muted-foreground' />
+                case 'phone':
+                case 'telephone': return <Phone className='h-4 w-4 text-muted-foreground' />
+                case 'website': return <Globe className='h-4 w-4 text-muted-foreground' />
+                case 'address': return <MapPin className='h-4 w-4 text-muted-foreground' />
+                default: return null
+              }
+            }
+            return (
+              <div key={contact.id} className='border rounded-lg p-3 sm:p-4 flex items-center justify-between'>
+                <div className='flex-1 flex items-center gap-2 sm:gap-3'>
+                  {getIcon()}
+                  <span className='font-medium text-xs sm:text-sm'>{contact.value}</span>
                   {contact.is_primary && (
-                    <span className='text-xs text-muted-foreground opacity-70'>• Primary</span>
+                    <span className='text-[10px] sm:text-xs text-muted-foreground opacity-70'>• Primary</span>
                   )}
-                </div>
               </div>
               <div className='flex gap-2'>
                 <Button variant='ghost' size='sm' onClick={() => handleEdit(contact)}>
@@ -1727,45 +1719,132 @@ function ContactInfoForm({ contactInfo, onSave, saving }) {
                 </Button>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       ))}
     </div>
   )
 }
 
-function ManageList({ title, items, endpoint, onAdd, onUpdate, onDelete, formComponent: FormComponent }) {
+function ManageList({ title, items, endpoint, onAdd, onUpdate, onDelete, formComponent: FormComponent, experiences, educations, skills, languages, socials, onLiveUpdate, onResetLivePreview }) {
   const [editing, setEditing] = useState(null)
   const [showAdd, setShowAdd] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(null)
+  const isGallery = title === 'Gallery'
+
+  // Filter gallery items (items with only image, no other fields)
+  const galleryItems = isGallery ? items.filter(item => item.image && !item.name && !item.title && !item.school && !item.company && !item.core_social) : []
+  const otherItems = isGallery ? items.filter(item => item.name || item.title || item.school || item.company || item.core_social || !item.image) : items
+
+  // Handle cancel - reset live preview and close form
+  const handleCancel = () => {
+    setShowAdd(false)
+    setEditing(null)
+    if (onResetLivePreview) {
+      onResetLivePreview()
+    }
+  }
 
   return (
     <Card>
       <CardHeader>
-        <div className='flex items-center justify-between'>
-          <div>
-            <CardTitle>{title}</CardTitle>
-            <CardDescription>Manage your {title.toLowerCase()}</CardDescription>
+        <div className='flex items-center justify-between gap-4'>
+          <div className='flex-1 min-w-0'>
+            <CardTitle className='text-base sm:text-lg'>{title}</CardTitle>
+            <CardDescription className='text-xs sm:text-sm'>Manage your {title.toLowerCase()}</CardDescription>
           </div>
-          <Button onClick={() => setShowAdd(true)} size='sm'>
-            <Plus className='h-4 w-4 mr-2' />
-            Add
+          <Button onClick={() => setShowAdd(true)} size='sm' className='h-9 px-4 sm:h-9 sm:px-5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border border-purple-500/20 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 rounded-lg flex-shrink-0 text-sm font-medium'>
+            <Plus className='h-4 w-4' />
+            <span className='hidden sm:inline'>Add</span>
+            <span className='sm:hidden'>Add</span>
           </Button>
         </div>
       </CardHeader>
       <CardContent className='space-y-4'>
         {showAdd && (
           <FormComponent
+            item={undefined}
             onSave={(data) => {
               onAdd(endpoint, data)
               setShowAdd(false)
             }}
-            onCancel={() => setShowAdd(false)}
+            onCancel={handleCancel}
+            onLiveUpdate={onLiveUpdate}
+            experiences={title === 'Experience' ? (experiences || items) : undefined}
+            educations={title === 'Education' ? (educations || items) : undefined}
+            skills={title === 'Skills' ? (skills || items) : undefined}
+            languages={title === 'Languages' ? (languages || items) : undefined}
+            socials={title === 'Social Media Links' ? (socials || items) : undefined}
+            portfolios={title === 'Portfolio' ? (items) : undefined}
+            services={title === 'Services' ? (items) : undefined}
+            certificates={title === 'Certificates' ? (items) : undefined}
+            publications={title === 'Publications' ? (items) : undefined}
+            honors={title === 'Honors & Awards' ? (items) : undefined}
           />
         )}
-        {items.map((item) => (
+        
+        {/* Modern Gallery Grid */}
+        {isGallery && galleryItems.length > 0 && (
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3'>
+            {galleryItems.map((item) => (
+              <div
+                key={item.id}
+                className='group relative aspect-square rounded-xl overflow-hidden border border-border/50 bg-muted/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg cursor-pointer'
+                onClick={() => setSelectedImage(item)}
+              >
+                <div className='relative w-full h-full'>
+                  <Image
+                    src={resolveMediaUrl(item.image)}
+                    alt='Gallery image'
+                    fill
+                    className='object-cover transition-transform duration-300 group-hover:scale-110'
+                    unoptimized
+                  />
+                  
+                  {/* Delete Button - Always Visible Top Right */}
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-sm border border-white/20 text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (confirm('Are you sure you want to delete this image?')) {
+                        onDelete(endpoint, item.id)
+                      }
+                    }}
+                  >
+                    <Trash2 className='h-4 w-4' />
+                  </Button>
+                  
+                  {/* Overlay on hover - Edit Button */}
+                  <div className='absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center'>
+                    <div className='opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='h-10 w-10 rounded-full bg-white/95 hover:bg-white text-gray-900 shadow-xl backdrop-blur-sm'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEditing(item.id)
+                        }}
+                      >
+                        <Edit2 className='h-5 w-5' />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Other items (non-gallery or items with additional fields) */}
+        {otherItems.map((item) => (
           <div key={item.id} className='border rounded-lg p-4 space-y-2'>
             {editing === item.id ? (
               <FormComponent
+                key={`edit-${item.id}`}
                 item={item}
                 onSave={(data) => {
                   // Check if data is FormData, if not wrap it
@@ -1773,19 +1852,30 @@ function ManageList({ title, items, endpoint, onAdd, onUpdate, onDelete, formCom
                   onUpdate(endpoint, item.id, payload)
                   setEditing(null)
                 }}
-                onCancel={() => setEditing(null)}
+                onCancel={handleCancel}
+                onLiveUpdate={onLiveUpdate}
+                experiences={title === 'Experience' ? items : undefined}
+                educations={title === 'Education' ? items : undefined}
+                skills={title === 'Skills' ? items : undefined}
+                languages={title === 'Languages' ? items : undefined}
+                socials={title === 'Social Media Links' ? items : undefined}
+                portfolios={title === 'Portfolio' ? items : undefined}
+                services={title === 'Services' ? items : undefined}
+                certificates={title === 'Certificates' ? items : undefined}
+                publications={title === 'Publications' ? items : undefined}
+                honors={title === 'Honors & Awards' ? items : undefined}
               />
             ) : (
               <>
                 <div className='flex items-start justify-between'>
                   <div className='flex-1'>
-                    {/* Gallery items */}
-                    {item.image && (
+                    {/* Other items - show image if exists */}
+                    {item.image && (item.name || item.title || item.school || item.company || item.core_social) && (
                       <div className='mb-2'>
                         <div className='relative w-full h-32 rounded-lg overflow-hidden border border-border'>
                           <Image
                             src={resolveMediaUrl(item.image)}
-                            alt={item.title || 'Gallery image'}
+                            alt={item.title || 'Image'}
                             fill
                             className='object-cover'
                             unoptimized
@@ -1793,16 +1883,21 @@ function ManageList({ title, items, endpoint, onAdd, onUpdate, onDelete, formCom
                         </div>
                       </div>
                     )}
+                    {/* Only show title/name for non-gallery items */}
+                    {(item.name || item.title || item.school || item.company || item.core_social?.name) && (
                     <div className='font-semibold'>
                       {item.name || item.title || item.school || item.company || item.core_social?.name || 'Untitled'}
                     </div>
+                    )}
                     {/* Social items */}
                     {item.core_social && (
-                      <div className='text-sm text-muted-foreground mt-1'>
+                      <div className='text-xs sm:text-sm text-muted-foreground mt-1'>
                         {item.profile_url}
                       </div>
                     )}
-                    {item.description && <div className='text-sm text-muted-foreground mt-1'>{item.description}</div>}
+                    {item.description && (item.name || item.title || item.school || item.company || item.core_social) && (
+                      <div className='text-xs sm:text-sm text-muted-foreground mt-1'>{item.description}</div>
+                    )}
                     {/* Show additional details for Education */}
                     {item.school && (
                       <div className='text-sm text-muted-foreground mt-1'>
@@ -1829,20 +1924,234 @@ function ManageList({ title, items, endpoint, onAdd, onUpdate, onDelete, formCom
             )}
           </div>
         ))}
-        {items.length === 0 && !showAdd && (
-          <p className='text-sm text-muted-foreground text-center py-4'>No items yet. Click "Add" to get started.</p>
+        {(isGallery ? galleryItems.length === 0 && otherItems.length === 0 : items.length === 0) && !showAdd && (
+          <p className='text-xs sm:text-sm text-muted-foreground text-center py-4'>No items yet. Click "Add" to get started.</p>
         )}
       </CardContent>
+      
+      {/* Premium Image Lightbox */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className='fixed inset-0 z-[100] flex items-center justify-center'
+            onClick={() => setSelectedImage(null)}
+          >
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className='absolute inset-0 bg-black/98 backdrop-blur-xl'
+            />
+            
+            {/* Close Button - Top Right (No Background) */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={() => setSelectedImage(null)}
+              className='absolute top-6 right-6 z-20 h-11 w-11 flex items-center justify-center text-white transition-all duration-300 hover:scale-110'
+              aria-label='Close'
+            >
+              <X className='h-6 w-6' />
+            </motion.button>
+
+            {/* Image Container */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+              className='relative w-full h-full flex items-center justify-center p-6 sm:p-12'
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className='relative w-full h-full max-w-7xl max-h-[70vh] sm:max-h-[85vh] flex items-center justify-center'>
+                <Image
+                  src={resolveMediaUrl(selectedImage.image)}
+                  alt='Gallery image'
+                  fill
+                  className='object-contain rounded-lg'
+                  unoptimized
+                  priority
+                />
+              </div>
+
+              {/* Desktop Navigation Buttons - Side Positioned */}
+              {galleryItems.length > 1 && (
+                <>
+                  {/* Desktop: Modern Arrows (No Background) */}
+                  <motion.button
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    whileHover={{ scale: 1.1, x: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const currentIndex = galleryItems.findIndex(item => item.id === selectedImage.id)
+                      const prevIndex = currentIndex > 0 ? currentIndex - 1 : galleryItems.length - 1
+                      setSelectedImage(galleryItems[prevIndex])
+                    }}
+                    className='hidden sm:flex absolute left-8 top-1/2 -translate-y-1/2 z-20 h-12 w-12 items-center justify-center text-white transition-all duration-300 group'
+                    aria-label='Previous image'
+                  >
+                    <ArrowLeft className='h-8 w-8 group-hover:scale-110 transition-transform' />
+                  </motion.button>
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    whileHover={{ scale: 1.1, x: 5 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const currentIndex = galleryItems.findIndex(item => item.id === selectedImage.id)
+                      const nextIndex = currentIndex < galleryItems.length - 1 ? currentIndex + 1 : 0
+                      setSelectedImage(galleryItems[nextIndex])
+                    }}
+                    className='hidden sm:flex absolute right-8 top-1/2 -translate-y-1/2 z-20 h-12 w-12 items-center justify-center text-white transition-all duration-300 group'
+                    aria-label='Next image'
+                  >
+                    <ArrowRight className='h-8 w-8 group-hover:scale-110 transition-transform' />
+                  </motion.button>
+                </>
+              )}
+
+              {/* Mobile: Thumbnail Slider at Bottom */}
+              {galleryItems.length > 1 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className='sm:hidden absolute bottom-16 left-0 right-0 z-20 px-4'
+                >
+                  <div className='flex gap-2 overflow-x-auto pb-2 scrollbar-hide'>
+                    {galleryItems.map((item, index) => {
+                      const isActive = item.id === selectedImage.id
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedImage(item)
+                          }}
+                          className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                            isActive
+                              ? 'border-white shadow-lg scale-110'
+                              : 'border-white/30 opacity-60'
+                          }`}
+                        >
+                          <Image
+                            src={resolveMediaUrl(item.image)}
+                            alt={`Thumbnail ${index + 1}`}
+                            width={64}
+                            height={64}
+                            className='w-full h-full object-cover'
+                            unoptimized
+                          />
+                        </button>
+                      )
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Delete Button - Top Right (Next to Close) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className='absolute top-6 right-20 sm:right-24 z-20'
+              >
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (confirm('Are you sure you want to delete this image?')) {
+                      onDelete(endpoint, selectedImage.id)
+                      setSelectedImage(null)
+                    }
+                  }}
+                  className='h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 hover:border-red-500/50 text-white shadow-2xl flex items-center justify-center transition-all duration-300 group'
+                >
+                  <Trash2 className='h-5 w-5 sm:h-6 sm:w-6 group-hover:text-red-400 transition-colors' />
+                </motion.button>
+              </motion.div>
+
+              {/* Image Counter - Top Center */}
+              {galleryItems.length > 1 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className='absolute top-6 sm:top-8 left-1/2 -translate-x-1/2 z-20 px-4 py-2 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 text-white text-sm font-medium shadow-xl'
+                >
+                  {galleryItems.findIndex(item => item.id === selectedImage.id) + 1} / {galleryItems.length}
+                </motion.div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   )
 }
 
 // Individual form components (same as edit-profile page)
-function LanguageForm({ item, onSave, onCancel }) {
+function LanguageForm({ item, onSave, onCancel, onLiveUpdate, languages = [] }) {
+  const languagesRef = useRef(languages)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  const tempIdRef = useRef(`temp-${Date.now()}`)
+  
+  // Initialize formData from item prop - ONLY on mount, never reset automatically
+  // This matches ContactInfoForm pattern
   const [formData, setFormData] = useState({
     name: item?.name || '',
     proficiency: item?.proficiency || 'Intermediate'
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    languagesRef.current = languages
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [languages, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary language object for preview
+    const tempLanguage = {
+      id: item?.id || tempIdRef.current,
+      name: formData.name,
+      proficiency: formData.proficiency
+    }
+
+    const currentLanguages = languagesRef.current || []
+    const updatedLanguages = item?.id
+      ? currentLanguages.map(l => l.id === item.id ? tempLanguage : l)
+      : (() => {
+          // Check if temp item already exists, update it; otherwise add new
+          const existingTempIndex = currentLanguages.findIndex(l => l.id === tempIdRef.current)
+          if (existingTempIndex >= 0) {
+            const updated = [...currentLanguages]
+            updated[existingTempIndex] = tempLanguage
+            return updated
+          }
+          return [...currentLanguages, tempLanguage]
+        })()
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedLanguages)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.name, formData.proficiency, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -1855,29 +2164,68 @@ function LanguageForm({ item, onSave, onCancel }) {
         placeholder='Language name'
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
-      <SelectTrigger>
         <Select value={formData.proficiency} onValueChange={(v) => setFormData({ ...formData, proficiency: v })}>
-          <option value="" disabled>Select proficiency</option>
+        <SelectTrigger>
+          <SelectValue placeholder="Select proficiency" />
+        </SelectTrigger>
+        <SelectContent className='max-h-[200px]' position='popper' sideOffset={4}>
           {PROFICIENCY_LEVELS.map((level) => (
-            <option key={level} value={level}>{level}</option>
+            <SelectItem key={level} value={level}>{level}</SelectItem>
           ))}
+        </SelectContent>
         </Select>
-      </SelectTrigger>
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function SkillForm({ item, onSave, onCancel }) {
+function SkillForm({ item, onSave, onCancel, onLiveUpdate, skills = [] }) {
+  const skillsRef = useRef(skills)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  
+  // Initialize formData from item prop - ONLY on mount, never reset automatically
+  // This matches ContactInfoForm pattern
   const [formData, setFormData] = useState({
     name: item?.name || '',
     proficiency: item?.proficiency || 'Intermediate'
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    skillsRef.current = skills
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [skills, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary skill object for preview
+    const tempSkill = {
+      id: item?.id || `temp-${Date.now()}`,
+      name: formData.name,
+      proficiency: formData.proficiency
+    }
+
+    const currentSkills = skillsRef.current
+    const updatedSkills = item?.id
+      ? currentSkills.map(s => s.id === item.id ? tempSkill : s)
+      : [...currentSkills, tempSkill]
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedSkills)
+    }
+  }, [formData.name, formData.proficiency, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -1890,25 +2238,39 @@ function SkillForm({ item, onSave, onCancel }) {
         placeholder='Skill name'
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
-      <SelectTrigger>
         <Select value={formData.proficiency} onValueChange={(v) => setFormData({ ...formData, proficiency: v })}>
-          <option value="" disabled>Select proficiency</option>
+        <SelectTrigger>
+          <SelectValue placeholder="Select proficiency" />
+        </SelectTrigger>
+        <SelectContent className='max-h-[200px]' position='popper' sideOffset={4}>
           {['Beginner', 'Intermediate', 'Expert'].map((level) => (
-            <option key={level} value={level}>{level}</option>
+            <SelectItem key={level} value={level}>{level}</SelectItem>
           ))}
+        </SelectContent>
         </Select>
-      </SelectTrigger>
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function ExperienceForm({ item, onSave, onCancel }) {
+function ExperienceForm({ item, onSave, onCancel, onLiveUpdate, experiences = [] }) {
+  const { user } = useAuth()
+  const experiencesRef = useRef(experiences)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  const timeoutRef = useRef(null)
+  
+  // Initialize formData from item prop - ONLY on mount, never reset automatically
+  // This matches ContactInfoForm pattern - it only resets formData in explicit handlers
+  // ContactInfoForm doesn't watch item prop with useEffect, it only resets in handleAdd/handleEdit/handleCancel
   const [formData, setFormData] = useState({
     name: item?.name || '',
     employment_type: item?.employment_type || 'Full-Time',
@@ -1918,6 +2280,56 @@ function ExperienceForm({ item, onSave, onCancel }) {
     currently_working: item?.currently_working ?? true,
     description: item?.description || ''
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  // ContactInfoForm does the same - it updates contacts from contactInfo prop but doesn't reset formData
+  useEffect(() => {
+    experiencesRef.current = experiences
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [experiences, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing) - debounced
+  // This matches ContactInfoForm's pattern - it updates preview based on formData and editing state
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Clear previous timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+
+    // Debounce the update to avoid interfering with typing
+    timeoutRef.current = setTimeout(() => {
+      // Create temporary experience object for preview
+      const tempExperience = {
+        id: item?.id || `temp-${Date.now()}`,
+        name: formData.name,
+        company: formData.company,
+        employment_type: formData.employment_type,
+        start_at: formData.start_at ? new Date(formData.start_at + 'T00:00:00').toISOString() : null,
+        end_at: formData.currently_working ? null : (formData.end_at ? new Date(formData.end_at + 'T00:00:00').toISOString() : null),
+        currently_working: formData.currently_working,
+        description: formData.description
+      }
+
+      const currentExperiences = experiencesRef.current
+      const updatedExperiences = item?.id
+        ? currentExperiences.map(e => e.id === item.id ? tempExperience : e)
+        : [...currentExperiences, tempExperience]
+      
+      if (onLiveUpdateRef.current) {
+        onLiveUpdateRef.current(updatedExperiences)
+      }
+    }, 300) // 300ms debounce
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [formData.name, formData.company, formData.employment_type, formData.start_at, formData.end_at, formData.currently_working, formData.description, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -1934,43 +2346,63 @@ function ExperienceForm({ item, onSave, onCancel }) {
     onSave(payload)
   }
 
+  // Direct onChange handlers - no need for useCallback, just use inline functions
+  // This ensures the handlers always have the latest formData closure
+
   return (
     <form onSubmit={handleSubmit} className='space-y-3'>
       <Input
         placeholder='Position/Job title'
         value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        onChange={(e) => {
+          const value = e.target.value
+          setFormData(prev => ({ ...prev, name: value }))
+        }}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
+      <Select 
+        value={formData.employment_type} 
+        onValueChange={(v) => {
+          setFormData(prev => ({ ...prev, employment_type: v }))
+        }}
+      >
       <SelectTrigger>
-        <Select value={formData.employment_type} onValueChange={(v) => setFormData({ ...formData, employment_type: v })}>
-          <option value="" disabled>Select employment type</option>
+          <SelectValue placeholder="Select employment type" />
+        </SelectTrigger>
+        <SelectContent className='max-h-[200px]' position='popper' sideOffset={4}>
           {EMPLOYMENT_TYPES.map((type) => (
-            <option key={type} value={type}>{type}</option>
+            <SelectItem key={type} value={type}>{type}</SelectItem>
           ))}
+        </SelectContent>
         </Select>
-      </SelectTrigger>
       <Input
         placeholder='Company name'
         value={formData.company}
-        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+        onChange={(e) => {
+          const value = e.target.value
+          setFormData(prev => ({ ...prev, company: value }))
+        }}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='grid grid-cols-2 gap-2'>
         <div className='space-y-1'>
-          <Label className='text-xs'>Start Date</Label>
+          <Label className='text-xs sm:text-sm'>Start Date</Label>
           <Input
             type='date'
             value={formData.start_at}
             onChange={(e) => setFormData({ ...formData, start_at: e.target.value })}
+            className='placeholder:text-xs sm:placeholder:text-sm h-9 text-xs'
             required
           />
         </div>
         <div className='space-y-1'>
-          <Label className='text-xs'>End Date</Label>
+          <Label className='text-xs sm:text-sm'>End Date</Label>
           <Input
             type='date'
             value={formData.end_at}
             onChange={(e) => setFormData({ ...formData, end_at: e.target.value })}
+            className='placeholder:text-xs sm:placeholder:text-sm h-9 text-xs'
             disabled={formData.currently_working}
           />
         </div>
@@ -1981,23 +2413,32 @@ function ExperienceForm({ item, onSave, onCancel }) {
           checked={formData.currently_working}
           onChange={(e) => setFormData({ ...formData, currently_working: e.target.checked, end_at: e.target.checked ? '' : formData.end_at })}
         />
-        <Label className='text-sm'>Currently working here</Label>
+        <Label className='text-xs sm:text-sm'>Currently working here</Label>
       </div>
       <Textarea
         placeholder='Description'
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function EducationForm({ item, onSave, onCancel }) {
+function EducationForm({ item, onSave, onCancel, onLiveUpdate, educations = [] }) {
+  const educationsRef = useRef(educations)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  
+  // Initialize formData from item prop - ONLY on mount, never reset automatically
+  // This matches ContactInfoForm pattern - it only resets formData in explicit handlers
   const [formData, setFormData] = useState({
     school: item?.school || '',
     degree: item?.degree || '',
@@ -2006,6 +2447,38 @@ function EducationForm({ item, onSave, onCancel }) {
     end_at: item?.end_at ? new Date(item.end_at).toISOString().split('T')[0] : '',
     enrolling: item?.enrolling ?? true
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    educationsRef.current = educations
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [educations, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary education object for preview
+    const tempEducation = {
+      id: item?.id || `temp-${Date.now()}`,
+      school: formData.school,
+      degree: formData.degree,
+      department: formData.department,
+      start_at: formData.start_at ? new Date(formData.start_at + 'T00:00:00').toISOString() : null,
+      end_at: formData.enrolling ? null : (formData.end_at ? new Date(formData.end_at + 'T00:00:00').toISOString() : null),
+      enrolling: formData.enrolling
+    }
+
+    const currentEducations = educationsRef.current
+    const updatedEducations = item?.id
+      ? currentEducations.map(e => e.id === item.id ? tempEducation : e)
+      : [...currentEducations, tempEducation]
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedEducations)
+    }
+  }, [formData.school, formData.degree, formData.department, formData.start_at, formData.end_at, formData.enrolling, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -2028,36 +2501,41 @@ function EducationForm({ item, onSave, onCancel }) {
         placeholder='School/University name'
         value={formData.school}
         onChange={(e) => setFormData({ ...formData, school: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
         placeholder='Degree'
         value={formData.degree}
         onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
         placeholder='Department'
         value={formData.department}
         onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <div className='grid grid-cols-2 gap-2'>
         <div className='space-y-1'>
-          <Label className='text-xs'>Start Date</Label>
+          <Label className='text-xs sm:text-sm'>Start Date</Label>
           <Input
             type='date'
             value={formData.start_at}
             onChange={(e) => setFormData({ ...formData, start_at: e.target.value })}
+            className='placeholder:text-xs sm:placeholder:text-sm h-9 text-xs'
             required
           />
         </div>
         <div className='space-y-1'>
-          <Label className='text-xs'>End Date</Label>
+          <Label className='text-xs sm:text-sm'>End Date</Label>
           <Input
             type='date'
             value={formData.end_at}
             onChange={(e) => setFormData({ ...formData, end_at: e.target.value })}
+            className='placeholder:text-xs sm:placeholder:text-sm h-9 text-xs'
             disabled={formData.enrolling}
           />
         </div>
@@ -2068,17 +2546,24 @@ function EducationForm({ item, onSave, onCancel }) {
           checked={formData.enrolling}
           onChange={(e) => setFormData({ ...formData, enrolling: e.target.checked, end_at: e.target.checked ? '' : formData.end_at })}
         />
-        <Label className='text-sm'>Currently enrolling</Label>
+        <Label className='text-xs sm:text-sm'>Currently enrolling</Label>
       </div>
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function PortfolioForm({ item, onSave, onCancel }) {
+function PortfolioForm({ item, onSave, onCancel, onLiveUpdate, portfolios = [] }) {
+  const portfoliosRef = useRef(portfolios)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  const tempIdRef = useRef(`temp-${Date.now()}`)
+  
   const [formData, setFormData] = useState({
     name: item?.name || '',
     description: item?.description || '',
@@ -2086,6 +2571,46 @@ function PortfolioForm({ item, onSave, onCancel }) {
     tags: item?.tags || '',
     image: null
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    portfoliosRef.current = portfolios
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [portfolios, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary portfolio object for preview
+    const tempPortfolio = {
+      id: item?.id || tempIdRef.current,
+      name: formData.name,
+      description: formData.description,
+      portfolio_url: formData.portfolio_url,
+      tags: formData.tags,
+      image: formData.image ? URL.createObjectURL(formData.image) : item?.image
+    }
+
+    const currentPortfolios = portfoliosRef.current
+    const updatedPortfolios = item?.id
+      ? currentPortfolios.map(p => p.id === item.id ? tempPortfolio : p)
+      : (() => {
+          // Check if temp item already exists, update it; otherwise add new
+          const existingTempIndex = currentPortfolios.findIndex(p => p.id === tempIdRef.current)
+          if (existingTempIndex >= 0) {
+            const updated = [...currentPortfolios]
+            updated[existingTempIndex] = tempPortfolio
+            return updated
+          }
+          return [...currentPortfolios, tempPortfolio]
+        })()
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedPortfolios)
+    }
+  }, [formData.name, formData.description, formData.portfolio_url, formData.tags, formData.image, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -2104,6 +2629,7 @@ function PortfolioForm({ item, onSave, onCancel }) {
         placeholder='Project name'
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Textarea
@@ -2111,14 +2637,18 @@ function PortfolioForm({ item, onSave, onCancel }) {
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='space-y-2'>
-        <Label>Portfolio Image</Label>
+        <Label className='text-xs sm:text-sm'>Portfolio Image</Label>
+        <div className='relative'>
         <Input
           type='file'
           accept='image/*'
           onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
+            className='text-xs h-9 file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 file:cursor-pointer cursor-pointer'
         />
+        </div>
         {item?.image && !formData.image && (
           <div className='text-xs text-muted-foreground'>
             Current image: {item.image}
@@ -2130,25 +2660,71 @@ function PortfolioForm({ item, onSave, onCancel }) {
         placeholder='Portfolio URL'
         value={formData.portfolio_url}
         onChange={(e) => setFormData({ ...formData, portfolio_url: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <Input
         placeholder='Tags (comma separated)'
         value={formData.tags}
         onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function ServiceForm({ item, onSave, onCancel }) {
+function ServiceForm({ item, onSave, onCancel, onLiveUpdate, services = [] }) {
+  const servicesRef = useRef(services)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  const tempIdRef = useRef(`temp-${Date.now()}`)
+  
   const [formData, setFormData] = useState({
     name: item?.name || '',
     description: item?.description || ''
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    servicesRef.current = services
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [services, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary service object for preview
+    const tempService = {
+      id: item?.id || tempIdRef.current,
+      name: formData.name,
+      description: formData.description
+    }
+
+    const currentServices = servicesRef.current
+    const updatedServices = item?.id
+      ? currentServices.map(s => s.id === item.id ? tempService : s)
+      : (() => {
+          // Check if temp item already exists, update it; otherwise add new
+          const existingTempIndex = currentServices.findIndex(s => s.id === tempIdRef.current)
+          if (existingTempIndex >= 0) {
+            const updated = [...currentServices]
+            updated[existingTempIndex] = tempService
+            return updated
+          }
+          return [...currentServices, tempService]
+        })()
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedServices)
+    }
+  }, [formData.name, formData.description, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -2161,6 +2737,7 @@ function ServiceForm({ item, onSave, onCancel }) {
         placeholder='Service name'
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Textarea
@@ -2168,16 +2745,24 @@ function ServiceForm({ item, onSave, onCancel }) {
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function CertificateForm({ item, onSave, onCancel }) {
+function CertificateForm({ item, onSave, onCancel, onLiveUpdate, certificates = [] }) {
+  const certificatesRef = useRef(certificates)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  const tempIdRef = useRef(`temp-${Date.now()}`)
+  
   const [formData, setFormData] = useState({
     name: item?.name || '',
     issuer: item?.issuer || '',
@@ -2186,6 +2771,47 @@ function CertificateForm({ item, onSave, onCancel }) {
     credential_id: item?.credential_id || '',
     credential_url: item?.credential_url || ''
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    certificatesRef.current = certificates
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [certificates, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary certificate object for preview
+    const tempCertificate = {
+      id: item?.id || tempIdRef.current,
+      name: formData.name,
+      issuer: formData.issuer,
+      issue_date: formData.issue_date ? new Date(formData.issue_date + 'T00:00:00').toISOString() : null,
+      description: formData.description,
+      credential_id: formData.credential_id,
+      credential_url: formData.credential_url
+    }
+
+    const currentCertificates = certificatesRef.current
+    const updatedCertificates = item?.id
+      ? currentCertificates.map(c => c.id === item.id ? tempCertificate : c)
+      : (() => {
+          // Check if temp item already exists, update it; otherwise add new
+          const existingTempIndex = currentCertificates.findIndex(c => c.id === tempIdRef.current)
+          if (existingTempIndex >= 0) {
+            const updated = [...currentCertificates]
+            updated[existingTempIndex] = tempCertificate
+            return updated
+          }
+          return [...currentCertificates, tempCertificate]
+        })()
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedCertificates)
+    }
+  }, [formData.name, formData.issuer, formData.issue_date, formData.description, formData.credential_id, formData.credential_url, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -2198,12 +2824,14 @@ function CertificateForm({ item, onSave, onCancel }) {
         placeholder='Certificate name'
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
         placeholder='Issuer'
         value={formData.issuer}
         onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
@@ -2211,6 +2839,7 @@ function CertificateForm({ item, onSave, onCancel }) {
         placeholder='Issue date'
         value={formData.issue_date}
         onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm h-9 text-xs'
         required
       />
       <Textarea
@@ -2218,27 +2847,37 @@ function CertificateForm({ item, onSave, onCancel }) {
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <Input
         placeholder='Credential ID'
         value={formData.credential_id}
         onChange={(e) => setFormData({ ...formData, credential_id: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <Input
         type='url'
         placeholder='Credential URL'
         value={formData.credential_url}
         onChange={(e) => setFormData({ ...formData, credential_url: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function PublicationForm({ item, onSave, onCancel }) {
+function PublicationForm({ item, onSave, onCancel, onLiveUpdate, publications = [] }) {
+  const publicationsRef = useRef(publications)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  const tempIdRef = useRef(`temp-${Date.now()}`)
+  
   const [formData, setFormData] = useState({
     name: item?.name || '',
     publisher: item?.publisher || '',
@@ -2246,6 +2885,46 @@ function PublicationForm({ item, onSave, onCancel }) {
     publication_url: item?.publication_url || '',
     description: item?.description || ''
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    publicationsRef.current = publications
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [publications, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary publication object for preview
+    const tempPublication = {
+      id: item?.id || tempIdRef.current,
+      name: formData.name,
+      publisher: formData.publisher,
+      publication_date: formData.publication_date ? new Date(formData.publication_date + 'T00:00:00').toISOString() : null,
+      publication_url: formData.publication_url,
+      description: formData.description
+    }
+
+    const currentPublications = publicationsRef.current
+    const updatedPublications = item?.id
+      ? currentPublications.map(p => p.id === item.id ? tempPublication : p)
+      : (() => {
+          // Check if temp item already exists, update it; otherwise add new
+          const existingTempIndex = currentPublications.findIndex(p => p.id === tempIdRef.current)
+          if (existingTempIndex >= 0) {
+            const updated = [...currentPublications]
+            updated[existingTempIndex] = tempPublication
+            return updated
+          }
+          return [...currentPublications, tempPublication]
+        })()
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedPublications)
+    }
+  }, [formData.name, formData.publisher, formData.publication_date, formData.publication_url, formData.description, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -2258,12 +2937,14 @@ function PublicationForm({ item, onSave, onCancel }) {
         placeholder='Publication name'
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
         placeholder='Publisher'
         value={formData.publisher}
         onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
@@ -2271,34 +2952,83 @@ function PublicationForm({ item, onSave, onCancel }) {
         placeholder='Publication date'
         value={formData.publication_date}
         onChange={(e) => setFormData({ ...formData, publication_date: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm h-9 text-xs'
       />
       <Input
         type='url'
         placeholder='Publication URL'
         value={formData.publication_url}
         onChange={(e) => setFormData({ ...formData, publication_url: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <Textarea
         placeholder='Description'
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function HonorForm({ item, onSave, onCancel }) {
+function HonorForm({ item, onSave, onCancel, onLiveUpdate, honors = [] }) {
+  const honorsRef = useRef(honors)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  const tempIdRef = useRef(`temp-${Date.now()}`)
+  
   const [formData, setFormData] = useState({
     name: item?.name || '',
     issuer: item?.issuer || '',
     issue_date: item?.issue_date ? new Date(item.issue_date).toISOString().split('T')[0] : '',
     description: item?.description || ''
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    honorsRef.current = honors
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [honors, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Always update preview when form data changes (form is only rendered when active)
+    // Create temporary honor object for preview
+    const tempHonor = {
+      id: item?.id || tempIdRef.current,
+      name: formData.name,
+      issuer: formData.issuer,
+      issue_date: formData.issue_date ? new Date(formData.issue_date + 'T00:00:00').toISOString() : null,
+      description: formData.description
+    }
+
+    const currentHonors = honorsRef.current
+    const updatedHonors = item?.id
+      ? currentHonors.map(h => h.id === item.id ? tempHonor : h)
+      : (() => {
+          // Check if temp item already exists, update it; otherwise add new
+          const existingTempIndex = currentHonors.findIndex(h => h.id === tempIdRef.current)
+          if (existingTempIndex >= 0) {
+            const updated = [...currentHonors]
+            updated[existingTempIndex] = tempHonor
+            return updated
+          }
+          return [...currentHonors, tempHonor]
+        })()
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedHonors)
+    }
+  }, [formData.name, formData.issuer, formData.issue_date, formData.description, item?.id])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -2311,12 +3041,14 @@ function HonorForm({ item, onSave, onCancel }) {
         placeholder='Award/Honor name'
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
         placeholder='Issuer'
         value={formData.issuer}
         onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm'
         required
       />
       <Input
@@ -2324,6 +3056,7 @@ function HonorForm({ item, onSave, onCancel }) {
         placeholder='Issue date'
         value={formData.issue_date}
         onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
+        className='placeholder:text-xs sm:placeholder:text-sm h-9 text-xs'
         required
       />
       <Textarea
@@ -2331,9 +3064,13 @@ function HonorForm({ item, onSave, onCancel }) {
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
+        className='placeholder:text-xs sm:placeholder:text-sm'
       />
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
@@ -2341,85 +3078,271 @@ function HonorForm({ item, onSave, onCancel }) {
 }
 
 function GalleryForm({ item, onSave, onCancel }) {
-  const [formData, setFormData] = useState({
-    title: item?.title || '',
-    description: item?.description || '',
-    image: null
-  })
-  const [imagePreview, setImagePreview] = useState(item?.image ? resolveMediaUrl(item.image) : null)
+  const [images, setImages] = useState([])
+  const [imagePreviews, setImagePreviews] = useState([])
+  const [isDragging, setIsDragging] = useState(false)
+  const previewUrlsRef = useRef([])
+  const fileInputRef = useRef(null)
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setFormData({ ...formData, image: file })
-      setImagePreview(URL.createObjectURL(file))
+  const handleImageChange = (files) => {
+    const fileArray = Array.isArray(files) ? files : Array.from(files)
+    if (fileArray.length > 0) {
+      // Clean up old previews
+      previewUrlsRef.current.forEach(url => URL.revokeObjectURL(url))
+      
+      // Add new files to existing ones
+      const newImages = item ? fileArray : [...images, ...fileArray]
+      const newPreviews = newImages.map(file => URL.createObjectURL(file))
+      previewUrlsRef.current = newPreviews
+      setImages(newImages)
+      setImagePreviews(newPreviews)
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleFileInputChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleImageChange(e.target.files)
+    }
+  }
+
+  const handleDragOver = (e) => {
     e.preventDefault()
-    const data = new FormData()
-    if (formData.title !== item?.title) data.append('title', formData.title)
-    if (formData.description !== item?.description) data.append('description', formData.description)
-    if (formData.image) data.append('image', formData.image)
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
     
-    // If creating new item, image is required
-    if (!item && !formData.image) {
-      alert('Please select an image')
+    const files = e.dataTransfer.files
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'))
+    if (imageFiles.length > 0) {
+      handleImageChange(imageFiles)
+    }
+  }
+
+  const removeImage = (index) => {
+    // Revoke the URL to free memory
+    URL.revokeObjectURL(imagePreviews[index])
+    const newImages = images.filter((_, i) => i !== index)
+    const newPreviews = imagePreviews.filter((_, i) => i !== index)
+    previewUrlsRef.current = newPreviews
+    setImages(newImages)
+    setImagePreviews(newPreviews)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    // If creating new items, images are required
+    if (!item && images.length === 0) {
+      alert('Please select at least one image')
       return
     }
     
+    // If editing existing item, save single image
+    if (item && images.length > 0) {
+      const data = new FormData()
+      data.append('image', images[0])
     onSave(data)
+      // Clean up preview URLs
+      previewUrlsRef.current.forEach(url => URL.revokeObjectURL(url))
+      previewUrlsRef.current = []
+      setImagePreviews([])
+      setImages([])
+      return
+    }
+    
+    // If creating new items, save each image as a separate gallery item
+    if (!item && images.length > 0) {
+      for (let i = 0; i < images.length; i++) {
+        const data = new FormData()
+        data.append('image', images[i])
+        await onSave(data)
+      }
+      // Clean up preview URLs
+      previewUrlsRef.current.forEach(url => URL.revokeObjectURL(url))
+      previewUrlsRef.current = []
+      setImagePreviews([])
+      setImages([])
+    }
   }
 
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach(url => URL.revokeObjectURL(url))
+    }
+  }, [])
+
   return (
-    <form onSubmit={handleSubmit} className='space-y-3'>
+    <form onSubmit={handleSubmit} className='space-y-4'>
       <div>
-        <Label>Image</Label>
-        <div className='mt-2'>
-          {imagePreview ? (
-            <div className='relative w-full h-48 rounded-lg overflow-hidden border-2 border-border mb-2'>
+        <Label className='text-xs sm:text-sm'>Upload Images</Label>
+        <p className='text-xs sm:text-sm text-muted-foreground mt-1 mb-3'>
+          Drag and drop images here or click to browse
+        </p>
+        
+        {/* Modern Drag & Drop Upload Zone */}
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`
+            relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
+            transition-all duration-200
+            ${isDragging 
+              ? 'border-purple-500 bg-purple-50 dark:bg-purple-950/20' 
+              : 'border-gray-300 dark:border-gray-700 hover:border-purple-400 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+            }
+          `}
+        >
+          <input
+            ref={fileInputRef}
+            type='file'
+            accept='image/*'
+            multiple
+            onChange={handleFileInputChange}
+            className='hidden'
+          />
+          
+          <div className='flex flex-col items-center justify-center space-y-3'>
+            <div className={`p-3 rounded-full ${isDragging ? 'bg-purple-100 dark:bg-purple-900/30' : 'bg-gray-100 dark:bg-gray-800'}`}>
+              <Upload className={`h-6 w-6 ${isDragging ? 'text-purple-600' : 'text-gray-400'}`} />
+            </div>
+            <div>
+              <p className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                {isDragging ? 'Drop images here' : 'Click to upload or drag and drop'}
+              </p>
+              <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                PNG, JPG, GIF up to 10MB each
+              </p>
+            </div>
+            {images.length > 0 && (
+              <p className='text-xs text-purple-600 dark:text-purple-400 font-medium'>
+                {images.length} {images.length === 1 ? 'image' : 'images'} selected
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {imagePreviews.length > 0 && (
+        <div className='space-y-3'>
+          <div className='flex items-center justify-between'>
+            <p className='text-xs sm:text-sm font-medium'>Selected Images ({imagePreviews.length})</p>
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              onClick={() => {
+                previewUrlsRef.current.forEach(url => URL.revokeObjectURL(url))
+                previewUrlsRef.current = []
+                setImagePreviews([])
+                setImages([])
+                if (fileInputRef.current) fileInputRef.current.value = ''
+              }}
+              className='text-xs h-7'
+            >
+              Clear All
+            </Button>
+          </div>
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3'>
+            {imagePreviews.map((preview, index) => (
+              <div key={index} className='relative group'>
+                <div className='relative w-full aspect-square rounded-lg overflow-hidden border-2 border-border bg-gray-100 dark:bg-gray-800'>
               <Image
-                src={imagePreview}
-                alt='Preview'
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
                 fill
                 className='object-cover'
                 unoptimized
               />
             </div>
-          ) : null}
-          <Input
-            type='file'
-            accept='image/*'
-            onChange={handleImageChange}
-            required={!item}
-          />
+                <Button
+                  type='button'
+                  variant='destructive'
+                  size='sm'
+                  className='absolute top-1 right-1 h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity shadow-md'
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    removeImage(index)
+                  }}
+                >
+                  <X className='h-3.5 w-3.5' />
+                </Button>
+                <div className='absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-1 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity truncate'>
+                  {images[index]?.name || `Image ${index + 1}`}
         </div>
       </div>
-      <Input
-        placeholder='Title (optional)'
-        value={formData.title}
-        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-      />
-      <Textarea
-        placeholder='Description (optional)'
-        value={formData.description}
-        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-        rows={3}
-      />
+            ))}
+          </div>
+        </div>
+      )}
+      
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          {item ? 'Update' : images.length > 1 ? `Upload ${images.length} Images` : images.length === 1 ? 'Upload Image' : 'Upload'}
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
 
-function SocialForm({ item, onSave, onCancel, socialPlatforms = [] }) {
+function SocialForm({ item, onSave, onCancel, socialPlatforms = [], onLiveUpdate, socials = [] }) {
+  const socialsRef = useRef(socials)
+  const onLiveUpdateRef = useRef(onLiveUpdate)
+  
+  // Initialize formData from item prop - ONLY on mount, never reset automatically
+  // This matches ContactInfoForm pattern
   const [formData, setFormData] = useState({
     core_social_in: item?.core_social?.id || item?.core_social || '',
     profile_url: item?.profile_url || ''
   })
+
+  // Update refs when props change (but don't trigger re-renders or reset formData)
+  useEffect(() => {
+    socialsRef.current = socials
+    onLiveUpdateRef.current = onLiveUpdate
+  }, [socials, onLiveUpdate])
+
+  // Live update preview when form data changes (while adding/editing)
+  useEffect(() => {
+    if (!onLiveUpdateRef.current) return
+    
+    // Only update if we have form data (similar to ContactInfoForm checking formData.value.trim())
+    // Always update preview when form data changes (form is only rendered when active)
+    // Find the selected platform
+    const selectedPlatform = socialPlatforms.find(p => p.id === formData.core_social_in || p.id === parseInt(formData.core_social_in))
+
+    // Create temporary social object for preview
+    const tempSocial = {
+      id: item?.id || `temp-${Date.now()}`,
+      core_social: selectedPlatform ? { id: selectedPlatform.id, name: selectedPlatform.name } : null,
+      profile_url: formData.profile_url,
+      full_social_profile_url: formData.profile_url
+    }
+
+    const currentSocials = socialsRef.current
+    const updatedSocials = item?.id
+      ? currentSocials.map(s => s.id === item.id ? tempSocial : s)
+      : [...currentSocials, tempSocial]
+    
+    if (onLiveUpdateRef.current) {
+      onLiveUpdateRef.current(updatedSocials)
+    }
+  }, [formData.core_social_in, formData.profile_url, item?.id, socialPlatforms])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -2437,7 +3360,7 @@ function SocialForm({ item, onSave, onCancel, socialPlatforms = [] }) {
   return (
     <form onSubmit={handleSubmit} className='space-y-3'>
       <div>
-        <Label>Social Platform</Label>
+        <Label className='text-xs sm:text-sm'>Social Platform</Label>
         <Select 
           value={formData.core_social_in?.toString()} 
           onValueChange={(v) => setFormData({ ...formData, core_social_in: parseInt(v) })}
@@ -2445,7 +3368,7 @@ function SocialForm({ item, onSave, onCancel, socialPlatforms = [] }) {
           <SelectTrigger>
             <SelectValue placeholder='Select a social platform' />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className='max-h-[200px]' position='popper' sideOffset={4}>
             {socialPlatforms.map((platform) => (
               <SelectItem key={platform.id} value={platform.id.toString()}>
                 {platform.name}
@@ -2455,11 +3378,12 @@ function SocialForm({ item, onSave, onCancel, socialPlatforms = [] }) {
         </Select>
       </div>
       <div>
-        <Label>Profile URL or Username</Label>
+        <Label className='text-xs sm:text-sm'>Profile URL or Username</Label>
         <Input
           placeholder='Enter your profile URL or username'
           value={formData.profile_url}
           onChange={(e) => setFormData({ ...formData, profile_url: e.target.value })}
+          className='placeholder:text-xs sm:placeholder:text-sm'
           required
         />
         <p className='text-xs text-muted-foreground mt-1'>
@@ -2467,10 +3391,14 @@ function SocialForm({ item, onSave, onCancel, socialPlatforms = [] }) {
         </p>
       </div>
       <div className='flex gap-2'>
-        <Button type='submit' size='sm'>Save</Button>
+        <Button type='submit' size='sm' className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 rounded-lg'>
+          <Save className='h-3.5 w-3.5' />
+          Save
+        </Button>
         {onCancel && <Button type='button' variant='outline' size='sm' onClick={onCancel}>Cancel</Button>}
       </div>
     </form>
   )
 }
+
 
