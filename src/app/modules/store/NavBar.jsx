@@ -87,19 +87,31 @@ export function Navbar() {
           </nav>
 
           {/* Right Side Icons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0 sm:gap-2">
             {user ? (
-              // User is logged in - show dashboard link button instead of profile dropdown
-              <Button
-                variant="ghost"
-                className="text-sm font-medium text-white hover:text-white hover:bg-white/10"
-                asChild
-              >
-                <Link href="/dashboard">
-                  <LayoutPanelLeft className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Dashboard</span>
-                </Link>
-              </Button>
+              // User is logged in - show dashboard link button with logout icon
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/10 sm:size-auto sm:px-2"
+                  asChild
+                >
+                  <Link href="/dashboard" className="flex items-center">
+                    <LayoutPanelLeft className="h-8 w-8 sm:mr-2" />
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/10"
+                  onClick={handleLogout}
+                  title="Logout"
+                >
+                  <LogOut className="h-8 w-8" />
+                </Button>
+              </>
             ) : (
               // User is not logged in - show login/register buttons
               <>
@@ -109,7 +121,7 @@ export function Navbar() {
                   asChild
                 >
                   <Link href="/login" className="flex items-center gap-1">
-                    <User className="h-4 w-4" />
+                    <User className="h-6 w-6" />
                     <span>Login</span>
                   </Link>
                 </Button>
@@ -121,7 +133,7 @@ export function Navbar() {
                     asChild
                   >
                     <Link href="/login" className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
+                      <User className="h-6 w-6" />
                       <span>Login</span>
                     </Link>
                   </Button>
@@ -169,14 +181,14 @@ export function Navbar() {
                     onClick={toggleMenu}
                     className="flex items-center gap-2 py-3 px-4 text-lg font-medium rounded-lg hover:bg-white/10 transition-colors"
                   >
-                    <User className="h-5 w-5" />
+                    <User className="h-6 w-6" />
                     <span>Profile</span>
                   </Link>
                   <Button
                     onClick={handleLogout}
                     className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700"
                   >
-                    <LogOut className="h-5 w-5" />
+                    <LogOut className="h-8 w-8" />
                     <span>Logout</span>
                   </Button>
                 </>
@@ -191,7 +203,7 @@ export function Navbar() {
                       onClick={toggleMenu}
                       className="flex items-center justify-center gap-2"
                     >
-                      <User className="h-5 w-5" />
+                      <User className="h-6 w-6" />
                       <span>Login</span>
                     </Link>
                   </Button>

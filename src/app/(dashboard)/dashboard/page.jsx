@@ -107,29 +107,25 @@ export default function DashboardPage() {
       title: 'My Card',
       description: 'Manage your digital business card',
       icon: CreditCard,
-      href: '/dashboard/cards',
-      color: 'from-blue-500 to-blue-600'
+      href: '/dashboard/cards'
     },
     {
       title: 'Landing Page Design',
       description: 'Customize your profile theme',
       icon: Palette,
-      href: '/dashboard/themes',
-      color: 'from-blue-500 to-blue-600'
+      href: '/dashboard/themes'
     },
     {
       title: 'My Orders',
       description: 'View your order history',
       icon: Package,
-      href: '/dashboard/my-orders',
-      color: 'from-blue-500 to-blue-600'
+      href: '/dashboard/my-orders'
     },
     {
       title: 'Share Profile',
       description: 'Share your profile link',
       icon: Share2,
-      href: '/dashboard/share',
-      color: 'from-blue-500 to-blue-600'
+      href: '/dashboard/share'
     }
   ]
 
@@ -145,30 +141,30 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute>
-      <div className="space-y-6 min-h-screen">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.first_name || user?.username || 'User'}! Here's an overview of your account.
+      <div className="space-y-8 min-h-screen">
+        {/* Welcome Message */}
+        <div className="mb-4">
+          <p className="text-lg text-muted-foreground">
+            Welcome back, <span className="font-bold text-foreground text-xl">{user?.first_name || user?.username || 'User'}</span>! 👋
           </p>
+          <p className="text-sm text-muted-foreground mt-1">Here's an overview of your account.</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <Card className="border-2 hover:shadow-lg transition-shadow">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="border hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Card Status</CardTitle>
               {stats.hasCard ? (
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-5 w-5 text-gray-700" />
               ) : (
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock className="h-5 w-5 text-muted-foreground" />
               )}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {stats.hasCard ? (
-                  <span className="text-green-600">Active</span>
+                  <span className="text-foreground">Active</span>
                 ) : (
                   <span className="text-muted-foreground">Setup</span>
                 )}
@@ -182,20 +178,21 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div>
-          <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold">Quick Actions</h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickActions.map((action) => {
               const Icon = action.icon
               return (
                 <Card 
                   key={action.href}
-                  className="group border-2 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative"
+                  className="group border hover:shadow-md transition-all cursor-pointer"
                 >
                   <Link href={action.href} className="block h-full">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
                     <CardHeader>
-                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
-                        <Icon className="h-6 w-6 text-white" />
+                      <div className="w-12 h-12 rounded-lg bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center mb-3 transition-colors">
+                        <Icon className="h-6 w-6 text-gray-700" />
                       </div>
                       <CardTitle className="text-lg">{action.title}</CardTitle>
                       <CardDescription>{action.description}</CardDescription>
@@ -295,10 +292,10 @@ export default function DashboardPage() {
 
         {/* Setup Status */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-2">
+          <Card className="border hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
+                <CreditCard className="h-5 w-5 text-gray-700" />
                 Card Setup
               </CardTitle>
               <CardDescription>Complete your digital business card</CardDescription>
@@ -307,7 +304,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">Profile Information</span>
                 {stats.hasCard ? (
-                  <Badge className="bg-green-100 text-green-800">
+                  <Badge className="bg-gray-100 text-gray-800">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Complete
                   </Badge>
@@ -318,7 +315,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">Theme Selection</span>
                 {stats.hasTheme ? (
-                  <Badge className="bg-green-100 text-green-800">
+                  <Badge className="bg-gray-100 text-gray-800">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Complete
                   </Badge>
@@ -337,10 +334,10 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ShoppingBag className="h-5 w-5" />
+                <ShoppingBag className="h-5 w-5 text-gray-700" />
                 Shop Now
               </CardTitle>
               <CardDescription>Browse our collection of products</CardDescription>

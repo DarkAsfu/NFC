@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { Home, User, CreditCard, Bell, Share2, ShoppingBag, LogOut, Radio, Palette, LayoutDashboard, Package } from 'lucide-react'
+import { Home, User, CreditCard, Bell, Share2, ShoppingBag, LogOut, Radio, Palette, LayoutDashboard, Package, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
+import { useAuth } from '@/provider/AuthProvider'
 
 export function DashboardNav() {
   const pathname = usePathname()
@@ -19,7 +20,7 @@ export function DashboardNav() {
       // badge: <Radio className="absolute -top-1 -right-1 h-3 w-3 text-blue-500" />
     },
     { href: "/dashboard/themes", icon: Palette, label: "Landing Page Design" },
-    { href: "/products", icon: ShoppingBag, label: "Shop" },
+    { href: "/dashboard/resume", icon: FileText, label: "Resume / CV" },
     { href: "/dashboard/my-orders", icon: Package, label: "My Orders" },
     // { href: "/dashboard/notifications", icon: Bell, label: "Notifications" },
     { href: "/dashboard/profile", icon: User, label: "Account Settings" },

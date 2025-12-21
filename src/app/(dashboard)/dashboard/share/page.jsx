@@ -53,7 +53,7 @@ export default function ShareProfilePage() {
   const [profileUrl, setProfileUrl] = useState('')
   const [hasProfile, setHasProfile] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [qrColor, setQrColor] = useState('#FF0000')
+  const [qrColor, setQrColor] = useState('#000000')
   const [qrBgColor, setQrBgColor] = useState('#FFFFFF')
   const [colorPanelOpen, setColorPanelOpen] = useState(false)
   const [offlineQR, setOfflineQR] = useState(false)
@@ -296,7 +296,6 @@ export default function ShareProfilePage() {
       skype: `https://web.skype.com/share?url=${encodedUrl}&text=${encodedText}`,
       tumblr: `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${encodedUrl}&title=${encodedText}`,
       buffer: `https://buffer.com/add?text=${encodedText}&url=${encodedUrl}`,
-      hackernews: `https://news.ycombinator.com/submitlink?u=${encodedUrl}&t=${encodedText}`,
       flipboard: `https://share.flipboard.com/bookmarklet/popout?v=2&title=${encodedText}&url=${encodedUrl}`,
       instagram: `instagram://`, // Deep link to Instagram app
       tiktok: `https://www.tiktok.com/` // TikTok doesn't have direct share, will copy to clipboard
@@ -425,12 +424,6 @@ export default function ShareProfilePage() {
       iconColor: 'text-gray-700'
     },
     { 
-      platform: 'hackernews', 
-      icon: Newspaper, 
-      label: 'Share on Hacker News', 
-      iconColor: 'text-orange-500'
-    },
-    { 
       platform: 'flipboard', 
       icon: BookOpen, 
       label: 'Share on Flipboard', 
@@ -465,9 +458,6 @@ export default function ShareProfilePage() {
       <div className="space-y-6 min-h-screen">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Share Profile
-          </h1>
           <p className="text-muted-foreground">
             Share your digital business card with the world
           </p>

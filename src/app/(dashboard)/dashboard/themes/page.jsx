@@ -182,7 +182,6 @@ export default function ThemesPage() {
     <ProtectedRoute>
       <div className='space-y-6 min-h-screen'>
         <div>
-          <h1 className='text-3xl font-bold mb-2'>Landing Page Design</h1>
           <p className='text-muted-foreground'>Choose a design template for your public profile page</p>
         </div>
 

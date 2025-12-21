@@ -50,7 +50,7 @@ export function MobileNav () {
               <div className='relative'>
                 <item.icon
                   className={cn(
-                    'h-5 w-5 transition-transform',
+                    'h-8 w-8 transition-transform',
                     item.isSpecial ? 'text-blue-600' : 'opacity-80',
                     pathname === item.href && !item.isSpecial ? 'scale-110' : ''
                   )}

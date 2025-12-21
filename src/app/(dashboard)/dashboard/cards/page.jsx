@@ -659,9 +659,8 @@ export default function MyCardsPage() {
   return (
     <ProtectedRoute>
       <div className='pb-28 lg:pb-0 min-h-screen'>
-        {/* Mobile Title - Visible on mobile only */}
+        {/* Mobile Subtitle - Visible on mobile only */}
         <div className='lg:hidden mb-4'>
-          <h1 className='text-2xl md:text-3xl font-bold'>My Card</h1>
           <p className='text-sm text-muted-foreground mt-1'>
             Manage your profile card information
           </p>
@@ -690,9 +689,8 @@ export default function MyCardsPage() {
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 lg:h-[calc(100vh-2rem)]'>
           {/* Left Side: Sticky Section with Title, Subtitle, and Preview */}
           <div className='hidden lg:flex flex-col order-2 lg:order-1 sticky top-4 h-fit max-h-[calc(100vh-2rem)]'>
-            {/* Title and Subtitle - Desktop only */}
+            {/* Subtitle - Desktop only */}
             <div className='mb-4'>
-              <h1 className='text-2xl md:text-3xl font-bold'>My Card</h1>
               <p className='text-sm text-muted-foreground mt-1'>
                 Manage your profile card information
               </p>
