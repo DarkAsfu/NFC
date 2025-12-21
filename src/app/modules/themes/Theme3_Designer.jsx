@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Save, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Award, FileText, Palette, ExternalLink, Languages, BookOpen, Trophy, Calendar } from 'lucide-react'
 import { DetailModal } from './DetailModal'
 import { resolveMediaUrl } from '@/lib/utils'
+import SocialIcon from '@/components/SocialIcon'
 
 export function Theme3_Designer({ cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -123,7 +124,6 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
         {socials?.length > 0 && (
           <div className='flex justify-center gap-3 mb-4 flex-wrap'>
             {socials.map((s, idx) => {
-              const iconUrl = s.core_social?.icon ? resolveMediaUrl(s.core_social.icon) : null
               const gradients = [
                 'from-pink-500 via-rose-500 to-pink-600',
                 'from-purple-500 via-fuchsia-500 to-purple-600',
@@ -142,11 +142,14 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
                   title={s.core_social?.name || 'Social'}
                 >
                   <div className='absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity'></div>
-                  {iconUrl ? (
-                    <Image src={iconUrl} alt={s.core_social?.name || 'Social'} width={32} height={32} className='object-contain relative z-10' unoptimized style={{ filter: 'brightness(0) saturate(100%) invert(100%)' }} />
-                  ) : (
-                    <Globe className='h-7 w-7 text-white relative z-10' />
-                  )}
+                  <div className='relative z-10'>
+                    <SocialIcon 
+                      social={s} 
+                      size={32}
+                      colorFilter='brightness(0) saturate(100%) invert(100%)'
+                      fallbackColor='white'
+                    />
+                  </div>
                 </a>
               )
             })}

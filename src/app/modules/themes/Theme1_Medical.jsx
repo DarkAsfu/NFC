@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Save, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Award, FileText, ExternalLink, Languages, BookOpen, Trophy, Calendar, Heart } from 'lucide-react'
 import { DetailModal } from './DetailModal'
 import { resolveMediaUrl } from '@/lib/utils'
+import SocialIcon from '@/components/SocialIcon'
 
 export function Theme1_Medical({ cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -164,7 +165,6 @@ export function Theme1_Medical({ cover, avatar, user, profile, about, contactInf
             </h3>
             <div className='flex flex-wrap gap-2.5'>
               {socials.map((s) => {
-                const iconUrl = s.core_social?.icon ? resolveMediaUrl(s.core_social.icon) : null
                 return (
                   <a 
                     key={s.id} 
@@ -173,11 +173,12 @@ export function Theme1_Medical({ cover, avatar, user, profile, about, contactInf
                     rel='noreferrer' 
                     className='flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-all'
                   >
-                    {iconUrl ? (
-                      <Image src={iconUrl} alt={s.core_social?.name || 'Social'} width={18} height={18} className='object-contain' unoptimized style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(2476%) hue-rotate(212deg) brightness(98%) contrast(96%)' }} />
-                    ) : (
-                      <Globe className='h-4 w-4 text-blue-600' />
-                    )}
+                    <SocialIcon 
+                      social={s} 
+                      size={18}
+                      colorFilter='brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(2476%) hue-rotate(212deg) brightness(98%) contrast(96%)'
+                      fallbackColor='#2563eb'
+                    />
                     <span className='text-blue-700 font-medium text-xs'>{s.core_social?.name || 'Social'}</span>
                   </a>
                 )

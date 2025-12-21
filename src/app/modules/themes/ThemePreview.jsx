@@ -3,7 +3,7 @@
 import { THEMES } from './index'
 import { resolveMediaUrl } from '@/lib/utils'
 
-export function ThemePreview({ theme, cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
+export function ThemePreview({ theme, cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors, galleries }) {
   // Get the theme component based on theme ID
   const ThemeComponent = THEMES[theme?.theme || 'it_engineers'] || THEMES['it_engineers']
   
@@ -31,6 +31,12 @@ export function ThemePreview({ theme, cover, avatar, user, profile, about, conta
     image: p.image ? resolveMediaUrl(p.image) : null
   })) || []
   
+  // Resolve gallery images
+  const galleriesWithImages = galleries?.map(g => ({
+    ...g,
+    image: g.image ? resolveMediaUrl(g.image) : null
+  })) || []
+  
   return (
     <ThemeComponent
       cover={coverUrl}
@@ -49,6 +55,7 @@ export function ThemePreview({ theme, cover, avatar, user, profile, about, conta
       certificates={certificates}
       publications={publications}
       honors={honors}
+      galleries={galleriesWithImages}
     />
   )
 }

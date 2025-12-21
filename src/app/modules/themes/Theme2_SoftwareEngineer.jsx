@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Save, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Award, FileText, Code, ExternalLink, Languages, BookOpen, Trophy, Calendar } from 'lucide-react'
 import { DetailModal } from './DetailModal'
 import { resolveMediaUrl } from '@/lib/utils'
+import SocialIcon from '@/components/SocialIcon'
 
 export function Theme2_SoftwareEngineer({ cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -175,7 +176,6 @@ export function Theme2_SoftwareEngineer({ cover, avatar, user, profile, about, c
             <h3 className='text-base font-bold text-blue-400 mb-3 font-mono'>Social Links</h3>
             <div className='flex flex-wrap gap-2'>
               {socials.map((s) => {
-                const iconUrl = s.core_social?.icon ? resolveMediaUrl(s.core_social.icon) : null
                 return (
                   <a 
                     key={s.id} 
@@ -184,11 +184,12 @@ export function Theme2_SoftwareEngineer({ cover, avatar, user, profile, about, c
                     rel='noreferrer'
                     className='flex items-center gap-2 px-3 py-2 bg-blue-500/20 border border-blue-400/30 rounded-lg hover:bg-blue-500/30 transition-colors'
                   >
-                    {iconUrl ? (
-                      <Image src={iconUrl} alt={s.core_social?.name || 'Social'} width={20} height={20} className='object-contain' unoptimized style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(2476%) hue-rotate(212deg) brightness(98%) contrast(96%)' }} />
-                    ) : (
-                      <Globe className='h-5 w-5 text-blue-300' />
-                    )}
+                    <SocialIcon 
+                      social={s} 
+                      size={20}
+                      colorFilter='brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(2476%) hue-rotate(212deg) brightness(98%) contrast(96%)'
+                      fallbackColor='#93c5fd'
+                    />
                     <span className='text-blue-300 font-mono text-xs'>{s.core_social?.name || 'Social'}</span>
                   </a>
                 )

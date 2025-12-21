@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Save, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Award, FileText, ExternalLink, Languages, BookOpen, Trophy, Calendar, Moon, ChevronLeft, ChevronRight } from 'lucide-react'
 import { DetailModal } from './DetailModal'
 import { resolveMediaUrl } from '@/lib/utils'
+import SocialIcon from '@/components/SocialIcon'
 
 export function Theme7_Dark({ cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -112,7 +113,6 @@ export function Theme7_Dark({ cover, avatar, user, profile, about, contactInfo, 
           {socials?.length > 0 && (
             <div className='flex flex-wrap justify-center gap-3 mb-8'>
               {socials.map((s) => {
-                const iconUrl = s.core_social?.icon ? resolveMediaUrl(s.core_social.icon) : null
                 return (
                   <a 
                     key={s.id} 
@@ -122,11 +122,13 @@ export function Theme7_Dark({ cover, avatar, user, profile, about, contactInfo, 
                     className='w-12 h-12 md:w-14 md:h-14 rounded-full bg-gray-900/50 backdrop-blur-sm border border-violet-500/20 flex items-center justify-center hover:border-violet-500/50 hover:bg-violet-500/10 transition-all group'
                     title={s.core_social?.name || 'Social'}
                   >
-                    {iconUrl ? (
-                      <Image src={iconUrl} alt={s.core_social?.name || 'Social'} width={24} height={24} className='object-contain' unoptimized style={{ filter: 'brightness(0) saturate(100%) invert(77%) sepia(100%) saturate(2000%) hue-rotate(250deg) brightness(1.1) contrast(1.2)' }} />
-                    ) : (
-                      <Globe className='h-5 w-5 md:h-6 md:w-6 text-violet-400 group-hover:text-violet-300' />
-                    )}
+                    <SocialIcon 
+                      social={s} 
+                      size='lg'
+                      colorFilter='brightness(0) saturate(100%) invert(77%) sepia(100%) saturate(2000%) hue-rotate(250deg) brightness(1.1) contrast(1.2)'
+                      fallbackColor='#a78bfa'
+                      iconClassName='h-5 w-5 md:h-6 md:w-6'
+                    />
                   </a>
                 )
               })}
@@ -415,92 +417,91 @@ export function Theme7_Dark({ cover, avatar, user, profile, about, contactInfo, 
           </div>
         )}
 
-        {/* Services, Publications, Honors - Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-
-          {services?.length > 0 && (
-            <div className='bg-gray-900/40 backdrop-blur-md rounded-2xl md:rounded-3xl p-6 md:p-8 border border-violet-500/20 hover:border-violet-500/40 transition-all'>
-              <h3 className='text-lg md:text-xl font-bold text-violet-300 mb-4'>Services</h3>
-              <div className='space-y-3'>
-                {services.map((service) => (
-                  <div 
-                    key={service.id} 
-                    className='p-3 md:p-4 bg-gray-800/50 rounded-xl border border-violet-500/20 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all'
-                    onClick={() => service.description && openModal(service, 'service')}
-                  >
-                    <div className='font-bold text-white text-sm md:text-base break-words'>{service.name}</div>
-                    {service.description && (
-                      <div className='text-gray-400 text-xs md:text-sm mt-2 leading-relaxed break-words'>
-                        {truncateText(service.description, 80)}
-                        {service.description.length > 80 && (
-                          <span className='text-violet-400 font-semibold ml-1'>Read more →</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+        {/* Services - Separate Row */}
+        {services?.length > 0 && (
+          <div className='bg-gray-900/40 backdrop-blur-md rounded-2xl md:rounded-3xl p-6 md:p-8 border border-violet-500/20 hover:border-violet-500/40 transition-all'>
+            <h3 className='text-lg md:text-xl font-bold text-violet-300 mb-4'>Services</h3>
+            <div className='space-y-3'>
+              {services.map((service) => (
+                <div 
+                  key={service.id} 
+                  className='p-3 md:p-4 bg-gray-800/50 rounded-xl border border-violet-500/20 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all'
+                  onClick={() => service.description && openModal(service, 'service')}
+                >
+                  <div className='font-bold text-white text-sm md:text-base break-words'>{service.name}</div>
+                  {service.description && (
+                    <div className='text-gray-400 text-xs md:text-sm mt-2 leading-relaxed break-words'>
+                      {truncateText(service.description, 80)}
+                      {service.description.length > 80 && (
+                        <span className='text-violet-400 font-semibold ml-1'>Read more →</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {publications?.length > 0 && (
-            <div className='bg-gray-900/40 backdrop-blur-md rounded-2xl md:rounded-3xl p-6 md:p-8 border border-violet-500/20 hover:border-violet-500/40 transition-all'>
-              <h3 className='text-lg md:text-xl font-bold text-violet-300 mb-4 flex items-center gap-2'>
-                <BookOpen className='h-5 w-5' />
-                Publications
-              </h3>
-              <div className='space-y-3'>
-                {publications.map((pub) => (
-                  <div 
-                    key={pub.id} 
-                    className='p-3 md:p-4 bg-gray-800/50 rounded-xl border border-violet-500/20 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all'
-                    onClick={() => pub.description && openModal(pub, 'publication')}
-                  >
-                    <div className='font-bold text-white text-sm md:text-base break-words'>{pub.title || pub.name}</div>
-                    {pub.publisher && <div className='text-violet-400 text-xs md:text-sm mt-1 font-semibold break-words'>{pub.publisher}</div>}
-                    {pub.description && (
-                      <div className='text-gray-400 text-xs md:text-sm mt-2 leading-relaxed break-words'>
-                        {truncateText(pub.description, 80)}
-                        {pub.description.length > 80 && (
-                          <span className='text-violet-400 font-semibold ml-1'>Read more →</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+        {/* Publications - Separate Row */}
+        {publications?.length > 0 && (
+          <div className='bg-gray-900/40 backdrop-blur-md rounded-2xl md:rounded-3xl p-6 md:p-8 border border-violet-500/20 hover:border-violet-500/40 transition-all'>
+            <h3 className='text-lg md:text-xl font-bold text-violet-300 mb-4 flex items-center gap-2'>
+              <BookOpen className='h-5 w-5' />
+              Publications
+            </h3>
+            <div className='space-y-3'>
+              {publications.map((pub) => (
+                <div 
+                  key={pub.id} 
+                  className='p-3 md:p-4 bg-gray-800/50 rounded-xl border border-violet-500/20 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all'
+                  onClick={() => pub.description && openModal(pub, 'publication')}
+                >
+                  <div className='font-bold text-white text-sm md:text-base break-words'>{pub.title || pub.name}</div>
+                  {pub.publisher && <div className='text-violet-400 text-xs md:text-sm mt-1 font-semibold break-words'>{pub.publisher}</div>}
+                  {pub.description && (
+                    <div className='text-gray-400 text-xs md:text-sm mt-2 leading-relaxed break-words'>
+                      {truncateText(pub.description, 80)}
+                      {pub.description.length > 80 && (
+                        <span className='text-violet-400 font-semibold ml-1'>Read more →</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {honors?.length > 0 && (
-            <div className='bg-gray-900/40 backdrop-blur-md rounded-2xl md:rounded-3xl p-6 md:p-8 border border-violet-500/20 hover:border-violet-500/40 transition-all'>
-              <h3 className='text-lg md:text-xl font-bold text-violet-300 mb-4 flex items-center gap-2'>
-                <Trophy className='h-5 w-5' />
-                Honors & Awards
-              </h3>
-              <div className='space-y-3'>
-                {honors.map((honor) => (
-                  <div 
-                    key={honor.id} 
-                    className='p-3 md:p-4 bg-gray-800/50 rounded-xl border border-violet-500/20 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all'
-                    onClick={() => honor.description && openModal(honor, 'honor')}
-                  >
-                    <div className='font-bold text-white text-sm md:text-base break-words'>{honor.title || honor.name}</div>
-                    {honor.issuer && <div className='text-violet-400 text-xs md:text-sm mt-1 font-semibold break-words'>{honor.issuer}</div>}
-                    {honor.description && (
-                      <div className='text-gray-400 text-xs md:text-sm mt-2 leading-relaxed break-words'>
-                        {truncateText(honor.description, 80)}
-                        {honor.description.length > 80 && (
-                          <span className='text-violet-400 font-semibold ml-1'>Read more →</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+        {/* Honors & Awards - Separate Row */}
+        {honors?.length > 0 && (
+          <div className='bg-gray-900/40 backdrop-blur-md rounded-2xl md:rounded-3xl p-6 md:p-8 border border-violet-500/20 hover:border-violet-500/40 transition-all'>
+            <h3 className='text-lg md:text-xl font-bold text-violet-300 mb-4 flex items-center gap-2'>
+              <Trophy className='h-5 w-5' />
+              Honors & Awards
+            </h3>
+            <div className='space-y-3'>
+              {honors.map((honor) => (
+                <div 
+                  key={honor.id} 
+                  className='p-3 md:p-4 bg-gray-800/50 rounded-xl border border-violet-500/20 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all'
+                  onClick={() => honor.description && openModal(honor, 'honor')}
+                >
+                  <div className='font-bold text-white text-sm md:text-base break-words'>{honor.title || honor.name}</div>
+                  {honor.issuer && <div className='text-violet-400 text-xs md:text-sm mt-1 font-semibold break-words'>{honor.issuer}</div>}
+                  {honor.description && (
+                    <div className='text-gray-400 text-xs md:text-sm mt-2 leading-relaxed break-words'>
+                      {truncateText(honor.description, 80)}
+                      {honor.description.length > 80 && (
+                        <span className='text-violet-400 font-semibold ml-1'>Read more →</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Detail Modal */}

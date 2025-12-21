@@ -6,13 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/provider/AuthProvider";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,42 +89,17 @@ export function Navbar() {
           {/* Right Side Icons */}
           <div className="flex items-center gap-2">
             {user ? (
-              // User is logged in - show profile dropdown
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full hover:bg-white/10 text-black"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar} alt={user.username} />
-                      <AvatarFallback>
-                        {user.username?.charAt(0).toUpperCase() || 
-                         user.email?.charAt(0).toUpperCase() || 
-                         "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-bG text-tX font-semibold" align="end" forceMount>
-                <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="w-full cursor-pointer">
-                      <LayoutPanelLeft className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="w-full cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              // User is logged in - show dashboard link button instead of profile dropdown
+              <Button
+                variant="ghost"
+                className="text-sm font-medium text-white hover:text-white hover:bg-white/10"
+                asChild
+              >
+                <Link href="/dashboard">
+                  <LayoutPanelLeft className="mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Link>
+              </Button>
             ) : (
               // User is not logged in - show login/register buttons
               <>

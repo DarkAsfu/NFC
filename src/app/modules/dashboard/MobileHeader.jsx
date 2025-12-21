@@ -1,5 +1,8 @@
+'use client'
+
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Search, Bell, ShoppingCart, Radio } from 'lucide-react'
+import { Search, Bell, Store, Radio } from 'lucide-react'
 
 export function MobileHeader() {
   return (
@@ -23,6 +26,20 @@ export function MobileHeader() {
           </Button>
           <Button variant="ghost" size="icon" className="text-muted-foreground">
             <Bell className="h-5 w-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-muted-foreground relative group"
+            asChild
+            title="Go to Shop"
+          >
+            <Link href="/products">
+              <Store className="h-5 w-5" />
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity">
+                Shop
+              </span>
+            </Link>
           </Button>
         </div>
       </div>

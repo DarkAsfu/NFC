@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Save, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Award, FileText, ExternalLink, Languages, BookOpen, Trophy, Calendar } from 'lucide-react'
 import { DetailModal } from './DetailModal'
 import { resolveMediaUrl } from '@/lib/utils'
+import SocialIcon from '@/components/SocialIcon'
 
 export function Theme4_Professional({ cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -138,7 +139,6 @@ export function Theme4_Professional({ cover, avatar, user, profile, about, conta
             <h3 className='text-sm font-bold text-gray-900 uppercase tracking-wide mb-3'>Social Links</h3>
             <div className='space-y-2'>
               {socials.map((s) => {
-                const iconUrl = s.core_social?.icon ? resolveMediaUrl(s.core_social.icon) : null
                 return (
                   <a 
                     key={s.id} 
@@ -147,11 +147,12 @@ export function Theme4_Professional({ cover, avatar, user, profile, about, conta
                     rel='noreferrer' 
                     className='flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900 py-2 border-b border-gray-100 last:border-0 transition-colors'
                   >
-                    {iconUrl ? (
-                      <Image src={iconUrl} alt={s.core_social?.name || 'Social'} width={20} height={20} className='object-contain' unoptimized style={{ filter: 'brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)' }} />
-                    ) : (
-                      <Globe className='h-5 w-5 text-gray-400' />
-                    )}
+                    <SocialIcon 
+                      social={s} 
+                      size={20}
+                      colorFilter='brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)'
+                      fallbackColor='#9ca3af'
+                    />
                     <span className='flex-1'>{s.core_social?.name || 'Social'}</span>
                     <ExternalLink className='h-3 w-3 opacity-50' />
                   </a>

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Save, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Award, FileText, Sparkles, ExternalLink, Languages, BookOpen, Trophy, Calendar } from 'lucide-react'
 import { DetailModal } from './DetailModal'
 import { resolveMediaUrl } from '@/lib/utils'
+import SocialIcon from '@/components/SocialIcon'
 
 export function Theme5_Creative({ cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -91,21 +92,21 @@ export function Theme5_Creative({ cover, avatar, user, profile, about, contactIn
         {socials?.length > 0 && (
           <div className='absolute left-6 top-1/2 -translate-y-1/2 space-y-3'>
             {socials.slice(0, 3).map((s) => {
-              const iconUrl = s.core_social?.icon ? resolveMediaUrl(s.core_social.icon) : null
               return (
                 <a 
                   key={s.id} 
                   href={s.full_social_profile_url || s.profile_url} 
                   target='_blank' 
                   rel='noreferrer' 
-                  className='block p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 hover:bg-white/30 hover:scale-110 transition-all shadow-lg'
+                  className='p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 hover:bg-white/30 hover:scale-110 transition-all shadow-lg flex items-center justify-center'
                   title={s.core_social?.name || 'Social'}
                 >
-                  {iconUrl ? (
-                    <Image src={iconUrl} alt={s.core_social?.name || 'Social'} width={32} height={32} className='object-contain mx-auto' unoptimized style={{ filter: 'brightness(0) saturate(100%) invert(100%)' }} />
-                  ) : (
-                    <Globe className='h-8 w-8 text-white mx-auto' />
-                  )}
+                  <SocialIcon 
+                    social={s} 
+                    size={32}
+                    colorFilter='brightness(0) saturate(100%) invert(100%)'
+                    fallbackColor='white'
+                  />
                 </a>
               )
             })}

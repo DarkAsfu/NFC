@@ -64,39 +64,110 @@ export default function PublicProfilePage() {
         setTheme(themeRes.data)
         setProfile(profileRes.data)
 
-        // Fetch optional sections (allow failures)
+        // Fetch optional sections (allow failures but log errors)
         const optionalSections = await Promise.allSettled([
-          api.get(`/profile/about/${username}/`).catch(() => ({ data: null })),
-          api.get(`/profile/languages/${username}/`),
-          api.get(`/profile/skills/${username}/`),
-          api.get(`/profile/experiences/${username}/`),
-          api.get(`/profile/educations/${username}/`),
-          api.get(`/profile/galleries/${username}/`),
-          api.get(`/profile/portfolios/${username}/`),
-          api.get(`/profile/services/${username}/`),
-          api.get(`/profile/social-links/${username}/`),
-          api.get(`/profile/certificates/${username}/`),
-          api.get(`/profile/publications/${username}/`),
-          api.get(`/profile/honor-and-award/${username}/`),
-          api.get(`/profile/contact-informations/${username}/`).catch(() => ({ data: [] }))
+          api.get(`/profile/about/${username}/`).catch((err) => {
+            console.warn('Failed to fetch about:', err?.response?.status, err?.message)
+            return { data: null }
+          }),
+          api.get(`/profile/languages/${username}/`).catch((err) => {
+            console.warn('Failed to fetch languages:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/skills/${username}/`).catch((err) => {
+            console.warn('Failed to fetch skills:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/experiences/${username}/`).catch((err) => {
+            console.warn('Failed to fetch experiences:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/educations/${username}/`).catch((err) => {
+            console.warn('Failed to fetch educations:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/galleries/${username}/`).catch((err) => {
+            console.warn('Failed to fetch galleries:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/portfolios/${username}/`).catch((err) => {
+            console.warn('Failed to fetch portfolios:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/services/${username}/`).catch((err) => {
+            console.warn('Failed to fetch services:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/social-links/${username}/`).catch((err) => {
+            console.warn('Failed to fetch social-links:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/certificates/${username}/`).catch((err) => {
+            console.warn('Failed to fetch certificates:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/publications/${username}/`).catch((err) => {
+            console.warn('Failed to fetch publications:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/honor-and-award/${username}/`).catch((err) => {
+            console.warn('Failed to fetch honors:', err?.response?.status, err?.message)
+            return { data: [] }
+          }),
+          api.get(`/profile/contact-informations/${username}/`).catch((err) => {
+            console.warn('Failed to fetch contact info:', err?.response?.status, err?.message)
+            return { data: [] }
+          })
         ])
 
         if (cancelled) return
 
-        // Extract data from settled promises
-        setAbout(optionalSections[0].status === 'fulfilled' ? optionalSections[0].value.data : null)
-        setLanguages(optionalSections[1].status === 'fulfilled' ? optionalSections[1].value.data || [] : [])
-        setSkills(optionalSections[2].status === 'fulfilled' ? optionalSections[2].value.data || [] : [])
-        setExperiences(optionalSections[3].status === 'fulfilled' ? optionalSections[3].value.data || [] : [])
-        setEducations(optionalSections[4].status === 'fulfilled' ? optionalSections[4].value.data || [] : [])
-        setGalleries(optionalSections[5].status === 'fulfilled' ? optionalSections[5].value.data || [] : [])
-        setPortfolios(optionalSections[6].status === 'fulfilled' ? optionalSections[6].value.data || [] : [])
-        setServices(optionalSections[7].status === 'fulfilled' ? optionalSections[7].value.data || [] : [])
-        setSocials(optionalSections[8].status === 'fulfilled' ? optionalSections[8].value.data || [] : [])
-        setCertificates(optionalSections[9].status === 'fulfilled' ? optionalSections[9].value.data || [] : [])
-        setPublications(optionalSections[10].status === 'fulfilled' ? optionalSections[10].value.data || [] : [])
-        setHonors(optionalSections[11].status === 'fulfilled' ? optionalSections[11].value.data || [] : [])
-        setContactInfo(optionalSections[12].status === 'fulfilled' ? (optionalSections[12].value.data || []) : [])
+        // Extract data from settled promises - ensure we always get arrays or null
+        const aboutData = optionalSections[0].status === 'fulfilled' && optionalSections[0].value?.data ? optionalSections[0].value.data : null
+        const languagesData = optionalSections[1].status === 'fulfilled' && optionalSections[1].value?.data ? (Array.isArray(optionalSections[1].value.data) ? optionalSections[1].value.data : []) : []
+        const skillsData = optionalSections[2].status === 'fulfilled' && optionalSections[2].value?.data ? (Array.isArray(optionalSections[2].value.data) ? optionalSections[2].value.data : []) : []
+        const experiencesData = optionalSections[3].status === 'fulfilled' && optionalSections[3].value?.data ? (Array.isArray(optionalSections[3].value.data) ? optionalSections[3].value.data : []) : []
+        const educationsData = optionalSections[4].status === 'fulfilled' && optionalSections[4].value?.data ? (Array.isArray(optionalSections[4].value.data) ? optionalSections[4].value.data : []) : []
+        const galleriesData = optionalSections[5].status === 'fulfilled' && optionalSections[5].value?.data ? (Array.isArray(optionalSections[5].value.data) ? optionalSections[5].value.data : []) : []
+        const portfoliosData = optionalSections[6].status === 'fulfilled' && optionalSections[6].value?.data ? (Array.isArray(optionalSections[6].value.data) ? optionalSections[6].value.data : []) : []
+        const servicesData = optionalSections[7].status === 'fulfilled' && optionalSections[7].value?.data ? (Array.isArray(optionalSections[7].value.data) ? optionalSections[7].value.data : []) : []
+        const socialsData = optionalSections[8].status === 'fulfilled' && optionalSections[8].value?.data ? (Array.isArray(optionalSections[8].value.data) ? optionalSections[8].value.data : []) : []
+        const certificatesData = optionalSections[9].status === 'fulfilled' && optionalSections[9].value?.data ? (Array.isArray(optionalSections[9].value.data) ? optionalSections[9].value.data : []) : []
+        const publicationsData = optionalSections[10].status === 'fulfilled' && optionalSections[10].value?.data ? (Array.isArray(optionalSections[10].value.data) ? optionalSections[10].value.data : []) : []
+        const honorsData = optionalSections[11].status === 'fulfilled' && optionalSections[11].value?.data ? (Array.isArray(optionalSections[11].value.data) ? optionalSections[11].value.data : []) : []
+        const contactInfoData = optionalSections[12].status === 'fulfilled' && optionalSections[12].value?.data ? (Array.isArray(optionalSections[12].value.data) ? optionalSections[12].value.data : []) : []
+
+        // Log data for debugging
+        console.log('Profile data loaded:', {
+          about: aboutData,
+          languages: languagesData.length,
+          skills: skillsData.length,
+          experiences: experiencesData.length,
+          educations: educationsData.length,
+          galleries: galleriesData.length,
+          portfolios: portfoliosData.length,
+          services: servicesData.length,
+          socials: socialsData.length,
+          certificates: certificatesData.length,
+          publications: publicationsData.length,
+          honors: honorsData.length,
+          contactInfo: contactInfoData.length
+        })
+
+        // Set all state
+        setAbout(aboutData)
+        setLanguages(languagesData)
+        setSkills(skillsData)
+        setExperiences(experiencesData)
+        setEducations(educationsData)
+        setGalleries(galleriesData)
+        setPortfolios(portfoliosData)
+        setServices(servicesData)
+        setSocials(socialsData)
+        setCertificates(certificatesData)
+        setPublications(publicationsData)
+        setHonors(honorsData)
+        setContactInfo(contactInfoData)
       } catch (e) {
         if (cancelled) return
         const errorMsg = e?.response?.data?.detail || e?.response?.data?.error || e?.message || 'Failed to load profile'
@@ -174,6 +245,7 @@ export default function PublicProfilePage() {
       certificates={certificates}
       publications={publications}
       honors={honors}
+      galleries={galleries}
     />
   )
 }

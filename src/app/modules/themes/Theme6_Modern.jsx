@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Save, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Award, FileText, ExternalLink, Languages, BookOpen, Trophy, Calendar, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { DetailModal } from './DetailModal'
 import { resolveMediaUrl } from '@/lib/utils'
+import SocialIcon from '@/components/SocialIcon'
 
 export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo, socials, skills, experiences, educations, languages, portfolios, services, certificates, publications, honors }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -130,7 +131,6 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
           {socials?.length > 0 && (
             <div className='flex flex-wrap gap-2 justify-center items-center'>
               {socials.map((s) => {
-                const iconUrl = s.core_social?.icon ? resolveMediaUrl(s.core_social.icon) : null
                 return (
                   <a 
                     key={s.id} 
@@ -139,11 +139,12 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
                     rel='noreferrer'
                     className='p-2.5 rounded-xl border-2 transition-all shadow-sm flex items-center justify-center' style={{ backgroundColor: '#d96846', borderColor: 'rgba(217, 104, 70, 0.5)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c55a3a'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d96846'}
                   >
-                    {iconUrl ? (
-                      <Image src={iconUrl} alt={s.core_social?.name || 'Social'} width={20} height={20} className='object-contain flex-shrink-0' unoptimized style={{ filter: 'brightness(0) saturate(100%) invert(100%)' }} />
-                    ) : (
-                      <Globe className='h-5 w-5 text-white flex-shrink-0' />
-                    )}
+                    <SocialIcon 
+                      social={s} 
+                      size={20}
+                      colorFilter='brightness(0) saturate(100%) invert(100%)'
+                      fallbackColor='white'
+                    />
                   </a>
                 )
               })}

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Home, User, CreditCard, Bell, Share2, ShoppingBag, LogOut, Radio, Palette } from 'lucide-react'
+import { Home, User, CreditCard, Bell, Share2, ShoppingBag, LogOut, Radio, Palette, LayoutDashboard, Package } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
@@ -10,6 +10,7 @@ export function DashboardNav() {
   const pathname = usePathname()
 
   const navItems = [
+    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/dashboard/cards", icon: CreditCard, label: "My Card" },
     { 
       href: "/dashboard/share", 
@@ -19,6 +20,7 @@ export function DashboardNav() {
     },
     { href: "/dashboard/themes", icon: Palette, label: "Landing Page Design" },
     { href: "/products", icon: ShoppingBag, label: "Shop" },
+    { href: "/dashboard/my-orders", icon: Package, label: "My Orders" },
     // { href: "/dashboard/notifications", icon: Bell, label: "Notifications" },
     { href: "/dashboard/profile", icon: User, label: "Account Settings" },
   ]

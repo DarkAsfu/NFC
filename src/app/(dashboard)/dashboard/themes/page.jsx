@@ -36,8 +36,29 @@ export default function ThemesPage() {
     if (!user?.username) return
     try {
       const res = await api.get(`/theme/${user.username}/`)
-      setCurrentTheme(res.data)
-      setSelectedTheme(res.data)
+      console.log('DEBUG: Fetched theme from backend:', res.data)
+      // Only set if we have valid theme data
+      if (res.data && res.data.theme) {
+        setCurrentTheme(res.data)
+        // Use functional update to check current state
+        setSelectedTheme(prev => {
+          // Only update if previous state is empty or null
+          if (!prev || !prev.theme) {
+            return res.data
+          }
+          return prev
+        })
+      } else {
+        // If no theme exists, set default
+        const defaultTheme = { theme: 'it_engineers' }
+        setCurrentTheme(defaultTheme)
+        setSelectedTheme(prev => {
+          if (!prev || !prev.theme) {
+            return defaultTheme
+          }
+          return prev
+        })
+      }
     } catch (err) {
       console.error('Failed to fetch theme:', err)
     } finally {
@@ -102,18 +123,48 @@ export default function ThemesPage() {
   }
 
   const handleSaveTheme = async (themeOverride = null) => {
+    if (!user?.username) {
+      console.error('DEBUG: Missing user:', user?.username)
+      return
+    }
+    
+    // If themeOverride is provided, use it; otherwise use selectedTheme
     const themeToSave = themeOverride || selectedTheme
-    if (!user?.username || !themeToSave) return
+    
+    console.log('DEBUG: handleSaveTheme called with:', { themeOverride, selectedTheme, themeToSave })
+    
+    // Extract theme value - handle both { theme: 'dark' } and direct string
+    let themeValue = null
+    if (typeof themeToSave === 'string') {
+      themeValue = themeToSave
+    } else if (themeToSave && typeof themeToSave === 'object') {
+      themeValue = themeToSave.theme
+    }
+    
+    if (!themeValue) {
+      console.error('DEBUG: No theme value found. themeToSave:', themeToSave, 'selectedTheme:', selectedTheme)
+      setMessage({ type: 'error', text: 'Please select a theme first by clicking on a theme card' })
+      return
+    }
+    
     setSaving(true)
     setMessage(null)
     try {
-      await api.patch(`/theme/${user.username}/`, { theme: themeToSave.theme })
-      setCurrentTheme(themeToSave)
-      setSelectedTheme(themeToSave)
+      console.log('DEBUG: Saving theme value:', themeValue)
+      console.log('DEBUG: Full theme object:', themeToSave)
+      const response = await api.patch(`/theme/${user.username}/`, { theme: themeValue })
+      console.log('DEBUG: Response from backend:', response.data)
+      // Refetch theme from backend to ensure we have the latest data
+      await fetchCurrentTheme()
       setMessage({ type: 'success', text: 'Theme updated successfully!' })
     } catch (err) {
-      const errorMsg = err?.response?.data?.detail || err?.response?.data?.error || 'Failed to update theme'
+      console.error('DEBUG: Error saving theme:', err)
+      console.error('DEBUG: Error response:', err?.response?.data)
+      console.error('DEBUG: Error status:', err?.response?.status)
+      const errorMsg = err?.response?.data?.detail || err?.response?.data?.error || err?.response?.data?.theme?.[0] || JSON.stringify(err?.response?.data) || 'Failed to update theme'
       setMessage({ type: 'error', text: errorMsg })
+      // Refetch theme on error to ensure state is correct
+      await fetchCurrentTheme()
     } finally {
       setSaving(false)
     }
@@ -164,7 +215,12 @@ export default function ThemesPage() {
                         className={`group relative cursor-pointer transition-all duration-300 ${
                           isSelected ? 'ring-2 ring-primary ring-offset-2' : 'hover:ring-2 hover:ring-primary/50 ring-offset-2'
                         }`}
-                        onClick={() => setSelectedTheme({ theme: theme.id })}
+                        onClick={(e) => {
+                          // Don't trigger if clicking on buttons inside
+                          if (e.target.closest('button')) return
+                          console.log('DEBUG: Theme card clicked, selecting:', theme.id)
+                          setSelectedTheme({ theme: theme.id })
+                        }}
                       >
                         <Card className={`overflow-hidden border-2 transition-all duration-300 ${
                           isSelected 
@@ -352,13 +408,19 @@ export default function ThemesPage() {
                                     setSaving(true)
                                     setMessage(null)
                                     try {
-                                      await api.patch(`/theme/${user.username}/`, { theme: theme.id })
-                                      setCurrentTheme({ theme: theme.id })
-                                      setSelectedTheme({ theme: theme.id })
+                                      console.log('DEBUG: Applying theme:', theme.id)
+                                      const response = await api.patch(`/theme/${user.username}/`, { theme: theme.id })
+                                      console.log('DEBUG: Response from backend:', response.data)
+                                      // Refetch theme from backend to ensure we have the latest data
+                                      await fetchCurrentTheme()
                                       setMessage({ type: 'success', text: 'Theme updated successfully!' })
                                     } catch (err) {
+                                      console.error('DEBUG: Error applying theme:', err)
+                                      console.error('DEBUG: Error response:', err?.response?.data)
                                       const errorMsg = err?.response?.data?.detail || err?.response?.data?.error || 'Failed to update theme'
                                       setMessage({ type: 'error', text: errorMsg })
+                                      // Refetch theme on error to ensure state is correct
+                                      await fetchCurrentTheme()
                                     } finally {
                                       setSaving(false)
                                     }
@@ -384,8 +446,11 @@ export default function ThemesPage() {
               </Card>
 
               <Button
-                onClick={handleSaveTheme}
-                disabled={saving || !selectedTheme || selectedTheme.theme === currentTheme?.theme}
+                onClick={() => {
+                  console.log('DEBUG: Save Theme button clicked, selectedTheme:', selectedTheme)
+                  handleSaveTheme()
+                }}
+                disabled={saving || !selectedTheme || !selectedTheme?.theme || selectedTheme.theme === currentTheme?.theme}
                 className='w-full h-12 text-base font-semibold shadow-lg'
                 size='lg'
               >
