@@ -39,3 +39,4 @@ export function CVPreview({ template, user, profile, about, contactInfo, skills,
   )
 }
 
+

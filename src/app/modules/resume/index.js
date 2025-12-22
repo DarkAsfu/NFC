@@ -95,6 +95,7 @@ export const CV_TEMPLATE_INFO = [
   }
 ]
 
+<<<<<<< HEAD
 // Map profile types to recommended templates
 export const getTemplatesForProfileType = (profileType) => {
   if (!profileType) return CV_TEMPLATE_INFO
@@ -113,4 +114,6 @@ export const getRecommendedTemplate = (profileType) => {
   const templates = getTemplatesForProfileType(profileType)
   return templates[0] || CV_TEMPLATE_INFO[0]
 }
+=======
+>>>>>>> 01ba7c1 (need to pull)
 
