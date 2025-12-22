@@ -1,6 +1,6 @@
 'use client'
 
-import { Sparkles, Layers, Cpu, ArrowRight, TrendingUp, Code2, Server, Lock, Zap, Globe2, Smartphone, CreditCard, Radio, QrCode, Users, FileText, Share2 } from 'lucide-react'
+import { Sparkles, Layers, Cpu, ArrowRight, TrendingUp, Code2, Server, Lock, Zap, Globe2, Smartphone, CreditCard, Radio, QrCode, Users, FileText, Share2, Mail, Phone, Linkedin, Twitter, Github, Instagram, Facebook, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { motion, useAnimation, useInView } from 'framer-motion'
@@ -27,29 +27,29 @@ function NFCTapAnimation() {
         // Initial delay
         await new Promise(resolve => setTimeout(resolve, 1000))
         
-        // Card moves toward phone
+        // Card moves toward phone top edge (where NFC chip is)
         await cardControls.start({
-          x: 120,
-          y: -30,
+          x: 0,
+          y: -20,
           scale: 0.9,
-          rotate: -5,
+          rotate: 0,
           transition: { duration: 0.6, ease: "easeOut" }
         })
         
-        // Card taps (slight bounce)
+        // Card taps on phone top (slight bounce)
         await cardControls.start({
-          x: 130,
-          y: -35,
+          x: 0,
+          y: -30,
           scale: 0.85,
-          rotate: -8,
+          rotate: 0,
           transition: { duration: 0.2 }
         })
         
         await cardControls.start({
-          x: 120,
-          y: -30,
+          x: 0,
+          y: -20,
           scale: 0.9,
-          rotate: -5,
+          rotate: 0,
           transition: { duration: 0.2 }
         })
         
@@ -72,11 +72,11 @@ function NFCTapAnimation() {
           transition: { duration: 0.3, delay: 0.2 }
         })
         
-        // Card returns to original position
+        // Card returns to original position (top right, outside phone)
         await new Promise(resolve => setTimeout(resolve, 2000))
         cardControls.start({
-          x: 0,
-          y: 0,
+          x: 180,
+          y: -20,
           scale: 1,
           rotate: 0,
           transition: { duration: 0.6, ease: "easeInOut" }
@@ -110,18 +110,8 @@ function NFCTapAnimation() {
         className="relative z-10"
       >
         <div className='rounded-[2.5rem] border-8 border-gray-900 bg-gray-900 overflow-hidden shadow-2xl' style={{ width: '375px', maxWidth: '100%', height: '750px', transform: 'scale(0.65)', transformOrigin: 'top center' }}>
-          {/* Phone Status Bar */}
-          <div className='bg-black h-7 flex items-center justify-between px-6 text-white text-[10px] font-medium'>
-            <span>9:41</span>
-            <div className='flex items-center gap-1'>
-              <div className='w-4 h-2 border border-white rounded-sm'></div>
-              <div className='w-1 h-1 bg-white rounded-full'></div>
-              <div className='w-6 h-3 border border-white rounded-sm ml-1'></div>
-            </div>
-          </div>
-
           {/* Scrollable Content Area */}
-          <div className='bg-black overflow-y-auto scrollbar-hide relative' style={{ height: 'calc(750px - 28px)' }}>
+          <div className='bg-black overflow-y-auto scrollbar-hide relative' style={{ height: '750px' }}>
             {/* Default Screen (when profile not showing) */}
             <motion.div
               initial={{ opacity: 1 }}
@@ -150,12 +140,13 @@ function NFCTapAnimation() {
               initial={{ opacity: 0, y: 20 }}
               className="absolute inset-0 w-full"
             >
-              <div className="h-full bg-bG min-h-full">
+              <div className="h-full bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-full">
                 {/* Header with Gradient */}
-                <div className="relative h-32 bg-gradient-to-br from-purple-600 via-blue-600 to-purple-600 overflow-visible">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                <div className="relative h-40 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 overflow-visible">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.2)_100%)]"></div>
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 text-center">
-                    <div className="relative w-20 h-20 rounded-full bg-white border-4 border-white shadow-xl mx-auto overflow-hidden">
+                    <div className="relative w-24 h-24 rounded-full bg-white border-4 border-white shadow-2xl mx-auto overflow-hidden ring-4 ring-purple-500/20">
                       <Image
                         src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces"
                         alt="Profile"
@@ -168,55 +159,67 @@ function NFCTapAnimation() {
                 </div>
                 
                 {/* Content */}
-                <div className="px-6 pt-20 pb-6">
+                <div className="px-5 pt-24 pb-6">
                   {/* Name and Title */}
                   <div className="text-center mb-6">
-                    <h3 className="text-white font-bold text-xl mb-1">John Doe</h3>
-                    <p className="text-gray-400 text-sm">Software Engineer</p>
+                    <h3 className="text-white font-bold text-2xl mb-1.5">John Doe</h3>
+                    <p className="text-gray-300 text-sm font-medium">Software Engineer</p>
+                    <p className="text-gray-500 text-xs mt-1">San Francisco, CA</p>
                   </div>
                   
                   {/* Contact Info - Modern Cards */}
-                  <div className="space-y-3 mb-6">
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+                  <div className="space-y-2.5 mb-5">
+                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5 hover:bg-white/10 hover:border-white/20 transition-all shadow-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-purple-500/30 shrink-0">
-                          <div className="w-5 h-5 rounded bg-purple-500"></div>
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center border border-purple-500/40 shrink-0 shadow-md">
+                          <Mail className="w-5 h-5 text-purple-300" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-gray-400 text-xs mb-0.5">Email</div>
-                          <div className="text-white text-sm font-medium truncate">john@example.com</div>
+                          <div className="text-gray-400 text-[10px] mb-0.5 font-medium uppercase tracking-wide">Email</div>
+                          <div className="text-white text-sm font-semibold truncate">john@example.com</div>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5 hover:bg-white/10 hover:border-white/20 transition-all shadow-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center border border-blue-500/30 shrink-0">
-                          <div className="w-5 h-5 rounded bg-blue-500"></div>
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/30 to-cyan-500/30 flex items-center justify-center border border-blue-500/40 shrink-0 shadow-md">
+                          <Phone className="w-5 h-5 text-blue-300" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-gray-400 text-xs mb-0.5">Phone</div>
-                          <div className="text-white text-sm font-medium truncate">+1 234 567 8900</div>
+                          <div className="text-gray-400 text-[10px] mb-0.5 font-medium uppercase tracking-wide">Phone</div>
+                          <div className="text-white text-sm font-semibold truncate">+1 (234) 567-8900</div>
                         </div>
                       </div>
                     </div>
                   </div>
                   
                   {/* Social Links - Modern Grid */}
-                  <div className="mb-4">
-                    <div className="text-gray-400 text-xs mb-3 font-medium">Connect</div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="aspect-square bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors">
-                          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500/30 to-blue-500/30"></div>
-                        </div>
-                      ))}
+                  <div className="mb-5">
+                    <div className="text-gray-400 text-xs mb-3 font-semibold uppercase tracking-wider text-center">Connect</div>
+                    <div className="grid grid-cols-3 gap-2.5">
+                      {[
+                        { icon: Linkedin, color: 'from-blue-600 to-blue-700', bg: 'bg-blue-500/20', border: 'border-blue-500/30' },
+                        { icon: Twitter, color: 'from-sky-500 to-sky-600', bg: 'bg-sky-500/20', border: 'border-sky-500/30' },
+                        { icon: Github, color: 'from-gray-700 to-gray-800', bg: 'bg-gray-700/20', border: 'border-gray-700/30' },
+                        { icon: Instagram, color: 'from-pink-500 to-purple-600', bg: 'bg-pink-500/20', border: 'border-pink-500/30' },
+                        { icon: Facebook, color: 'from-blue-600 to-blue-700', bg: 'bg-blue-600/20', border: 'border-blue-600/30' },
+                        { icon: Globe, color: 'from-purple-500 to-indigo-600', bg: 'bg-purple-500/20', border: 'border-purple-500/30' }
+                      ].map((social, i) => {
+                        const Icon = social.icon
+                        return (
+                          <div key={i} className={`aspect-square ${social.bg} backdrop-blur-sm border ${social.border} rounded-xl flex items-center justify-center hover:bg-white/10 hover:scale-105 transition-all shadow-md cursor-pointer`}>
+                            <Icon className={`w-5 h-5 text-white`} />
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                   
                   {/* Action Button */}
-                  <button className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl text-white font-semibold text-sm hover:from-purple-600 hover:to-blue-700 transition-all">
-                    Save Contact
+                  <button className="w-full mt-3 py-3.5 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 rounded-xl text-white font-bold text-sm hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2">
+                    <span>Save Contact</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -228,8 +231,9 @@ function NFCTapAnimation() {
       {/* NFC Card - Professional Design with NFC Logo and QR Code */}
       <motion.div
         animate={cardControls}
-        initial={{ x: 0, y: 0, scale: 1, rotate: 0 }}
-        className="absolute left-0 z-20"
+        initial={{ x: 180, y: -20, scale: 1, rotate: 0 }}
+        className="absolute left-1/2 top-0 z-20"
+        style={{ transform: 'translateX(-50%)' }}
       >
         <div className="relative w-72 h-44 bg-white rounded-xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden">
           {/* Card Content - Split Layout */}
@@ -334,13 +338,13 @@ export default function AboutPage() {
           <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl"></div>
         </div>
         
-        <div className="max-w-7xl mx-auto relative z-10 pl-8 md:pl-16 lg:pl-24">
+        <div className="max-w-7xl mx-auto relative z-10 px-4">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="mt-0"
+              className="text-center md:text-left mt-0"
             >
               <div className="inline-block mb-6">
                 <span className="text-sm font-mono text-purple-400 tracking-wider uppercase">Since 2024</span>
@@ -352,7 +356,7 @@ export default function AboutPage() {
                   digital bridges
                 </span>
               </h1>
-              <p className="text-xl text-gray-400 leading-relaxed max-w-lg">
+              <p className="text-xl text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0">
                 Transforming how professionals connect through innovative NFC technology. 
                 No more lost business cards, no more outdated contact info.
               </p>

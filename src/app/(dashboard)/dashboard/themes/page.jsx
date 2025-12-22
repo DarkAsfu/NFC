@@ -352,6 +352,35 @@ export default function ThemesPage() {
                                   <div className='absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-2 bg-violet-500/20 rounded-full'></div>
                                 </div>
                               )}
+                              {theme.id === 'premium' && (
+                                <div className='w-full h-full bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 relative'>
+                                  {/* Header with Gradient */}
+                                  <div className='absolute top-0 left-0 right-0 h-16 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700'>
+                                    <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent'></div>
+                                    <div className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2'>
+                                      <div className='w-8 h-8 rounded-full bg-white border-2 border-white shadow-lg ring-2 ring-purple-500/20'></div>
+                                    </div>
+                                  </div>
+                                  {/* Name and Title */}
+                                  <div className='absolute top-20 left-1/2 -translate-x-1/2 text-center'>
+                                    <div className='w-16 h-1.5 bg-white rounded mb-1'></div>
+                                    <div className='w-12 h-1 bg-gray-300 rounded'></div>
+                                  </div>
+                                  {/* Contact Cards */}
+                                  <div className='absolute bottom-8 left-4 right-4 space-y-1.5'>
+                                    <div className='h-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg'></div>
+                                    <div className='h-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg'></div>
+                                  </div>
+                                  {/* Social Grid */}
+                                  <div className='absolute bottom-2 left-4 right-4'>
+                                    <div className='grid grid-cols-3 gap-1'>
+                                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                                        <div key={i} className='aspect-square bg-white/5 border border-white/10 rounded-lg'></div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             
                             {/* Theme Info */}
@@ -489,7 +518,7 @@ export default function ThemesPage() {
                     </div>
 
                     {/* Scrollable Content Area */}
-                    <div className='bg-black overflow-y-auto scrollbar-hide' style={{ height: 'calc(750px - 28px - 56px)' }}>
+                    <div className='bg-black overflow-y-auto scrollbar-hide' style={{ height: 'calc(750px - 28px)' }}>
                       {selectedTheme && previewData && (
                         <ThemePreview
                           theme={selectedTheme}
@@ -511,30 +540,6 @@ export default function ThemesPage() {
                           honors={previewData.honors}
                         />
                       )}
-                    </div>
-
-                    {/* Phone Bottom Navigation Bar */}
-                    <div className='bg-gray-800 border-t border-gray-700 h-14 flex items-center justify-around'>
-                      <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-blue-400 hover:text-blue-300 transition-colors'>
-                        <Palette className='h-5 w-5' />
-                        <span className='text-[10px] font-medium'>Theme</span>
-                      </button>
-                      <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                        <CreditCard className='h-5 w-5' />
-                        <span className='text-[10px] font-medium'>Card</span>
-                      </button>
-                      <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                        <ShoppingBag className='h-5 w-5' />
-                        <span className='text-[10px] font-medium'>Dashboard</span>
-                      </button>
-                      <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                        <Share2 className='h-5 w-5' />
-                        <span className='text-[10px] font-medium'>Share</span>
-                      </button>
-                      <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                        <User className='h-5 w-5' />
-                        <span className='text-[10px] font-medium'>Profile</span>
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -564,7 +569,7 @@ export default function ThemesPage() {
                 </div>
 
                 {/* Scrollable Content Area */}
-                <div className='bg-black overflow-y-auto scrollbar-hide' style={{ height: 'calc(750px - 28px - 56px)' }}>
+                <div className='bg-black overflow-y-auto scrollbar-hide' style={{ height: 'calc(750px - 28px)' }}>
                   {previewTheme && previewData && (
                     <ThemePreview
                       theme={previewTheme}
@@ -586,30 +591,6 @@ export default function ThemesPage() {
                       honors={previewData.honors}
                     />
                   )}
-                </div>
-
-                {/* Phone Bottom Navigation Bar */}
-                <div className='bg-gray-800 border-t border-gray-700 h-14 flex items-center justify-around'>
-                  <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-blue-400 hover:text-blue-300 transition-colors'>
-                    <Palette className='h-5 w-5' />
-                    <span className='text-[10px] font-medium'>Theme</span>
-                  </button>
-                  <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                    <CreditCard className='h-5 w-5' />
-                    <span className='text-[10px] font-medium'>Card</span>
-                  </button>
-                  <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                    <ShoppingBag className='h-5 w-5' />
-                    <span className='text-[10px] font-medium'>Shop</span>
-                  </button>
-                  <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                    <Share2 className='h-5 w-5' />
-                    <span className='text-[10px] font-medium'>Share</span>
-                  </button>
-                  <button className='flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-400 hover:text-white transition-colors'>
-                    <User className='h-5 w-5' />
-                    <span className='text-[10px] font-medium'>Profile</span>
-                  </button>
                 </div>
               </div>
             </div>

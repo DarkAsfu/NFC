@@ -5,8 +5,9 @@ import { Theme4_Professional } from './Theme4_Professional'
 import { Theme5_Creative } from './Theme5_Creative'
 import { Theme6_Modern } from './Theme6_Modern'
 import { Theme7_Dark } from './Theme7_Dark'
+import { Theme8_Premium } from './Theme8_Premium'
 
-export { Theme1_Medical, Theme2_SoftwareEngineer, Theme3_Designer, Theme4_Professional, Theme5_Creative, Theme6_Modern, Theme7_Dark }
+export { Theme1_Medical, Theme2_SoftwareEngineer, Theme3_Designer, Theme4_Professional, Theme5_Creative, Theme6_Modern, Theme7_Dark, Theme8_Premium }
 
 export const THEMES = {
   'medical': Theme1_Medical,
@@ -16,6 +17,7 @@ export const THEMES = {
   'creative': Theme5_Creative,
   'modern': Theme6_Modern,
   'dark': Theme7_Dark,
+  'premium': Theme8_Premium,
 }
 
 export const THEME_INFO = [
@@ -67,6 +69,13 @@ export const THEME_INFO = [
     description: 'Elegant dark theme with professional layout',
     colors: ['Black', 'Gray', 'White'],
     component: Theme7_Dark
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    description: 'Modern premium design with gradient header and glassmorphism effects',
+    colors: ['Purple', 'Blue', 'Indigo'],
+    component: Theme8_Premium
   }
 ]
 
