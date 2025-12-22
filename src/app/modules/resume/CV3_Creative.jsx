@@ -19,7 +19,7 @@ export default function CV3_Creative({ user, profile, about, contactInfo, skills
     <div className="bg-white text-gray-900 print:p-0" style={{ maxWidth: '210mm', margin: '0 auto', padding: '40px' }}>
       {/* Header with Colorful Accent */}
       <div className="relative mb-8">
-        <div className="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-orange-500 to-yellow-500 rounded"></div>
+        <div className="absolute left-0 top-0 w-2 h-full bg-blue-700 rounded"></div>
         <div className="pl-8">
           <h1 className="text-5xl font-bold mb-3 text-gray-900">{fullName}</h1>
           {profile?.bio && (
@@ -27,26 +27,26 @@ export default function CV3_Creative({ user, profile, about, contactInfo, skills
           )}
           <div className="flex flex-wrap gap-4 text-sm">
             {email && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 rounded-full">
-                <Mail className="h-4 w-4 text-orange-600" />
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
+                <Mail className="h-4 w-4 text-blue-700" />
                 <span className="text-gray-700">{email}</span>
               </div>
             )}
             {phone && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 rounded-full">
-                <Phone className="h-4 w-4 text-yellow-600" />
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
+                <Phone className="h-4 w-4 text-blue-700" />
                 <span className="text-gray-700">{phone}</span>
               </div>
             )}
             {location && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 rounded-full">
-                <MapPin className="h-4 w-4 text-orange-600" />
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
+                <MapPin className="h-4 w-4 text-blue-700" />
                 <span className="text-gray-700">{location}</span>
               </div>
             )}
             {website && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 rounded-full">
-                <Globe className="h-4 w-4 text-yellow-600" />
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
+                <Globe className="h-4 w-4 text-blue-700" />
                 <span className="text-gray-700">{website}</span>
               </div>
             )}
@@ -61,14 +61,14 @@ export default function CV3_Creative({ user, profile, about, contactInfo, skills
           {experiences?.length > 0 && (
             <section>
               <div className="flex items-center gap-3 mb-4">
-                <Briefcase className="h-6 w-6 text-orange-500" />
+                <Briefcase className="h-6 w-6 text-blue-700" />
                 <h2 className="text-2xl font-bold text-gray-900">Experience</h2>
               </div>
               <div className="space-y-5">
                 {experiences.map((exp) => (
-                  <div key={exp.id} className="pl-6 border-l-4 border-orange-500">
+                  <div key={exp.id} className="pl-6 border-l-4 border-blue-700">
                     <h3 className="text-xl font-bold text-gray-900">{exp.title || exp.position}</h3>
-                    <p className="text-orange-600 font-semibold">{exp.company}</p>
+                    <p className="text-blue-700 font-semibold">{exp.company}</p>
                     <p className="text-sm text-gray-600 mb-2">
                       {exp.start_date && formatDate(exp.start_date)} - {exp.end_date ? formatDate(exp.end_date) : 'Present'}
                     </p>
@@ -85,14 +85,14 @@ export default function CV3_Creative({ user, profile, about, contactInfo, skills
           {educations?.length > 0 && (
             <section>
               <div className="flex items-center gap-3 mb-4">
-                <GraduationCap className="h-6 w-6 text-orange-500" />
+                <GraduationCap className="h-6 w-6 text-blue-700" />
                 <h2 className="text-2xl font-bold text-gray-900">Education</h2>
               </div>
               <div className="space-y-4">
                 {educations.map((edu) => (
-                  <div key={edu.id} className="pl-6 border-l-4 border-orange-500">
+                  <div key={edu.id} className="pl-6 border-l-4 border-blue-700">
                     <h3 className="text-xl font-bold text-gray-900">{edu.degree || edu.field_of_study}</h3>
-                    <p className="text-orange-600 font-semibold">{edu.institution}</p>
+                    <p className="text-blue-700 font-semibold">{edu.institution}</p>
                     <p className="text-sm text-gray-600">
                       {edu.start_date && formatDate(edu.start_date)} - {edu.end_date ? formatDate(edu.end_date) : 'Present'}
                     </p>
@@ -109,12 +109,12 @@ export default function CV3_Creative({ user, profile, about, contactInfo, skills
           {skills?.length > 0 && (
             <section>
               <div className="flex items-center gap-2 mb-4">
-                <Code className="h-5 w-5 text-orange-500" />
+                <Code className="h-5 w-5 text-blue-700" />
                 <h2 className="text-xl font-bold text-gray-900">Skills</h2>
               </div>
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span key={skill.id} className="px-3 py-1 bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-800 rounded-full text-sm font-medium">
+                  <span key={skill.id} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {skill.name}
                   </span>
                 ))}
@@ -126,7 +126,7 @@ export default function CV3_Creative({ user, profile, about, contactInfo, skills
           {languages?.length > 0 && (
             <section>
               <div className="flex items-center gap-2 mb-4">
-                <Languages className="h-5 w-5 text-orange-500" />
+                <Languages className="h-5 w-5 text-blue-700" />
                 <h2 className="text-xl font-bold text-gray-900">Languages</h2>
               </div>
               <div className="space-y-2">
@@ -146,7 +146,7 @@ export default function CV3_Creative({ user, profile, about, contactInfo, skills
           {certificates?.length > 0 && (
             <section>
               <div className="flex items-center gap-2 mb-4">
-                <Award className="h-5 w-5 text-orange-500" />
+                <Award className="h-5 w-5 text-blue-700" />
                 <h2 className="text-xl font-bold text-gray-900">Certifications</h2>
               </div>
               <div className="space-y-2">

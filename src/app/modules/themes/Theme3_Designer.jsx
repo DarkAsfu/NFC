@@ -87,7 +87,7 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
             {/* Outer Glow */}
             <div className='absolute inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-fuchsia-400 rounded-3xl blur-xl opacity-60 scale-110'></div>
             {/* Profile Container */}
-            <div className='relative h-28 w-28 rounded-3xl border-4 border-white shadow-2xl overflow-hidden bg-white transform hover:scale-105 transition-transform duration-300'>
+            <div className='relative h-24 w-24 rounded-3xl border-4 border-white shadow-2xl overflow-hidden bg-white transform hover:scale-105 transition-transform duration-300'>
               {avatar ? (
                 <Image src={avatar} alt='Profile' fill className='object-cover' unoptimized />
               ) : (
@@ -110,13 +110,13 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
                 : user?.username || 'Your Name'}
             </h1>
           </div>
-          <h1 className='relative text-2xl md:text-3xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow-sm'>
+          <h1 className='relative text-xl md:text-2xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow-sm'>
             {user?.first_name || user?.last_name 
               ? `${user?.first_name || ''} ${user?.last_name || ''}`.trim() 
               : user?.username || 'Your Name'}
           </h1>
           {profile?.bio && (
-            <p className='text-purple-700 font-bold text-sm md:text-base mt-2 max-w-2xl mx-auto leading-relaxed'>{profile.bio}</p>
+            <p className='text-purple-700 font-bold text-xs md:text-sm mt-2 max-w-2xl mx-auto leading-relaxed'>{profile.bio}</p>
           )}
         </div>
 
@@ -138,14 +138,14 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
                   href={s.full_social_profile_url || s.profile_url} 
                   target='_blank' 
                   rel='noreferrer' 
-                  className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/50 p-2.5 group`}
+                  className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/50 p-2 group`}
                   title={s.core_social?.name || 'Social'}
                 >
                   <div className='absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity'></div>
                   <div className='relative z-10'>
                     <SocialIcon 
                       social={s} 
-                      size={32}
+                      size={24}
                       colorFilter='brightness(0) saturate(100%) invert(100%)'
                       fallbackColor='white'
                     />
@@ -157,43 +157,43 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
         )}
 
         {/* Save Contact Button - Enhanced */}
-        <div className='flex justify-center mb-5'>
+        <div className='flex justify-center mb-6'>
           <Button 
             onClick={handleDownloadVCF}
-            className='relative bg-gradient-to-r from-pink-500 via-purple-500 to-fuchsia-500 hover:from-pink-600 hover:via-purple-600 hover:to-fuchsia-600 text-white h-14 px-12 rounded-full font-black text-base shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 transform hover:scale-105 active:scale-95 border-2 border-white/30 overflow-hidden group'
+            className='relative bg-gradient-to-r from-pink-500 via-purple-500 to-fuchsia-500 hover:from-pink-600 hover:via-purple-600 hover:to-fuchsia-600 text-white h-12 md:h-14 px-24 md:px-32 rounded-full font-black text-base md:text-lg shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 transform hover:scale-105 active:scale-95 border-4 border-white/30 overflow-hidden group'
           >
             <div className='absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700'></div>
-            <Save className='h-5 w-5 mr-2 relative z-10' />
+            <Save className='h-5 w-5 md:h-6 md:w-6 mr-3 relative z-10' />
             <span className='relative z-10'>Save Contact</span>
           </Button>
         </div>
 
         {/* Contact Information - Enhanced Design */}
         {contactInfo?.length > 0 && (
-          <div className='bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-pink-200/50 relative overflow-hidden'>
-            <div className='absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-200/30 to-purple-200/30 rounded-full blur-2xl -mr-16 -mt-16'></div>
+          <div className='bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border-2 border-pink-200/50 relative overflow-hidden'>
+            <div className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-200/30 to-purple-200/30 rounded-full blur-2xl -mr-12 -mt-12'></div>
             <div className='relative z-10'>
-              <h3 className='text-xl font-black text-gray-900 mb-5 flex items-center gap-2'>
-                <div className='w-1 h-6 bg-gradient-to-b from-pink-500 to-purple-500 rounded-full'></div>
+              <h3 className='text-lg font-black text-gray-900 mb-3 flex items-center gap-2'>
+                <div className='w-1 h-5 bg-gradient-to-b from-pink-500 to-purple-500 rounded-full'></div>
                 Contact
               </h3>
-              <div className='space-y-3'>
+              <div className='space-y-2'>
                 {contactInfo.map((contact, idx) => {
                   const getIcon = () => {
                     switch (contact.contact_type) {
-                      case 'email': return <Mail className='h-5 w-5 text-pink-600' />
-                      case 'phone': case 'telephone': return <Phone className='h-5 w-5 text-pink-600' />
-                      case 'website': return <Globe className='h-5 w-5 text-pink-600' />
-                      case 'address': return <MapPin className='h-5 w-5 text-pink-600' />
-                      default: return <Globe className='h-5 w-5 text-pink-600' />
+                      case 'email': return <Mail className='h-4 w-4 text-pink-600' />
+                      case 'phone': case 'telephone': return <Phone className='h-4 w-4 text-pink-600' />
+                      case 'website': return <Globe className='h-4 w-4 text-pink-600' />
+                      case 'address': return <MapPin className='h-4 w-4 text-pink-600' />
+                      default: return <Globe className='h-4 w-4 text-pink-600' />
                     }
                   }
                   return (
-                    <div key={contact.id} className='flex items-center gap-4 p-4 bg-gradient-to-r from-pink-50/80 to-purple-50/80 rounded-2xl border border-pink-200/50 hover:shadow-md transition-all hover:scale-[1.02]'>
-                      <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center border border-pink-200'>
+                    <div key={contact.id} className='flex items-center gap-3 p-3 bg-gradient-to-r from-pink-50/80 to-purple-50/80 rounded-xl border border-pink-200/50 hover:shadow-md transition-all hover:scale-[1.02]'>
+                      <div className='w-8 h-8 rounded-lg bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center border border-pink-200'>
                         {getIcon()}
                       </div>
-                      <span className='text-gray-800 font-semibold flex-1'>{contact.value}</span>
+                      <span className='text-gray-800 font-semibold text-sm flex-1'>{contact.value}</span>
                     </div>
                   )
                 })}
@@ -204,30 +204,30 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
 
         {/* About - Enhanced */}
         {about?.bio && (
-          <div className='bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-purple-200/50 relative overflow-hidden'>
-            <div className='absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-purple-200/30 to-fuchsia-200/30 rounded-full blur-3xl -ml-20 -mb-20'></div>
+          <div className='bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border-2 border-purple-200/50 relative overflow-hidden'>
+            <div className='absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-200/30 to-fuchsia-200/30 rounded-full blur-3xl -ml-16 -mb-16'></div>
             <div className='relative z-10'>
-              <div className='flex items-center gap-3 mb-4'>
-                <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center border border-purple-200'>
-                  <FileText className='h-5 w-5 text-purple-600' />
+              <div className='flex items-center gap-2 mb-3'>
+                <div className='w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center border border-purple-200'>
+                  <FileText className='h-4 w-4 text-purple-600' />
                 </div>
-                <h3 className='text-xl font-black text-gray-900'>About</h3>
+                <h3 className='text-lg font-black text-gray-900'>About</h3>
               </div>
-              <p className='text-gray-700 text-base leading-relaxed whitespace-pre-line'>{about.bio}</p>
+              <p className='text-gray-700 text-sm leading-relaxed whitespace-pre-line'>{about.bio}</p>
             </div>
           </div>
         )}
 
         {/* Skills - Enhanced Designer Style */}
         {skills?.length > 0 && (
-          <div className='bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-fuchsia-200/50 relative overflow-hidden'>
-            <div className='absolute top-0 left-0 w-36 h-36 bg-gradient-to-br from-fuchsia-200/30 to-pink-200/30 rounded-full blur-3xl -tl-18 -ml-18'></div>
+          <div className='bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border-2 border-fuchsia-200/50 relative overflow-hidden'>
+            <div className='absolute top-0 left-0 w-28 h-28 bg-gradient-to-br from-fuchsia-200/30 to-pink-200/30 rounded-full blur-3xl -ml-14 -mt-14'></div>
             <div className='relative z-10'>
-              <div className='flex items-center gap-3 mb-5'>
-                <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-100 to-pink-100 flex items-center justify-center border border-fuchsia-200'>
-                  <Palette className='h-5 w-5 text-fuchsia-600' />
+              <div className='flex items-center gap-2 mb-3'>
+                <div className='w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-100 to-pink-100 flex items-center justify-center border border-fuchsia-200'>
+                  <Palette className='h-4 w-4 text-fuchsia-600' />
                 </div>
-                <h3 className='text-xl font-black text-gray-900'>Skills</h3>
+                <h3 className='text-lg font-black text-gray-900'>Skills</h3>
               </div>
               <div className='flex flex-wrap gap-2 justify-start items-center'>
                 {skills.map((sk, idx) => {
@@ -247,9 +247,9 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
                   return (
                     <div 
                       key={sk.id} 
-                      className={`bg-gradient-to-br ${colorClass} rounded-lg px-3 py-1.5 text-white shadow-md hover:shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 ${rotation} border border-white/20`}
+                      className={`bg-gradient-to-br ${colorClass} rounded-md px-2.5 py-1 text-white shadow-md hover:shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 ${rotation} border border-white/20`}
                     >
-                      <span className='font-bold text-xs'>{sk.name}</span>
+                      <span className='font-bold text-[10px]'>{sk.name}</span>
                     </div>
                   )
                 })}
@@ -260,18 +260,18 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
 
         {/* Portfolio Grid - Enhanced */}
         {portfolios?.length > 0 && (
-          <div className='bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-pink-200/50 relative overflow-hidden'>
-            <div className='absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-pink-200/30 to-rose-200/30 rounded-full blur-3xl -mr-20 -mb-20'></div>
+          <div className='bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border-2 border-pink-200/50 relative overflow-hidden'>
+            <div className='absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-pink-200/30 to-rose-200/30 rounded-full blur-3xl -mr-16 -mb-16'></div>
             <div className='relative z-10'>
-              <h3 className='text-xl font-black text-gray-900 mb-5 flex items-center gap-2'>
-                <div className='w-1 h-6 bg-gradient-to-b from-pink-500 to-rose-500 rounded-full'></div>
+              <h3 className='text-lg font-black text-gray-900 mb-3 flex items-center gap-2'>
+                <div className='w-1 h-5 bg-gradient-to-b from-pink-500 to-rose-500 rounded-full'></div>
                 Portfolio
               </h3>
-              <div className='grid grid-cols-2 gap-4'>
+              <div className='grid grid-cols-2 gap-3'>
                 {portfolios.map((p) => (
                   <div 
                     key={p.id} 
-                    className='bg-white rounded-2xl border-2 border-pink-200/50 overflow-hidden cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group relative'
+                    className='bg-white rounded-xl border-2 border-pink-200/50 overflow-hidden cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group relative'
                     onClick={() => openModal(p, 'portfolio')}
                   >
                     <div className='relative aspect-square bg-gradient-to-br from-pink-100 to-purple-100 overflow-hidden'>
@@ -280,15 +280,15 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
                       )}
                       <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity'></div>
                     </div>
-                    <div className='p-4'>
-                      <div className='font-black text-gray-900 text-sm mb-1.5'>{p.name}</div>
+                    <div className='p-3'>
+                      <div className='font-black text-gray-900 text-xs mb-1'>{p.name}</div>
                       {p.description && (
-                        <div className='text-gray-600 text-xs mb-2.5 line-clamp-2 leading-relaxed'>{truncateText(p.description, 60)}</div>
+                        <div className='text-gray-600 text-[10px] mb-2 line-clamp-2 leading-relaxed'>{truncateText(p.description, 50)}</div>
                       )}
                       {p.tags && (
-                        <div className='flex flex-wrap gap-1.5'>
-                          {p.tags.split(',').slice(0, 3).map((tag, idx) => (
-                            <Badge key={idx} className='bg-gradient-to-r from-pink-100 to-purple-100 text-pink-800 border border-pink-300/50 text-[10px] px-2 py-0.5 font-bold shadow-sm'>
+                        <div className='flex flex-wrap gap-1'>
+                          {p.tags.split(',').slice(0, 2).map((tag, idx) => (
+                            <Badge key={idx} className='bg-gradient-to-r from-pink-100 to-purple-100 text-pink-800 border border-pink-300/50 text-[9px] px-1.5 py-0.5 font-bold shadow-sm'>
                               {tag.trim()}
                             </Badge>
                           ))}
@@ -304,34 +304,34 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
 
         {/* Experience - Enhanced */}
         {experiences?.length > 0 && (
-          <div className='bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-purple-200/50 relative overflow-hidden'>
-            <div className='absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-200/30 to-violet-200/30 rounded-full blur-2xl -mr-16 -mt-16'></div>
+          <div className='bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border-2 border-purple-200/50 relative overflow-hidden'>
+            <div className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-200/30 to-violet-200/30 rounded-full blur-2xl -mr-12 -mt-12'></div>
             <div className='relative z-10'>
-              <div className='flex items-center gap-3 mb-5'>
-                <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-violet-100 flex items-center justify-center border border-purple-200'>
-                  <Briefcase className='h-5 w-5 text-purple-600' />
+              <div className='flex items-center gap-2 mb-3'>
+                <div className='w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-violet-100 flex items-center justify-center border border-purple-200'>
+                  <Briefcase className='h-4 w-4 text-purple-600' />
                 </div>
-                <h3 className='text-xl font-black text-gray-900'>Experience</h3>
+                <h3 className='text-lg font-black text-gray-900'>Experience</h3>
               </div>
-              <div className='space-y-4'>
+              <div className='space-y-3'>
                 {experiences.map((e) => (
                   <div 
                     key={e.id} 
-                    className='p-4 bg-gradient-to-r from-purple-50/80 to-violet-50/80 rounded-2xl border-l-4 border-purple-500 cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-300 group'
+                    className='p-3 bg-gradient-to-r from-purple-50/80 to-violet-50/80 rounded-xl border-l-4 border-purple-500 cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-300 group'
                     onClick={() => openModal(e, 'experience')}
                   >
-                    <div className='font-black text-gray-900 text-base mb-1'>{e.name}</div>
-                    {e.company && <div className='text-sm text-purple-700 font-semibold mt-1'>{e.company}</div>}
-                    <div className='flex items-center gap-2 text-xs text-purple-600 mt-2 font-medium'>
-                      <Calendar className='h-3.5 w-3.5' />
+                    <div className='font-black text-gray-900 text-sm mb-1'>{e.name}</div>
+                    {e.company && <div className='text-xs text-purple-700 font-semibold mt-1'>{e.company}</div>}
+                    <div className='flex items-center gap-2 text-[10px] text-purple-600 mt-1.5 font-medium'>
+                      <Calendar className='h-3 w-3' />
                       <span>
                         {formatDate(e.start_at)} - {e.currently_working || !e.end_at ? 'Present' : formatDate(e.end_at)}
                       </span>
                     </div>
                     {e.description && (
-                      <div className='text-sm text-gray-700 mt-3 leading-relaxed'>
-                        {truncateText(e.description, 100)}
-                        {e.description.length > 100 && (
+                      <div className='text-xs text-gray-700 mt-2 leading-relaxed'>
+                        {truncateText(e.description, 80)}
+                        {e.description.length > 80 && (
                           <span className='text-purple-600 font-bold ml-2 group-hover:underline'>Read more →</span>
                         )}
                       </div>
@@ -345,26 +345,26 @@ export function Theme3_Designer({ cover, avatar, user, profile, about, contactIn
 
         {/* Education - Enhanced */}
         {educations?.length > 0 && (
-          <div className='bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-fuchsia-200/50 relative overflow-hidden'>
-            <div className='absolute bottom-0 left-0 w-36 h-36 bg-gradient-to-tr from-fuchsia-200/30 to-pink-200/30 rounded-full blur-3xl -ml-18 -mb-18'></div>
+          <div className='bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border-2 border-fuchsia-200/50 relative overflow-hidden'>
+            <div className='absolute bottom-0 left-0 w-28 h-28 bg-gradient-to-tr from-fuchsia-200/30 to-pink-200/30 rounded-full blur-3xl -ml-14 -mb-14'></div>
             <div className='relative z-10'>
-              <div className='flex items-center gap-3 mb-5'>
-                <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-100 to-pink-100 flex items-center justify-center border border-fuchsia-200'>
-                  <GraduationCap className='h-5 w-5 text-fuchsia-600' />
+              <div className='flex items-center gap-2 mb-3'>
+                <div className='w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-100 to-pink-100 flex items-center justify-center border border-fuchsia-200'>
+                  <GraduationCap className='h-4 w-4 text-fuchsia-600' />
                 </div>
-                <h3 className='text-xl font-black text-gray-900'>Education</h3>
+                <h3 className='text-lg font-black text-gray-900'>Education</h3>
               </div>
-              <div className='space-y-4'>
+              <div className='space-y-3'>
                 {educations.map((ed) => (
                   <div 
                     key={ed.id} 
-                    className='p-4 bg-gradient-to-r from-fuchsia-50/80 to-pink-50/80 rounded-2xl border-l-4 border-fuchsia-500 cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-300 group'
+                    className='p-3 bg-gradient-to-r from-fuchsia-50/80 to-pink-50/80 rounded-xl border-l-4 border-fuchsia-500 cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-300 group'
                     onClick={() => openModal(ed, 'education')}
                   >
-                    <div className='font-black text-gray-900 text-base mb-1'>{ed.school}</div>
-                    <div className='text-sm text-fuchsia-700 font-semibold mt-1'>{ed.degree} • {ed.department}</div>
-                    <div className='flex items-center gap-2 text-xs text-fuchsia-600 mt-2 font-medium'>
-                      <Calendar className='h-3.5 w-3.5' />
+                    <div className='font-black text-gray-900 text-sm mb-1'>{ed.school}</div>
+                    <div className='text-xs text-fuchsia-700 font-semibold mt-1'>{ed.degree} • {ed.department}</div>
+                    <div className='flex items-center gap-2 text-[10px] text-fuchsia-600 mt-1.5 font-medium'>
+                      <Calendar className='h-3 w-3' />
                       <span>
                         {formatDate(ed.start_at)} - {ed.enrolling || !ed.end_at ? 'Present' : formatDate(ed.end_at)}
                       </span>

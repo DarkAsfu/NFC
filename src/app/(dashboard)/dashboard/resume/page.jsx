@@ -6,11 +6,11 @@ import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Loader2, FileText, Download, Eye, CheckCircle } from 'lucide-react'
+import { Loader2, FileText, Download, Eye, CheckCircle, X } from 'lucide-react'
 import ProtectedRoute from '@/lib/ProtectedRoute'
-import { CV_TEMPLATES, CV_TEMPLATE_INFO } from '@/app/modules/resume'
+import { CV_TEMPLATES, CV_TEMPLATE_INFO, getTemplatesForProfileType } from '@/app/modules/resume'
 import { CVPreview } from '@/app/modules/resume/CVPreview'
+import { TemplatePreview } from '@/app/modules/resume/TemplatePreview'
 
 export default function ResumePage() {
   const { user } = useAuth()
@@ -20,6 +20,7 @@ export default function ResumePage() {
   const [showPreview, setShowPreview] = useState(false)
   const [previewTemplate, setPreviewTemplate] = useState(null)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
+  const [availableTemplates, setAvailableTemplates] = useState(CV_TEMPLATE_INFO)
 
   useEffect(() => {
     if (!user?.username) return
@@ -49,8 +50,10 @@ export default function ResumePage() {
         api.get(`/profile/certificates/${user.username}/`).catch(() => ({ data: [] }))
       ])
 
+      const profile = profileRes.status === 'fulfilled' ? profileRes.value.data : null
+      
       setPreviewData({
-        profile: profileRes.status === 'fulfilled' ? profileRes.value.data : null,
+        profile: profile,
         about: aboutRes.status === 'fulfilled' ? aboutRes.value.data : null,
         contactInfo: contactRes.status === 'fulfilled' ? contactRes.value.data : [],
         skills: skillsRes.status === 'fulfilled' ? skillsRes.value.data : [],
@@ -59,6 +62,10 @@ export default function ResumePage() {
         languages: languagesRes.status === 'fulfilled' ? languagesRes.value.data : [],
         certificates: certificatesRes.status === 'fulfilled' ? certificatesRes.value.data : []
       })
+
+      // Show all templates (recommended ones will be highlighted)
+      setAvailableTemplates(CV_TEMPLATE_INFO)
+      console.log('Available templates:', CV_TEMPLATE_INFO.length, CV_TEMPLATE_INFO.map(t => t.name))
     } catch (err) {
       console.error('Failed to fetch preview data:', err)
     } finally {
@@ -91,92 +98,41 @@ export default function ResumePage() {
 
   return (
     <ProtectedRoute>
-      <div className="space-y-6 min-h-screen">
-        <div>
-          <p className="text-muted-foreground">
-            Choose a CV template and download your resume with your profile data
-          </p>
-        </div>
+      {!showPreview ? (
+        <div className="space-y-6 min-h-screen">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Resume Templates</h1>
+            <p className="text-muted-foreground">
+              {previewData?.profile?.profile_type 
+                ? `Recommended templates for ${previewData.profile.profile_type}. Choose a CV template and download your resume with your profile data.`
+                : 'Choose a CV template and download your resume with your profile data'
+              }
+            </p>
+          </div>
 
-        {message && (
-          <Alert className={message.type === 'error' ? 'border-red-200 bg-red-50' : 'border-blue-200 bg-blue-50'}>
-            <AlertDescription>{message.text}</AlertDescription>
-          </Alert>
-        )}
+          {message && (
+            <Alert className={message.type === 'error' ? 'border-red-200 bg-red-50' : 'border-blue-200 bg-blue-50'}>
+              <AlertDescription>{message.text}</AlertDescription>
+            </Alert>
+          )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {CV_TEMPLATE_INFO.map((template) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {availableTemplates.map((template) => {
             const isSelected = selectedTemplate?.id === template.id
             return (
               <Card
                 key={template.id}
-                className={`overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
+                className={`overflow-hidden border-2 cursor-pointer ${
                   isSelected
-                    ? 'border-primary shadow-lg scale-[1.02]'
-                    : 'border-border hover:border-primary/50 hover:shadow-md'
+                    ? 'border-primary shadow-lg'
+                    : 'border-border'
                 }`}
                 onClick={() => setSelectedTemplate(template)}
               >
                 <CardContent className="p-0">
                   {/* Template Preview */}
-                  <div className="h-48 relative overflow-hidden bg-white border-b">
-                    {template.id === 'modern' && (
-                      <div className="w-full h-full p-4">
-                        <div className="h-full bg-gradient-to-br from-blue-50 to-purple-50 rounded">
-                          <div className="p-3 space-y-2">
-                            <div className="h-2 bg-blue-600 rounded w-3/4"></div>
-                            <div className="h-1 bg-gray-300 rounded w-1/2"></div>
-                            <div className="h-1 bg-gray-200 rounded w-2/3"></div>
-                            <div className="mt-4 space-y-1">
-                              <div className="h-1 bg-gray-300 rounded"></div>
-                              <div className="h-1 bg-gray-200 rounded w-5/6"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {template.id === 'professional' && (
-                      <div className="w-full h-full p-4">
-                        <div className="h-full border-2 border-gray-200 rounded">
-                          <div className="p-3 space-y-2">
-                            <div className="h-2 bg-gray-800 rounded w-2/3"></div>
-                            <div className="h-1 bg-gray-400 rounded w-1/2"></div>
-                            <div className="mt-4 space-y-1">
-                              <div className="h-1 bg-gray-300 rounded"></div>
-                              <div className="h-1 bg-gray-200 rounded w-4/5"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {template.id === 'creative' && (
-                      <div className="w-full h-full p-4">
-                        <div className="h-full bg-gradient-to-br from-orange-50 to-yellow-50 rounded">
-                          <div className="p-3 space-y-2">
-                            <div className="h-2 bg-orange-600 rounded w-3/4"></div>
-                            <div className="h-1 bg-orange-300 rounded w-1/2"></div>
-                            <div className="mt-4 space-y-1">
-                              <div className="h-1 bg-orange-200 rounded"></div>
-                              <div className="h-1 bg-yellow-100 rounded w-5/6"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {template.id === 'minimal' && (
-                      <div className="w-full h-full p-4">
-                        <div className="h-full border border-gray-300 rounded bg-white">
-                          <div className="p-3 space-y-2">
-                            <div className="h-2 bg-gray-900 rounded w-2/3"></div>
-                            <div className="h-0.5 bg-gray-400 rounded w-1/2"></div>
-                            <div className="mt-4 space-y-1">
-                              <div className="h-0.5 bg-gray-300 rounded"></div>
-                              <div className="h-0.5 bg-gray-200 rounded w-4/5"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                  <div className="h-80 relative overflow-hidden bg-white border-b">
+                    <TemplatePreview templateId={template.id} />
                   </div>
                   <CardHeader>
                     <CardTitle className="text-lg">{template.name}</CardTitle>
@@ -211,47 +167,71 @@ export default function ResumePage() {
               </Card>
             )
           })}
+          </div>
         </div>
-
-        {/* Preview Dialog */}
-        <Dialog open={showPreview} onOpenChange={setShowPreview}>
-          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0">
-            <DialogHeader className="px-6 pt-6 pb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <DialogTitle>CV Preview</DialogTitle>
-                  <DialogDescription>Preview your resume. Press Ctrl+P (Cmd+P on Mac) to print and save as PDF.</DialogDescription>
+      ) : (
+        // Full Screen Preview
+        <div className="fixed inset-0 z-50 bg-white overflow-y-auto print:relative print:inset-auto">
+            {/* Header Bar */}
+            <div className="sticky top-0 z-10 bg-white border-b shadow-sm print:hidden">
+              <div className="container mx-auto px-4 md:px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold">CV Preview</h2>
+                    <p className="text-sm text-muted-foreground">Press Ctrl+P (Cmd+P on Mac) to print and save as PDF</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => {
+                        window.print()
+                      }}
+                      variant="default"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Print / Save PDF
+                    </Button>
+                    <Button
+                      onClick={() => setShowPreview(false)}
+                      variant="outline"
+                      size="icon"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  onClick={() => {
-                    window.print()
-                  }}
-                  className="print:hidden"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Print / Save PDF
-                </Button>
               </div>
-            </DialogHeader>
+            </div>
+            
+            {/* Preview Content */}
             {previewTemplate && previewData && (
-              <div className="px-6 pb-6 print:p-0">
-                <CVPreview
-                  template={previewTemplate}
-                  user={user}
-                  profile={previewData.profile}
-                  about={previewData.about}
-                  contactInfo={previewData.contactInfo}
-                  skills={previewData.skills}
-                  experiences={previewData.experiences}
-                  educations={previewData.educations}
-                  languages={previewData.languages}
-                  certificates={previewData.certificates}
-                />
+              <div className="w-full py-6 print:p-0">
+                <div className="w-full overflow-x-auto md:overflow-visible">
+                  <div className="md:scale-100 print:scale-100" style={{ 
+                    transform: 'scale(0.4)',
+                    transformOrigin: 'top left',
+                    width: '250%',
+                    minHeight: '100vh'
+                  }}>
+                    <div className="container mx-auto px-4 md:px-6 print:px-0 md:transform-none md:w-auto md:min-h-0 print:transform-none print:w-auto print:min-h-0">
+                      <CVPreview
+                        template={previewTemplate}
+                        user={user}
+                        profile={previewData.profile}
+                        about={previewData.about}
+                        contactInfo={previewData.contactInfo}
+                        skills={previewData.skills}
+                        experiences={previewData.experiences}
+                        educations={previewData.educations}
+                        languages={previewData.languages}
+                        certificates={previewData.certificates}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-          </DialogContent>
-        </Dialog>
-      </div>
+          </div>
+        )}
     </ProtectedRoute>
   )
 }

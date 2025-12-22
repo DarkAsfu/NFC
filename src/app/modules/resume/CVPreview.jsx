@@ -1,6 +1,7 @@
 'use client'
 
 import { CV_TEMPLATES } from './index'
+import { resolveMediaUrl } from '@/lib/utils'
 
 export function CVPreview({ template, user, profile, about, contactInfo, skills, experiences, educations, languages, certificates }) {
   // Get the CV component based on template ID
@@ -14,14 +15,15 @@ export function CVPreview({ template, user, profile, about, contactInfo, skills,
     email: user?.email || '',
   }
   
-  // Prepare profile data
+  // Prepare profile data with resolved image URL
   const profileData = {
     ...profile,
     bio: profile?.bio || about?.about || '',
+    profile_image: profile?.profile_image ? resolveMediaUrl(profile.profile_image) : null,
   }
   
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg">
+    <div className="bg-white print:p-0">
       <CVComponent
         user={userData}
         profile={profileData}
