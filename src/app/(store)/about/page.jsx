@@ -1,16 +1,111 @@
 'use client'
 
-import { Sparkles, Layers, Cpu, ArrowRight, TrendingUp, Code2, Server, Lock, Zap, Globe2, Smartphone, CreditCard, Radio, QrCode, Users, FileText, Share2, Mail, Phone, Linkedin, Twitter, Github, Instagram, Facebook, Globe } from 'lucide-react'
+import { Sparkles, Layers, Cpu, ArrowRight, TrendingUp, Code2, Server, Lock, Zap, Globe2, Smartphone, CreditCard, Radio, QrCode, Users, FileText, Share2, Mail, Phone, Linkedin, Twitter, Github, Instagram, Facebook, Globe, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { motion, useAnimation, useInView } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
-// NFC Card Tap Animation Component
-function NFCTapAnimation() {
+// Desktop Hero Component - Original layout, untouched
+function DesktopHero() {
+  return (
+    <section className="relative pt-32 pb-0 px-4 overflow-hidden hidden md:block">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative z-10 px-4">
+        <div className="grid md:grid-cols-2 gap-12 items-start">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center md:text-left mt-0"
+          >
+            <div className="inline-block mb-6">
+              <span className="text-sm font-mono text-purple-400 tracking-wider uppercase">Since 2024</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+              We build
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_ease_infinite]">
+                digital bridges
+              </span>
+            </h1>
+            <p className="text-xl text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0">
+              Transforming how professionals connect through innovative NFC technology. 
+              No more lost business cards, no more outdated contact info.
+            </p>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative"
+          >
+            <DesktopNFCTapAnimation />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Mobile Hero Component - Optimized for mobile
+function MobileHero() {
+  return (
+    <section className="relative pt-20 pb-0 px-4 overflow-hidden md:hidden -mb-75">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative z-10 px-4">
+        <div className="flex flex-col items-center gap-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center w-full mb-8"
+          >
+            <div className="inline-block mb-4">
+              <span className="text-xs font-mono text-purple-400 tracking-wider uppercase">Since 2024</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+              We build
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_ease_infinite]">
+                digital bridges
+              </span>
+            </h1>
+            <p className="text-base sm:text-lg text-gray-400 leading-relaxed max-w-lg mx-auto">
+              Transforming how professionals connect through innovative NFC technology. 
+              No more lost business cards, no more outdated contact info.
+            </p>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative w-full flex justify-center"
+          >
+            <MobileNFCTapAnimation />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Desktop NFC Card Tap Animation Component - Original, DO NOT CHANGE
+function DesktopNFCTapAnimation() {
   const [isTapped, setIsTapped] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const canAnimateRef = useRef(false)
   const cardControls = useAnimation()
   const phoneControls = useAnimation()
   const profileControls = useAnimation()
@@ -19,13 +114,33 @@ function NFCTapAnimation() {
 
   useEffect(() => {
     setIsMounted(true)
+    // Set canAnimate after a delay to ensure controls are ready
+    const timer = setTimeout(() => {
+      canAnimateRef.current = true
+    }, 200)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
-    if (inView && isMounted) {
+    if (!inView || !isMounted) return
+    
+    let intervalId = null
+    let checkTimeout = null
+    
+    // Wait for canAnimate to be true
+    const checkAndStart = () => {
+      if (!canAnimateRef.current) {
+        checkTimeout = setTimeout(checkAndStart, 50)
+        return
+      }
+      
       const sequence = async () => {
+        if (!isMounted || !canAnimateRef.current) return
+        
         // Initial delay
         await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        if (!isMounted || !canAnimateRef.current) return
         
         // Card moves toward phone top edge (where NFC chip is)
         await cardControls.start({
@@ -36,6 +151,8 @@ function NFCTapAnimation() {
           transition: { duration: 0.6, ease: "easeOut" }
         })
         
+        if (!isMounted || !canAnimateRef.current) return
+        
         // Card taps on phone top (slight bounce)
         await cardControls.start({
           x: 0,
@@ -45,6 +162,8 @@ function NFCTapAnimation() {
           transition: { duration: 0.2 }
         })
         
+        if (!isMounted || !canAnimateRef.current) return
+        
         await cardControls.start({
           x: 0,
           y: -20,
@@ -53,11 +172,15 @@ function NFCTapAnimation() {
           transition: { duration: 0.2 }
         })
         
+        if (!isMounted || !canAnimateRef.current) return
+        
         // Phone lights up
         await phoneControls.start({
           scale: 1.05,
           transition: { duration: 0.3 }
         })
+        
+        if (!isMounted || !canAnimateRef.current) return
         
         // Profile appears
         profileControls.start({
@@ -74,6 +197,9 @@ function NFCTapAnimation() {
         
         // Card returns to original position (top right, outside phone)
         await new Promise(resolve => setTimeout(resolve, 2000))
+        
+        if (!isMounted || !canAnimateRef.current) return
+        
         cardControls.start({
           x: 180,
           y: -20,
@@ -90,15 +216,23 @@ function NFCTapAnimation() {
         })
       }
       
-      // Loop the animation
-      const interval = setInterval(() => {
-        sequence()
-      }, 5000)
-      
       // Initial run
       sequence()
       
-      return () => clearInterval(interval)
+      // Loop the animation
+      intervalId = setInterval(() => {
+        if (isMounted && canAnimateRef.current) {
+          sequence()
+        }
+      }, 5000)
+    }
+    
+    checkAndStart()
+    
+    return () => {
+      if (checkTimeout) clearTimeout(checkTimeout)
+      if (intervalId) clearInterval(intervalId)
+      canAnimateRef.current = false
     }
   }, [inView, isMounted, cardControls, phoneControls, profileControls])
 
@@ -328,77 +462,637 @@ function NFCTapAnimation() {
   )
 }
 
-export default function AboutPage() {
-  return (
-    <div className="bg-bG min-h-screen pt-28 md:pt-24 pb-16 overflow-hidden">
-      {/* Hero - Asymmetric Layout */}
-      <section className="relative pt-32 pb-16 px-4 overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl"></div>
-        </div>
+// Mobile NFC Card Tap Animation Component - Optimized for mobile
+function MobileNFCTapAnimation() {
+  const [isTapped, setIsTapped] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const canAnimateRef = useRef(false)
+  const cardControls = useAnimation()
+  const phoneControls = useAnimation()
+  const profileControls = useAnimation()
+  const containerRef = useRef(null)
+  const inView = useInView(containerRef, { once: true, margin: "-100px" })
+
+  useEffect(() => {
+    setIsMounted(true)
+    const timer = setTimeout(() => {
+      canAnimateRef.current = true
+    }, 200)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!inView || !isMounted) return
+    
+    let intervalId = null
+    let checkTimeout = null
+    
+    const checkAndStart = () => {
+      if (!canAnimateRef.current) {
+        checkTimeout = setTimeout(checkAndStart, 50)
+        return
+      }
+      
+      const sequence = async () => {
+        if (!isMounted || !canAnimateRef.current) return
         
-        <div className="max-w-7xl mx-auto relative z-10 px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-start">
+        // Mobile positions: Card at phone TOP, taps at phone TOP head (like desktop)
+        // Desktop uses y: -20 to tap at phone top (works perfectly)
+        // For mobile, use same approach but ensure it taps at phone top
+        const phoneScale = 0.5
+        const phoneHeight = 750 * phoneScale  // 375px
+        const phoneTopEdge = -phoneHeight / 2  // -187.5px (phone top edge)
+        
+        // Initial position: Card at phone TOP (above phone, centered)
+        // Card starts above phone top, then moves down to tap
+        const initialX = 0
+        const initialY = -50  // Card starts above phone top
+        
+        // Tap position: Card taps at phone TOP head (NFC chip location)
+        // Use EXACT same Y values as desktop to match the tap position
+        const tapX = 0
+        const tapY = -20  // Same as desktop: taps at phone top
+        const tapYBounce = -30  // Same as desktop: slight bounce
+        
+        // Initial delay
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        if (!isMounted || !canAnimateRef.current) return
+        
+        // Card moves toward phone top edge (where NFC chip is)
+        await cardControls.start({
+          x: tapX,
+          y: tapY,
+          scale: 0.9,
+          rotate: 0,
+          transition: { duration: 0.6, ease: "easeOut" }
+        })
+        
+        if (!isMounted || !canAnimateRef.current) return
+        
+        // Card taps on phone top (slight bounce)
+        await cardControls.start({
+          x: tapX,
+          y: tapYBounce,
+          scale: 0.85,
+          rotate: 0,
+          transition: { duration: 0.2 }
+        })
+        
+        if (!isMounted || !canAnimateRef.current) return
+        
+        await cardControls.start({
+          x: tapX,
+          y: tapY,
+          scale: 0.9,
+          rotate: 0,
+          transition: { duration: 0.2 }
+        })
+        
+        if (!isMounted || !canAnimateRef.current) return
+        
+        // Phone lights up
+        await phoneControls.start({
+          scale: 1.05,
+          transition: { duration: 0.3 }
+        })
+        
+        if (!isMounted || !canAnimateRef.current) return
+        
+        // Profile appears
+        profileControls.start({
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.5, ease: "easeOut" }
+        })
+        
+        // Phone returns to normal
+        phoneControls.start({
+          scale: 1,
+          transition: { duration: 0.3, delay: 0.2 }
+        })
+        
+        // Card returns to original position (phone TOP)
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        
+        if (!isMounted || !canAnimateRef.current) return
+        
+        cardControls.start({
+          x: initialX,
+          y: initialY,  // -50: Back to initial position (above phone top)
+          scale: 1,
+          rotate: 0,
+          transition: { duration: 0.6, ease: "easeInOut" }
+        })
+        
+        // Reset profile
+        profileControls.start({
+          opacity: 0,
+          y: 20,
+          transition: { duration: 0.3 }
+        })
+      }
+      
+      sequence()
+      
+      intervalId = setInterval(() => {
+        if (isMounted && canAnimateRef.current) {
+          sequence()
+        }
+      }, 5000)
+    }
+    
+    checkAndStart()
+    
+    return () => {
+      if (checkTimeout) clearTimeout(checkTimeout)
+      if (intervalId) clearInterval(intervalId)
+      canAnimateRef.current = false
+    }
+  }, [inView, isMounted, cardControls, phoneControls, profileControls])
+
+  return (
+    <div ref={containerRef} className="relative w-full h-full min-h-[150px] flex items-center justify-center overflow-visible px-2">
+      {/* Phone - Using Dashboard Preview Frame */}
+      <motion.div
+        animate={phoneControls}
+        className="relative z-10"
+      >
+        <div className='rounded-[2.5rem] border-8 border-gray-900 bg-gray-900 overflow-hidden shadow-2xl scale-[0.5]' style={{ width: '375px', maxWidth: '100%', height: '750px', transformOrigin: 'top center' }}>
+          {/* Scrollable Content Area */}
+          <div className='bg-black overflow-y-auto scrollbar-hide relative' style={{ height: '750px' }}>
+            {/* Default Screen (when profile not showing) */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center md:text-left mt-0"
+              initial={{ opacity: 1 }}
+              animate={{
+                opacity: [1, 0, 0, 1]
+              }}
+              transition={{
+                duration: 5,
+                times: [0, 0.2, 0.8, 1],
+                repeat: Infinity,
+                repeatDelay: 0
+              }}
+              className="absolute inset-0 h-full flex items-center justify-center"
             >
-              <div className="inline-block mb-6">
-                <span className="text-sm font-mono text-purple-400 tracking-wider uppercase">Since 2024</span>
+              <div className="text-center">
+                <div className="w-24 h-24 rounded-full bg-gray-800 mx-auto mb-6 flex items-center justify-center">
+                  <Smartphone className="h-12 w-12 text-gray-600" />
+                </div>
+                <div className="text-gray-600 text-base">Tap NFC card</div>
               </div>
-              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                We build
-                <br />
-                <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_ease_infinite]">
-                  digital bridges
-                </span>
-              </h1>
-              <p className="text-xl text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0">
-                Transforming how professionals connect through innovative NFC technology. 
-                No more lost business cards, no more outdated contact info.
-              </p>
             </motion.div>
             
+            {/* Profile Content - Same as desktop */}
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
+              animate={profileControls}
+              initial={{ opacity: 0, y: 20 }}
+              className="absolute inset-0 w-full"
             >
-              <NFCTapAnimation />
+              <div className="h-full bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-full">
+                {/* Header with Gradient */}
+                <div className="relative h-40 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 overflow-visible">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.2)_100%)]"></div>
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 text-center">
+                    <div className="relative w-24 h-24 rounded-full bg-white border-4 border-white shadow-2xl mx-auto overflow-hidden ring-4 ring-purple-500/20">
+                      <Image
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces"
+                        alt="Profile"
+                        fill
+                        className="object-cover object-center"
+                        unoptimized
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="px-5 pt-24 pb-6">
+                  <div className="text-center mb-6">
+                    <h3 className="text-white font-bold text-2xl mb-1.5">John Doe</h3>
+                    <p className="text-gray-300 text-sm font-medium">Software Engineer</p>
+                    <p className="text-gray-500 text-xs mt-1">San Francisco, CA</p>
+                  </div>
+                  
+                  <div className="space-y-2.5 mb-5">
+                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5 hover:bg-white/10 hover:border-white/20 transition-all shadow-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center border border-purple-500/40 shrink-0 shadow-md">
+                          <Mail className="w-5 h-5 text-purple-300" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-gray-400 text-[10px] mb-0.5 font-medium uppercase tracking-wide">Email</div>
+                          <div className="text-white text-sm font-semibold truncate">john@example.com</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5 hover:bg-white/10 hover:border-white/20 transition-all shadow-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/30 to-cyan-500/30 flex items-center justify-center border border-blue-500/40 shrink-0 shadow-md">
+                          <Phone className="w-5 h-5 text-blue-300" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-gray-400 text-[10px] mb-0.5 font-medium uppercase tracking-wide">Phone</div>
+                          <div className="text-white text-sm font-semibold truncate">+1 (234) 567-8900</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-5">
+                    <div className="text-gray-400 text-xs mb-3 font-semibold uppercase tracking-wider text-center">Connect</div>
+                    <div className="grid grid-cols-3 gap-2.5">
+                      {[
+                        { icon: Linkedin, color: 'from-blue-600 to-blue-700', bg: 'bg-blue-500/20', border: 'border-blue-500/30' },
+                        { icon: Twitter, color: 'from-sky-500 to-sky-600', bg: 'bg-sky-500/20', border: 'border-sky-500/30' },
+                        { icon: Github, color: 'from-gray-700 to-gray-800', bg: 'bg-gray-700/20', border: 'border-gray-700/30' },
+                        { icon: Instagram, color: 'from-pink-500 to-purple-600', bg: 'bg-pink-500/20', border: 'border-pink-500/30' },
+                        { icon: Facebook, color: 'from-blue-600 to-blue-700', bg: 'bg-blue-600/20', border: 'border-blue-600/30' },
+                        { icon: Globe, color: 'from-purple-500 to-indigo-600', bg: 'bg-purple-500/20', border: 'border-purple-500/30' }
+                      ].map((social, i) => {
+                        const Icon = social.icon
+                        return (
+                          <div key={i} className={`aspect-square ${social.bg} backdrop-blur-sm border ${social.border} rounded-xl flex items-center justify-center hover:bg-white/10 hover:scale-105 transition-all shadow-md cursor-pointer`}>
+                            <Icon className={`w-5 h-5 text-white`} />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  
+                  <button className="w-full mt-3 py-3.5 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 rounded-xl text-white font-bold text-sm hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2">
+                    <span>Save Contact</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
-      </section>
+      </motion.div>
+      
+      {/* NFC Card - Mobile optimized */}
+      <motion.div
+        animate={cardControls}
+        initial={{ 
+          x: 0, 
+          y: -50,  // Card starts above phone top
+          scale: 1, 
+          rotate: 0 
+        }}
+        className="absolute left-1/2 top-0 z-20"
+        style={{ transform: 'translateX(-50%)', maxWidth: 'calc(100vw - 2rem)' }}
+      >
+        <div className="relative w-48 h-32 bg-white rounded-xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden">
+          {/* Card Content - Split Layout */}
+          <div className="relative h-full flex items-center gap-2 p-2 z-10">
+            {/* Left Side - NFC Logo Box */}
+            <div className="w-16 h-16 bg-black rounded-lg flex flex-col items-center justify-center shrink-0">
+              {/* NFC Waves Icon */}
+              <div className="flex flex-col items-center gap-1 mb-1">
+                <div className="flex gap-0.5">
+                  <div className="w-1 h-1 bg-white rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                  <div className="w-1 h-1 bg-white rounded-full"></div>
+                </div>
+                <div className="flex gap-0.5">
+                  <div className="w-1 h-1 bg-white rounded-full"></div>
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-1 h-1 bg-white rounded-full"></div>
+                </div>
+                <div className="flex gap-0.5">
+                  <div className="w-1 h-1 bg-white rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                  <div className="w-1 h-1 bg-white rounded-full"></div>
+                </div>
+              </div>
+              {/* NFC Text */}
+              <div className="text-white text-[6px] font-semibold tracking-wide mt-1">NFC</div>
+            </div>
+            
+            {/* Right Side - User Info */}
+            <div className="flex-1 flex flex-col justify-center h-full min-w-0">
+              <div className="space-y-0.5">
+                {/* Name */}
+                <div className="text-gray-900 text-sm font-bold leading-tight truncate">John Doe</div>
+                {/* Designation */}
+                <div className="text-gray-600 text-[10px] font-medium leading-tight truncate">Software Engineer</div>
+                {/* Email */}
+                <div className="text-gray-700 text-[8px] font-normal leading-tight mt-1 truncate">john@example.com</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Tap Glow Effect */}
+          {isTapped && (
+            <motion.div
+              initial={{ scale: 1, opacity: 0.8 }}
+              animate={{ scale: 1.5, opacity: 0 }}
+              className="absolute inset-0 rounded-xl bg-purple-500/40"
+            />
+          )}
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+// Product Ecosystem Cards Data
+const ecosystemCards = [
+  {
+    id: 1,
+    title: 'NFC Smart Cards',
+    subtitle: 'Instant Connection',
+    image: '/nfc.webp',
+    badge: { icon: Smartphone, text: 'Tap to Connect', color: 'purple' },
+    heading: 'Share your digital profile instantly!',
+    description: 'Premium physical NFC cards that instantly share your digital profile with a simple tap. No apps needed, no batteries required. Works with any NFC-enabled smartphone to create seamless connections.',
+    buttonText: 'EXPLORE CARDS',
+    gradient: 'from-purple-600 to-purple-700',
+    badgeBg: 'bg-purple-800/50',
+    badgeBorder: 'border-purple-400/30'
+  },
+  {
+    id: 2,
+    title: 'Multiple Profiles',
+    subtitle: 'Flexibility',
+    image: '/nfc.webp',
+    badge: { icon: Users, text: 'Multi-Profile', color: 'blue' },
+    heading: 'Create separate profiles for different roles!',
+    description: 'Manage multiple professional profiles from one account. Switch between personal, business, or industry-specific profiles effortlessly. Perfect for professionals who wear multiple hats.',
+    buttonText: 'MANAGE PROFILES',
+    gradient: 'from-blue-600 to-blue-700',
+    badgeBg: 'bg-blue-800/50',
+    badgeBorder: 'border-blue-400/30'
+  },
+  {
+    id: 3,
+    title: 'Forever Updates',
+    subtitle: 'Always Current',
+    image: '/nfc.webp',
+    badge: { icon: Zap, text: 'Auto-Sync', color: 'indigo' },
+    heading: 'Your contacts always have your latest info!',
+    description: 'Update your profile once, and all previous connections automatically receive your latest details. No need to re-share cards or worry about outdated contact information. Your network stays current automatically.',
+    buttonText: 'UPDATE NOW',
+    gradient: 'from-indigo-600 to-indigo-700',
+    badgeBg: 'bg-indigo-800/50',
+    badgeBorder: 'border-indigo-400/30'
+  },
+  {
+    id: 4,
+    title: 'Share Everywhere',
+    subtitle: 'Universal Access',
+    image: '/nfc.webp',
+    badge: { icon: Share2, text: 'Multi-Channel', color: 'pink' },
+    heading: 'Share your profile however works best!',
+    description: 'NFC tap, QR codes, direct links, or social media—share your profile through any channel. Your contacts can access your information instantly, whether they tap your card or scan a QR code.',
+    buttonText: 'GET SHARING',
+    gradient: 'from-pink-600 to-pink-700',
+    badgeBg: 'bg-pink-800/50',
+    badgeBorder: 'border-pink-400/30'
+  }
+]
+
+// Product Ecosystem Section Component
+function ProductEcosystemSection() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const intervalRef = useRef(null)
+
+  const currentCard = ecosystemCards[currentIndex]
+  const totalCards = ecosystemCards.length
+
+  // Auto-change cards
+  useEffect(() => {
+    if (!isAutoPlaying) return
+
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % totalCards)
+    }, 5000) // Change every 5 seconds
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [isAutoPlaying, totalCards])
+
+  const goToNext = () => {
+    setIsAutoPlaying(false)
+    setCurrentIndex((prev) => (prev + 1) % totalCards)
+    // Resume auto-play after 10 seconds
+    setTimeout(() => setIsAutoPlaying(true), 10000)
+  }
+
+  const goToPrevious = () => {
+    setIsAutoPlaying(false)
+    setCurrentIndex((prev) => (prev - 1 + totalCards) % totalCards)
+    // Resume auto-play after 10 seconds
+    setTimeout(() => setIsAutoPlaying(true), 10000)
+  }
+
+  const goToCard = (index) => {
+    setIsAutoPlaying(false)
+    setCurrentIndex(index)
+    // Resume auto-play after 10 seconds
+    setTimeout(() => setIsAutoPlaying(true), 10000)
+  }
+
+  const BadgeIcon = currentCard.badge.icon
+
+  return (
+    <section className="py-12 md:py-24 px-4 md:px-4 relative">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-900/5 blur-3xl"></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="mb-12 md:mb-20">
+          <div className="inline-flex items-center gap-2 mb-3 md:mb-4">
+            <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-blue-500 to-purple-500"></div>
+            <span className="text-xs md:text-sm font-semibold text-blue-400 uppercase tracking-wider">Product Ecosystem</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 md:mb-6 leading-tight">
+            {currentCard.title.includes('(') 
+              ? currentCard.title.split('(')[0].trim()
+              : currentCard.title.split(' ').slice(0, -1).join(' ')}
+            <br />
+            <span className="text-gray-400">{currentCard.subtitle}</span>
+          </h2>
+        </div>
+        
+        {/* Split Layout: Image Left, Text Right */}
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+          {/* Left Side - Image with Modern Mask */}
+          <motion.div
+            key={`image-${currentIndex}`}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="relative w-full"
+          >
+            <div className="relative bg-white rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl">
+              {/* Wavy Top Edge Mask with Organic Shape */}
+              <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px]">
+                <div 
+                  className="relative w-full h-full bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50"
+                  style={{
+                    clipPath: 'polygon(0 8%, 3% 4%, 8% 5%, 12% 3%, 18% 5%, 22% 2%, 28% 4%, 32% 1%, 38% 3%, 42% 1%, 48% 3%, 52% 1%, 58% 3%, 62% 1%, 68% 3%, 72% 2%, 78% 4%, 82% 1%, 88% 3%, 92% 2%, 97% 4%, 100% 0%, 100% 100%, 0 100%)'
+                  }}
+                >
+                  <Image
+                    src={currentCard.image}
+                    alt={currentCard.title}
+                    fill
+                    className="object-cover"
+                  />
+                  {/* Decorative gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10"></div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Right Side - Text Content */}
+          <motion.div
+            key={`content-${currentIndex}`}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="space-y-6"
+          >
+            {/* Automation Description */}
+            <div className="mb-6 md:mb-8">
+              <p className="text-base md:text-lg text-gray-400 leading-relaxed">
+                Don't waste time exchanging outdated business cards.
+                <br className="hidden sm:inline" />
+                Let NFC technology do it for you. Simplify
+                <br className="hidden sm:inline" />
+                networking, reduce errors, and stay connected.
+              </p>
+            </div>
+            
+            {/* Feature Card */}
+            <div className="relative">
+              {/* Dynamic Bubble Card with Wavy Top */}
+              <div 
+                className={`relative bg-gradient-to-br ${currentCard.gradient} rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl overflow-hidden`}
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 100% 85%, 98% 90%, 95% 95%, 90% 98%, 0 100%)'
+                }}
+              >
+                {/* Badge */}
+                <div className={`inline-flex items-center gap-2 mb-4 md:mb-6 px-3 md:px-4 py-1.5 md:py-2 ${currentCard.badgeBg} rounded-full backdrop-blur-sm border ${currentCard.badgeBorder}`}>
+                  <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-white/20 flex items-center justify-center">
+                    <BadgeIcon className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
+                  </div>
+                  <span className="text-white text-xs md:text-sm font-semibold">{currentCard.badge.text}</span>
+                </div>
+                
+                {/* Content */}
+                <div className="space-y-3 md:space-y-4 text-white">
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">
+                    {currentCard.heading}
+                  </h3>
+                  <p className="text-white/90 text-sm md:text-base leading-relaxed">
+                    {currentCard.description}
+                  </p>
+                </div>
+                
+                {/* Navigation Footer */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 md:mt-8 pt-4 md:pt-6 border-t border-white/20">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <div className="text-white/60 text-xs md:text-sm font-medium">
+                      {currentIndex + 1}/{totalCards}
+                    </div>
+                    {/* Navigation Buttons */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={goToPrevious}
+                        className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all backdrop-blur-sm"
+                        aria-label="Previous card"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" />
+                      </button>
+                      <button
+                        onClick={goToNext}
+                        className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all backdrop-blur-sm"
+                        aria-label="Next card"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" />
+                      </button>
+                    </div>
+                  </div>
+                  <button className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-black/30 hover:bg-black/40 rounded-xl text-white text-sm md:text-base font-semibold transition-all backdrop-blur-sm w-full sm:w-auto justify-center">
+                    {currentCard.buttonText}
+                    <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Card Indicators */}
+            <div className="flex items-center justify-center gap-2 mt-6">
+              {ecosystemCards.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToCard(index)}
+                  className={`h-2 rounded-full transition-all ${
+                    index === currentIndex
+                      ? 'w-8 bg-white'
+                      : 'w-2 bg-white/30 hover:bg-white/50'
+                  }`}
+                  aria-label={`Go to card ${index + 1}`}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default function AboutPage() {
+  return (
+    <div className="bg-bG min-h-screen pt-20 md:pt-28 lg:pt-24 pb-8 md:pb-16 overflow-x-hidden">
+      {/* Hero - Separate components for Desktop and Mobile */}
+      <MobileHero />
+      <DesktopHero />
 
       {/* Brand Story - Split Layout */}
-      <section className="pt-8 pb-24 px-4 relative">
+      <section className="-mt-40 md:mt-0 pt-0 md:pt-0 pb-8 md:pb-24 px-4 md:px-4 relative">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-0 right-1/4 w-72 h-72 bg-purple-900/5 blur-3xl"></div>
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col lg:flex-row gap-16 items-center">
+          <div className="flex flex-col lg:flex-row gap-8 md:gap-16 items-center">
             {/* Left - Content */}
-            <div className="flex-1 space-y-8">
+            <div className="flex-1 space-y-6 md:space-y-8 w-full">
               <div>
-                <div className="inline-flex items-center gap-2 mb-4">
-                  <div className="w-1 h-8 bg-gradient-to-b from-purple-500 to-blue-500"></div>
-                  <span className="text-sm font-semibold text-purple-400 uppercase tracking-wider">Brand Story</span>
+                <div className="inline-flex items-center gap-2 mb-3 md:mb-4">
+                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-purple-500 to-blue-500"></div>
+                  <span className="text-xs md:text-sm font-semibold text-purple-400 uppercase tracking-wider">Brand Story</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 md:mb-6 leading-tight">
                   Started with a
                   <br />
                   simple question
                 </h2>
-                <p className="text-lg text-gray-400 leading-relaxed mb-6">
+                <p className="text-base md:text-lg text-gray-400 leading-relaxed mb-4 md:mb-6">
                   Why are we still exchanging paper cards in 2024? That question led us to build Widely—a platform 
                   that makes networking instant, digital, and permanent.
                 </p>
-                <p className="text-lg text-gray-400 leading-relaxed">
+                <p className="text-base md:text-lg text-gray-400 leading-relaxed">
                   We're not just selling NFC cards. We're reimagining how professionals connect, share, and grow 
                   their networks. Every feature we build, every card we ship, is designed with one goal: make 
                   networking effortless.
@@ -406,27 +1100,27 @@ export default function AboutPage() {
               </div>
               
               {/* Stats - Horizontal */}
-              <div className="flex flex-wrap gap-8 pt-8 border-t border-white/10">
+              <div className="flex flex-wrap gap-6 md:gap-8 pt-6 md:pt-8 border-t border-white/10">
                 <div>
-                  <div className="text-4xl font-bold text-white mb-1">10K+</div>
-                  <div className="text-sm text-gray-500">Active users</div>
+                  <div className="text-3xl md:text-4xl font-bold text-white mb-1">10K+</div>
+                  <div className="text-xs md:text-sm text-gray-500">Active users</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-bold text-white mb-1">50K+</div>
-                  <div className="text-sm text-gray-500">Cards shipped</div>
+                  <div className="text-3xl md:text-4xl font-bold text-white mb-1">50K+</div>
+                  <div className="text-xs md:text-sm text-gray-500">Cards shipped</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-bold text-white mb-1">99.9%</div>
-                  <div className="text-sm text-gray-500">Uptime</div>
+                  <div className="text-3xl md:text-4xl font-bold text-white mb-1">99.9%</div>
+                  <div className="text-xs md:text-sm text-gray-500">Uptime</div>
                 </div>
               </div>
             </div>
             
             {/* Right - Visual Element */}
-            <div className="lg:w-96 shrink-0">
+            <div className="w-full lg:w-96 shrink-0">
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-3xl blur-xl"></div>
-                <div className="relative bg-[#eee0ff08] border border-white/10 rounded-3xl p-8 backdrop-blur-sm">
+                <div className="relative bg-[#eee0ff08] border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-sm">
                   <div className="space-y-6">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
@@ -451,143 +1145,23 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Product Ecosystem - Asymmetric Layout */}
-      <section className="py-24 px-4 relative">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-900/5 blur-3xl"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="mb-20">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-500"></div>
-              <span className="text-sm font-semibold text-blue-400 uppercase tracking-wider">Product Ecosystem</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              Built for professionals
-              <br />
-              <span className="text-gray-400">who need more</span>
-            </h2>
-          </div>
-          
-          {/* Asymmetric Feature Layout */}
-          <div className="space-y-8">
-            {/* Row 1 - Large Left, Small Right */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="md:col-span-2 group"
-              >
-                <div className="relative h-full bg-[#eee0ff08] border border-white/10 rounded-3xl p-10 backdrop-blur-sm hover:border-white/20 transition-all">
-                  <h3 className="text-2xl font-bold text-white mb-3">NFC Cards</h3>
-                  <p className="text-gray-400 text-lg leading-relaxed mb-4">
-                    Premium physical cards that instantly share your digital profile. Tap to connect, no apps needed.
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>• Instant sharing</span>
-                    <span>• No batteries</span>
-                    <span>• Works with any phone</span>
-                  </div>
-                </div>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="group"
-              >
-                <div className="relative h-full bg-[#eee0ff08] border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-                  <h3 className="text-xl font-bold text-white mb-3">Multiple Profiles</h3>
-                  <p className="text-gray-400 leading-relaxed">
-                    Create separate profiles for different roles, industries, or purposes.
-                  </p>
-                </div>
-              </motion.div>
-            </div>
-            
-            {/* Row 2 - Small Left, Large Right */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="group"
-              >
-                <div className="relative h-full bg-[#eee0ff08] border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-                  <h3 className="text-xl font-bold text-white mb-3">Resumes & CVs</h3>
-                  <p className="text-gray-400 leading-relaxed">
-                    Professional templates tailored for your industry and role.
-                  </p>
-                </div>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="md:col-span-2 group"
-              >
-                <div className="relative h-full bg-[#eee0ff08] border border-white/10 rounded-3xl p-10 backdrop-blur-sm hover:border-white/20 transition-all">
-                  <h3 className="text-2xl font-bold text-white mb-3">Share Everywhere</h3>
-                  <p className="text-gray-400 text-lg leading-relaxed mb-4">
-                    QR codes, direct links, social media—share your profile however works best for you.
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>• QR codes</span>
-                    <span>• Custom links</span>
-                    <span>• Social integration</span>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-            
-            {/* Row 3 - Three Equal Cards */}
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { icon: Layers, title: 'Multiple Themes', desc: 'Choose from professional themes that match your style', color: 'purple' },
-                { icon: TrendingUp, title: 'Analytics', desc: 'See who viewed your profile and when', color: 'blue' },
-                { icon: Sparkles, title: 'Customization', desc: 'Make it yours with colors, layouts, and branding', color: 'purple' }
-              ].map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: idx * 0.15 }}
-                  className="group"
-                >
-                  <div className="relative h-full bg-[#eee0ff08] border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-                    <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                    <p className="text-gray-400 leading-relaxed">{item.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Product Ecosystem - Image & Text Layout with Auto-Changing Cards */}
+      <ProductEcosystemSection />
 
       {/* Technology & Innovation - Feature Focus */}
-      <section className="py-24 px-4 relative">
+      <section className="py-12 md:py-24 px-4 md:px-4 relative">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/3 -right-32 w-96 h-96 bg-purple-900/5 blur-3xl"></div>
           <div className="absolute bottom-1/3 -left-32 w-96 h-96 bg-blue-900/5 blur-3xl"></div>
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="mb-20">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-1 h-8 bg-gradient-to-b from-purple-500 via-blue-500 to-purple-500"></div>
-              <span className="text-sm font-semibold text-purple-400 uppercase tracking-wider">Technology & Innovation</span>
+          <div className="mb-12 md:mb-20">
+            <div className="inline-flex items-center gap-2 mb-3 md:mb-4">
+              <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-purple-500 via-blue-500 to-purple-500"></div>
+              <span className="text-xs md:text-sm font-semibold text-purple-400 uppercase tracking-wider">Technology & Innovation</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 md:mb-6 leading-tight">
               The tech behind
               <br />
               <span className="text-gray-400">every connection</span>
@@ -595,7 +1169,7 @@ export default function AboutPage() {
           </div>
           
           {/* Main Feature - NFC Technology */}
-          <div className="mb-12">
+          <div className="mb-8 md:mb-12">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -604,18 +1178,18 @@ export default function AboutPage() {
               className="relative"
             >
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-blue-500/30 rounded-3xl blur-xl"></div>
-              <div className="relative bg-[#eee0ff08] border border-white/10 rounded-3xl p-10 md:p-12 backdrop-blur-sm">
-                <div className="flex flex-col md:flex-row items-start gap-8">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shrink-0">
-                    <Cpu className="h-10 w-10 text-white" />
+              <div className="relative bg-[#eee0ff08] border border-white/10 rounded-3xl p-6 md:p-10 lg:p-12 backdrop-blur-sm">
+                <div className="flex flex-col md:flex-row items-start gap-6 md:gap-8">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shrink-0">
+                    <Cpu className="h-8 w-8 md:h-10 md:w-10 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-3xl font-bold text-white mb-4">NFC Technology</h3>
-                    <p className="text-gray-400 text-lg leading-relaxed mb-6">
+                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">NFC Technology</h3>
+                    <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-4 md:mb-6">
                       We use industry-leading NFC chips with enhanced read/write capabilities and extended range. 
                       Our cards work with any NFC-enabled device—no apps, no setup, just tap and connect.
                     </p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                       <div className="text-sm">
                         <div className="text-white font-semibold mb-1">5cm Range</div>
                         <div className="text-gray-500">Extended tap distance</div>
@@ -636,7 +1210,7 @@ export default function AboutPage() {
           </div>
           
           {/* Secondary Features Grid */}
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {[
               { 
                 icon: Server, 
@@ -665,9 +1239,9 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: idx * 0.15 }}
                 className="group"
               >
-                <div className="relative h-full bg-[#eee0ff08] border border-white/10 rounded-2xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-                  <h3 className="text-xl font-bold text-white mb-3">{tech.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-4">{tech.desc}</p>
+                <div className="relative h-full bg-[#eee0ff08] border border-white/10 rounded-xl md:rounded-2xl p-6 md:p-8 backdrop-blur-sm hover:border-white/20 transition-all">
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">{tech.title}</h3>
+                  <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-3 md:mb-4">{tech.desc}</p>
                   <div className="space-y-2">
                     {tech.stats.map((stat, statIdx) => (
                       <div key={statIdx} className="text-xs text-gray-500 flex items-center gap-2">
@@ -684,7 +1258,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA - Minimal */}
-      <section className="py-24 px-4">
+      <section className="py-12 md:py-24 px-4 md:px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -694,14 +1268,14 @@ export default function AboutPage() {
             className="relative"
           >
             <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-3xl blur-xl"></div>
-            <div className="relative bg-[#eee0ff08] border border-white/10 rounded-3xl p-12 backdrop-blur-sm">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <div className="relative bg-[#eee0ff08] border border-white/10 rounded-2xl md:rounded-3xl p-6 md:p-12 backdrop-blur-sm">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 md:mb-4">
                 Ready to get started?
               </h2>
-              <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
+              <p className="text-gray-400 text-base md:text-lg mb-6 md:mb-8 max-w-xl mx-auto">
                 Join thousands of professionals using Widely to transform their networking.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <Link href="/products">
                   <Button size="lg" className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white w-full sm:w-auto">
                     Explore products
@@ -721,3 +1295,4 @@ export default function AboutPage() {
     </div>
   )
 }
+ 
