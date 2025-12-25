@@ -16,8 +16,14 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter()
 
   // Initialize axios instance
+  // Normalize base URL to remove trailing slashes
+  const getBaseURL = () => {
+    const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://103.98.76.142/api';
+    return url.replace(/\/+$/, ""); // Remove trailing slashes
+  };
+  
   const authAxios = axios.create({
-    baseURL: 'http://103.98.76.142//api',
+    baseURL: getBaseURL(),
     headers: {
       'Content-Type': 'application/json'
     }
@@ -38,6 +44,15 @@ export const AuthProvider = ({ children }) => {
     config => {
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`
+      }
+      // Normalize URL to prevent double slashes (preserve http:// or https://)
+      if (config.baseURL && config.url) {
+        // Remove trailing slash from baseURL and leading slash from url, then combine
+        const base = config.baseURL.replace(/\/+$/, "");
+        const path = config.url.replace(/^\/+/, "");
+        // Reconstruct to ensure no double slashes
+        config.url = `/${path}`;
+        config.baseURL = base;
       }
       return config
     },

@@ -1,7 +1,12 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://103.98.76.142//api";
+// Normalize base URL to remove trailing slashes
+const getBaseURL = () => {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL || "http://103.98.76.142/api";
+  return url.replace(/\/+$/, ""); // Remove trailing slashes
+};
+
+const API_BASE_URL = getBaseURL();
 
 function getStored(key) {
   if (typeof window === "undefined") return null;
@@ -33,6 +38,15 @@ api.interceptors.request.use((config) => {
     config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // Normalize URL to prevent double slashes (preserve http:// or https://)
+  if (config.baseURL && config.url) {
+    // Remove trailing slash from baseURL and leading slash from url, then combine
+    const base = config.baseURL.replace(/\/+$/, "");
+    const path = config.url.replace(/^\/+/, "");
+    // Reconstruct to ensure no double slashes
+    config.url = `/${path}`;
+    config.baseURL = base;
+  }
   return config;
 });
 
@@ -56,11 +70,8 @@ api.interceptors.response.use(
 
     try {
       if (!refreshPromise) {
-        refreshPromise = axios.post(
-          `${API_BASE_URL}/auth/token/refresh/`,
-          { refresh },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        // Use the api instance instead of raw axios to ensure proper URL handling
+        refreshPromise = api.post('/auth/token/refresh/', { refresh });
       }
 
       const { data } = await refreshPromise;
