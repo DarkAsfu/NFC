@@ -222,13 +222,13 @@ function DesktopNFCTapAnimation() {
       // Loop the animation
       intervalId = setInterval(() => {
         if (isMounted && canAnimateRef.current) {
-          sequence()
+        sequence()
         }
       }, 5000)
     }
-    
+      
     checkAndStart()
-    
+      
     return () => {
       if (checkTimeout) clearTimeout(checkTimeout)
       if (intervalId) clearInterval(intervalId)
@@ -277,6 +277,16 @@ function DesktopNFCTapAnimation() {
               <div className="h-full bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-full">
                 {/* Header with Gradient */}
                 <div className="relative h-40 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 overflow-visible">
+                  {/* Cover Image - Widely Brand */}
+                  <div className="absolute inset-0">
+                    <Image
+                      src="/yearly.jpg"
+                      alt="Widely Brand Cover"
+                      fill
+                      className="object-cover opacity-40"
+                      unoptimized
+                    />
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.2)_100%)]"></div>
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 text-center">
@@ -344,14 +354,14 @@ function DesktopNFCTapAnimation() {
                         return (
                           <div key={i} className={`aspect-square ${social.bg} backdrop-blur-sm border ${social.border} rounded-xl flex items-center justify-center hover:bg-white/10 hover:scale-105 transition-all shadow-md cursor-pointer`}>
                             <Icon className={`w-5 h-5 text-white`} />
-                          </div>
+                        </div>
                         )
                       })}
                     </div>
                   </div>
                   
                   {/* Action Button */}
-                  <button className="w-full mt-3 py-3.5 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 rounded-xl text-white font-bold text-sm hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2">
+                  <button className="w-full mt-3 py-3.5 bg-purple-600 rounded-xl text-white font-bold text-sm hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2">
                     <span>Save Contact</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -652,6 +662,16 @@ function MobileNFCTapAnimation() {
               <div className="h-full bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-full">
                 {/* Header with Gradient */}
                 <div className="relative h-40 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 overflow-visible">
+                  {/* Cover Image - Widely Brand */}
+        <div className="absolute inset-0">
+                    <Image
+                      src="/yearly.jpg"
+                      alt="Widely Brand Cover"
+                      fill
+                      className="object-cover opacity-40"
+                      unoptimized
+                    />
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.2)_100%)]"></div>
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 text-center">
@@ -665,8 +685,8 @@ function MobileNFCTapAnimation() {
                       />
                     </div>
                   </div>
-                </div>
-                
+        </div>
+        
                 {/* Content */}
                 <div className="px-5 pt-24 pb-6">
                   <div className="text-center mb-6">
@@ -722,7 +742,7 @@ function MobileNFCTapAnimation() {
                     </div>
                   </div>
                   
-                  <button className="w-full mt-3 py-3.5 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 rounded-xl text-white font-bold text-sm hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2">
+                  <button className="w-full mt-3 py-3.5 bg-purple-600 rounded-xl text-white font-bold text-sm hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2">
                     <span>Save Contact</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -734,7 +754,7 @@ function MobileNFCTapAnimation() {
       </motion.div>
       
       {/* NFC Card - Mobile optimized */}
-      <motion.div
+            <motion.div
         animate={cardControls}
         initial={{ 
           x: 0, 
@@ -934,11 +954,11 @@ function ProductEcosystemSection() {
           {/* Left Side - Image with Modern Mask */}
           <motion.div
             key={`image-${currentIndex}`}
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
             className="relative w-full"
-          >
+            >
             <div className="relative bg-white rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl">
               {/* Wavy Top Edge Mask with Organic Shape */}
               <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px]">
@@ -956,16 +976,16 @@ function ProductEcosystemSection() {
                   />
                   {/* Decorative gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10"></div>
-                </div>
+              </div>
               </div>
             </div>
-          </motion.div>
-          
+            </motion.div>
+            
           {/* Right Side - Text Content */}
-          <motion.div
+            <motion.div
             key={`content-${currentIndex}`}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="space-y-6"
           >
@@ -1054,10 +1074,10 @@ function ProductEcosystemSection() {
                 />
               ))}
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
   )
 }
 
@@ -1295,4 +1315,3 @@ export default function AboutPage() {
     </div>
   )
 }
- 

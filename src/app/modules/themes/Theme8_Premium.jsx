@@ -201,7 +201,7 @@ export function Theme8_Premium({ cover, avatar, user, profile, about, contactInf
         {/* Save Contact Button */}
         <button
           onClick={handleDownloadVCF}
-          className='w-full mt-3 py-3.5 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 rounded-xl text-white font-bold text-sm hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2'
+          className='w-full mt-3 py-3.5 bg-purple-600 rounded-xl text-white font-bold text-sm hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2'
         >
           <span>Save Contact</span>
           <ArrowRight className='w-4 h-4' />

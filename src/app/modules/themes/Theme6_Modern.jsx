@@ -63,16 +63,16 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
 
   return (
     <div className='min-h-screen bg-white w-full overflow-x-hidden'>
-      {/* Split Header Layout - Rounded Vibe */}
-      <div className='w-full flex flex-col md:flex-row relative overflow-hidden'>
-        {/* Left: Profile Section - Matte Color (1/3 width) with Rounded Corners */}
-        <div className='w-full md:w-1/3 p-6 md:p-8 text-white relative min-h-[400px] md:min-h-[500px] flex flex-col rounded-br-[3rem] md:rounded-br-[4rem] overflow-hidden' style={{ backgroundColor: '#d96846' }}>
+      {/* Split Header Layout - Cover Left, Profile Right (Same design everywhere) */}
+      <div className='w-full flex flex-row relative overflow-hidden'>
+        {/* Left: Cover Section - Matte Color (1/3 width) with Rounded Corners */}
+        <div className='w-1/3 p-8 text-white relative min-h-[500px] flex flex-col rounded-br-[4rem] overflow-hidden' style={{ backgroundColor: '#d96846' }}>
           {cover && (
-            <div className='absolute inset-0 rounded-br-[3rem] md:rounded-br-[4rem] overflow-hidden'>
+            <div className='absolute inset-0 rounded-br-[4rem] overflow-hidden'>
               <Image src={cover} alt='Cover' fill className='object-cover opacity-20' unoptimized />
             </div>
           )}
-          <div className='relative z-10 flex flex-col h-full justify-end'>
+          <div className='relative z-10 flex flex-col h-full justify-end pb-8'>
             {/* Contact Icons Only - White Outline Style, Stacked Vertically Top to Bottom */}
             {contactInfo?.length > 0 && (
               <div className='flex flex-col gap-4'>
@@ -101,14 +101,14 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
           </div>
         </div>
 
-        {/* Right: Action Section - White Background (2/3 width) with Rounded Corners */}
-        <div className='w-full md:w-2/3 bg-white p-4 md:p-6 flex flex-col space-y-4 rounded-tl-[3rem] md:rounded-tl-[4rem]'>
+        {/* Right: Profile Section - White Background (2/3 width) with Rounded Corners */}
+        <div className='w-2/3 bg-white p-6 flex flex-col space-y-4 rounded-tl-[4rem]'>
           {/* Profile Picture Card - Wide Rectangle with Rounded Vibe */}
-          <div className='relative w-full h-48 md:h-56 rounded-[2rem] md:rounded-[2.5rem] border-4 border-white shadow-xl overflow-hidden bg-white'>
+          <div className='relative w-full h-56 rounded-[2.5rem] border-4 border-white shadow-xl overflow-hidden bg-white'>
             {avatar ? (
               <Image src={avatar} alt='Profile' fill className='object-cover' unoptimized />
             ) : (
-              <div className='h-full w-full flex items-center justify-center text-white font-bold text-4xl md:text-5xl' style={{ backgroundColor: '#d96846' }}>
+              <div className='h-full w-full flex items-center justify-center text-white font-bold text-5xl' style={{ backgroundColor: '#d96846' }}>
                 {user?.username?.slice(0, 1)?.toUpperCase()}
               </div>
             )}
@@ -116,14 +116,14 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
 
           {/* Name and Bio - Under Profile Picture, Better Alignment */}
           <div className='space-y-1'>
-            <h1 className='text-lg md:text-xl font-black text-gray-900 break-words leading-tight text-center'>
+            <h1 className='text-xl font-black text-gray-900 break-words leading-tight text-center'>
               {user?.first_name || user?.last_name 
                 ? `${user?.first_name || ''} ${user?.last_name || ''}`.trim() 
                 : user?.username || 'Your Name'}
             </h1>
             {/* Bio - Same Design as Profile Type */}
             {profile?.bio && (
-              <p className='text-gray-600 text-xs md:text-sm font-semibold text-center'>{profile.bio}</p>
+              <p className='text-gray-600 text-sm font-semibold text-center'>{profile.bio}</p>
             )}
           </div>
 
@@ -154,7 +154,7 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
           {/* Save Contact Button */}
           <Button 
             onClick={handleDownloadVCF}
-            className='w-full text-white h-12 rounded-2xl font-bold shadow-xl text-sm md:text-base' style={{ backgroundColor: '#d96846' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c55a3a'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d96846'}
+            className='w-full text-white h-12 rounded-2xl font-bold shadow-xl text-base' style={{ backgroundColor: '#d96846' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c55a3a'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d96846'}
           >
             <Save className='h-4 w-4 mr-2' />
             Save Contact
@@ -163,7 +163,7 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
       </div>
 
       {/* Main Content - Single Row Layout */}
-      <div className='w-full px-4 md:px-6 py-6 md:py-8'>
+      <div className='w-full px-6 py-8'>
         <div className='w-full max-w-6xl mx-auto space-y-6'>
           {/* About - Single Row */}
           {about?.bio && (
@@ -187,7 +187,7 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
                 {experiences.map((e) => (
                   <div 
                     key={e.id} 
-                    className='relative pl-6 border-l-3 cursor-pointer rounded-r-2xl p-3 -ml-2 transition-colors' style={{ borderLeftColor: '#d96846' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(217, 104, 70, 0.05)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    className='relative pl-6 border-l-[3px] cursor-pointer rounded-r-2xl p-3 -ml-2 transition-colors' style={{ borderLeftColor: '#d96846' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(217, 104, 70, 0.05)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     onClick={() => openModal(e, 'experience')}
                   >
                     <div className='absolute -left-2 top-4 w-3 h-3 rounded-full border-2 border-white shadow-lg' style={{ backgroundColor: '#d96846' }}></div>
@@ -279,7 +279,7 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
                 {educations.map((ed) => (
                   <div 
                     key={ed.id} 
-                    className='relative pl-6 border-l-3 cursor-pointer rounded-r-2xl p-3 -ml-2 transition-colors' style={{ borderLeftColor: '#d96846' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(217, 104, 70, 0.05)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    className='relative pl-6 border-l-[3px] cursor-pointer rounded-r-2xl p-3 -ml-2 transition-colors' style={{ borderLeftColor: '#d96846' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(217, 104, 70, 0.05)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     onClick={() => openModal(ed, 'education')}
                   >
                     <div className='absolute -left-2 top-4 w-3 h-3 rounded-full border-2 border-white shadow-lg' style={{ backgroundColor: '#d96846' }}></div>
@@ -301,7 +301,7 @@ export function Theme6_Modern({ cover, avatar, user, profile, about, contactInfo
           {portfolios?.length > 0 && (
             <div className='bg-white rounded-3xl p-6 shadow-lg border-2' style={{ borderColor: '#d96846' }}>
               <h3 className='text-lg font-black text-gray-900 mb-4'>Portfolio</h3>
-              <div className='relative'>
+              <div className='relative overflow-hidden'>
                 <div className='overflow-hidden'>
                   <div 
                     className='flex transition-transform duration-300 ease-in-out'
