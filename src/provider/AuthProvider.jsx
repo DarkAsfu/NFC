@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize axios instance
   const authAxios = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api',
+    baseURL: 'http://103.98.76.142//api',
     headers: {
       'Content-Type': 'application/json'
     }
